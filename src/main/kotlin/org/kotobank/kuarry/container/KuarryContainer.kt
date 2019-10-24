@@ -7,30 +7,69 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.SlotItemHandler
-import org.kotobank.kuarry.KuarryMod
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 
 class KuarryContainer(inventoryPlayer: InventoryPlayer, tileEntity: KuarryTileEntity) : Container() {
 
+    companion object {
+        private const val xStart = 8
+
+        private const val inventoryYStart = 84
+        private const val playerInventoryYStart = 144
+        private const val playerHotbarYStart = 202
+
+        private const val slotSize = 18
+    }
+
     init {
         val inventory = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.NORTH)
 
+        // Add all the slots from the kuarry inventory
         for (i in 0 until tileEntity.inventoryHeight) {
             for (j in 0 until tileEntity.inventoryWidth) {
-                KuarryMod.logger.info("$i $j")
                 val positionInInventory = (j * tileEntity.inventoryHeight) + i
 
                 addSlotToContainer(
-                        addSlotToContainer(object : SlotItemHandler(inventory, positionInInventory, 8 + j * 18, 84 + i * 18) {
-                            override fun onSlotChanged() {
-                                tileEntity.markDirty()
-                            }
-                        })
+                        addSlotToContainer(
+                                object : SlotItemHandler(
+                                        inventory,
+                                        positionInInventory,
+                                        xStart + (j * slotSize),
+                                        inventoryYStart + (i * slotSize)
+                                ) {
+                                    override fun onSlotChanged() {
+                                        tileEntity.markDirty()
+                                    }
+                                }
+                        )
                 )
             }
         }
-    }
 
+        // Player inventory size is constant, 3 x 9 + toolbar of width 9
+        val playerInventoryWidth = 9
+        val playerInventoryHeight = 3
+        val playerHotbarSize = 9
+
+        for (i in 0 until playerInventoryHeight) {
+            for (j in 0 until playerInventoryWidth) {
+                // Hotbar is at the beginning of the inventory, need to skip that for now
+                val positionInInventory = ((j * playerInventoryHeight) + i) + playerHotbarSize;
+
+                addSlotToContainer(Slot(
+                        inventoryPlayer,
+                        positionInInventory,
+                        xStart + (j * slotSize),
+                        playerInventoryYStart + (i * slotSize)
+                ))
+            }
+        }
+
+        // Now draw the player's hotbar
+        for (k in 0 until 9) {
+            addSlotToContainer(Slot(inventoryPlayer, k, xStart + (k * slotSize), playerHotbarYStart))
+        }
+    }
 
     override fun canInteractWith(playerIn: EntityPlayer) = true
 
