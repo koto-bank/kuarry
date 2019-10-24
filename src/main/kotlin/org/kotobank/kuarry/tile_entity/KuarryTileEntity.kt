@@ -15,11 +15,19 @@ import org.kotobank.kuarry.KuarryMod
 
 class KuarryTileEntity : TileEntity(), ITickable {
 
+    companion object {
+        internal const val upgradeInventoryWidth = 2
+        internal const val upgradeInventoryHeight = 3
+    }
+
+
     private val energyStorage = EnergyStorage(10000, 32, 32)
 
     internal val inventoryWidth = 9
     internal val inventoryHeight = 3
     private val inventory = ItemStackHandler(inventoryWidth * inventoryHeight) // Chest-sized inventory
+
+    internal val upgradeInventory = ItemStackHandler(upgradeInventoryWidth * upgradeInventoryHeight)
 
     override fun hasCapability(capability: Capability<*>, facing: EnumFacing?) =
         when (capability) {
@@ -43,8 +51,9 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
     override fun readFromNBT(compound: NBTTagCompound) {
         with (compound) {
-            CapabilityEnergy.ENERGY.readNBT(energyStorage, EnumFacing.NORTH, compound.getTag("energy"))
-            inventory.deserializeNBT(compound.getCompoundTag("inventory"))
+            CapabilityEnergy.ENERGY.readNBT(energyStorage, EnumFacing.NORTH, getTag("energy"))
+            inventory.deserializeNBT(getCompoundTag("inventory"))
+            upgradeInventory.deserializeNBT(getCompoundTag("upgrade_inventory"))
         }
 
         super.readFromNBT(compound)
@@ -54,6 +63,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
         with (compound) {
             setTag("energy", CapabilityEnergy.ENERGY.writeNBT(energyStorage, EnumFacing.NORTH)!!)
             setTag("inventory", inventory.serializeNBT())
+            setTag("upgrade_inventory", upgradeInventory.serializeNBT())
         }
 
         return super.writeToNBT(compound)

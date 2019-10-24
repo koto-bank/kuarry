@@ -11,10 +11,12 @@ class KuarryGUIContainer(container: Container, private val inventoryPlayer: Inve
     companion object {
         private val backgroundTexture = ResourceLocation(KuarryMod.MODID, "textures/gui/kuarry.png")
 
+        private const val actualXSize = 231
         private const val actualYSize = 226
     }
 
     init {
+        xSize = actualXSize
         ySize = actualYSize
     }
 

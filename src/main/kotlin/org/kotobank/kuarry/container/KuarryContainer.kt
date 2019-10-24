@@ -18,6 +18,9 @@ class KuarryContainer(inventoryPlayer: InventoryPlayer, tileEntity: KuarryTileEn
         private const val playerInventoryYStart = 144
         private const val playerHotbarYStart = 202
 
+        private const val upgradeInventoryXStart = 190
+        private const val upgradeInventoryYStart = 8
+
         private const val slotSize = 18
     }
 
@@ -68,6 +71,29 @@ class KuarryContainer(inventoryPlayer: InventoryPlayer, tileEntity: KuarryTileEn
         // Now draw the player's hotbar
         for (k in 0 until 9) {
             addSlotToContainer(Slot(inventoryPlayer, k, xStart + (k * slotSize), playerHotbarYStart))
+        }
+
+        // Draw the upgrade inventory
+        val upgradeInventory = tileEntity.upgradeInventory
+        for (i in 0 until KuarryTileEntity.upgradeInventoryHeight) {
+            for (j in 0 until KuarryTileEntity.upgradeInventoryWidth) {
+                val positionInInventory = (j * KuarryTileEntity.upgradeInventoryHeight) + i
+
+                addSlotToContainer(
+                        addSlotToContainer(
+                                object : SlotItemHandler(
+                                        upgradeInventory,
+                                        positionInInventory,
+                                        upgradeInventoryXStart + (j * slotSize),
+                                        upgradeInventoryYStart + (i * slotSize)
+                                ) {
+                                    override fun onSlotChanged() {
+                                        tileEntity.markDirty()
+                                    }
+                                }
+                        )
+                )
+            }
         }
     }
 
