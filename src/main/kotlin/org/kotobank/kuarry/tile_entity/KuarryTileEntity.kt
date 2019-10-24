@@ -17,9 +17,8 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
     private val energyStorage = EnergyStorage(10000, 32, 32)
 
-    val inventoryWidth = 9
-    val inventoryHeight = 3
-
+    internal val inventoryWidth = 9
+    internal val inventoryHeight = 3
     private val inventory = ItemStackHandler(inventoryWidth * inventoryHeight) // Chest-sized inventory
 
     override fun hasCapability(capability: Capability<*>, facing: EnumFacing?) =

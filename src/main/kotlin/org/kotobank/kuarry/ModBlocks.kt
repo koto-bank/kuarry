@@ -17,7 +17,6 @@ object ModBlocks {
 
     @SubscribeEvent
     fun registerBlocks(event: RegistryEvent.Register<Block>) {
-
         val kuarryBlock = KuarryBlock(Material.IRON, "kuarry")
 
         event.registry.registerAll(kuarryBlock)
