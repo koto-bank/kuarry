@@ -1,0 +1,124 @@
+buildscript {
+    ext.kotlin_version = '1.3.50'
+    repositories {
+        jcenter()
+        maven { url 'https://files.minecraftforge.net/maven' }
+        maven { url 'https://maven.shadowfacts.net/' }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.3.50"
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'kotlin'
+
+def mc_version_short = "1.12", mc_version = "${mc_version_short}.2"
+
+version = "0.1"
+group = "org.kotobank.kuarry" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "kuarry_${mc_version}-${version}"
+
+sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+compileJava {
+    sourceCompatibility = targetCompatibility = '1.8'
+}
+
+minecraft {
+    version = "${mc_version}-14.23.5.2847"
+    runDir = "run"
+    
+    // the mappings can be changed at any time, and must be in the following format.
+    // snapshot_YYYYMMDD   snapshot are built nightly.
+    // stable_#            stables are built at the discretion of the MCP team.
+    // Use non-default mappings at your own risk. they may not always work.
+    // simply re-run your setup task after changing the mappings to update your workspace.
+    mappings = "snapshot_20171003"
+    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+}
+
+repositories {
+    jcenter()
+    maven {  url "http://maven.shadowfacts.net/" }
+
+    maven { url = "http://chickenbones.net/maven/" } // CCL
+    maven { url = "http://maven.covers1624.net" } // COFH
+    maven { url = "http://dvs1.progwml6.com/files/maven" } // JEI
+}
+
+def cofh_core_version = "4.6.3.27", cofh_world_version = "1.3.1.7", redstone_flux_version = "2.1.0.6",
+        thermal_foundation_version = "2.6.3.27", thermal_expansion_version = "5.5.4.43",
+        jei_version = "4.15.0.291", ccl_version = "3.2.3.358"
+
+dependencies {
+    compile group: "net.shadowfacts", name: "Forgelin", version: "1.8.4"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+
+    runtime "codechicken:CodeChickenLib:${mc_version}-${ccl_version}:universal"
+    runtime "cofh:RedstoneFlux:${mc_version_short}-${redstone_flux_version}:universal"
+
+    runtime "mezz.jei:jei_${mc_version}:${jei_version}"
+
+    runtime "cofh:CoFHCore:${mc_version}-${cofh_core_version}:universal"
+    runtime "cofh:CoFHWorld:${mc_version}-${cofh_world_version}:universal"
+    runtime "cofh:ThermalFoundation:${mc_version}-${thermal_foundation_version}:universal"
+    runtime "cofh:ThermalExpansion:${mc_version}-${thermal_expansion_version}:universal"
+
+    // you may put jars on which you depend on in ./libs
+    // or you may define them like so..
+    //compile "some.group:artifact:version:classifier"
+    //compile "some.group:artifact:version"
+      
+    // real examples
+    //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
+    //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
+
+    // the 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
+    //provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+    // the deobf configurations:  'deobfCompile' and 'deobfProvided' are the same as the normal compile and provided,
+    // except that these dependencies get remapped to your current MCP mappings
+    //deobfCompile 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+    //deobfProvided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+    // for more info...
+    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
+    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+}
+
+processResources {
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+                
+        // replace version and mcversion
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+        
+    // copy everything else except the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+repositories {
+    mavenCentral()
+}
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}

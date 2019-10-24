@@ -1,0 +1,16 @@
+[
+{
+  "modid": "kuarry",
+  "name": "Kuarry",
+  "description": "A customizable quarry that replaces blocks",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["vaartis"],
+  "credits": "vaartis",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

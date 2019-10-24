@@ -1,0 +1,17 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {
+      "front": "kuarry:block/kuarry_front",
+      "side": "kuarry:block/kuarry_side"
+    }
+  },
+  "variants": {
+    "facing=north":  { "model": "kuarry:kuarry" },
+    "facing=south":  { "model": "kuarry:kuarry", "y": 180, "uvlock": true },
+    "facing=east": { "model": "kuarry:kuarry", "y": 90, "uvlock": true },
+    "facing=west": { "model": "kuarry:kuarry", "y": 270, "uvlock": true },
+
+    "inventory": {"model": "kuarry:kuarry"}
+  }
+}
