@@ -15,8 +15,8 @@ class KuarryContainer(inventoryPlayer: InventoryPlayer, tileEntity: KuarryTileEn
         private const val xStart = 8
 
         private const val inventoryYStart = 84
-        private const val playerInventoryYStart = 144
-        private const val playerHotbarYStart = 202
+        private const val playerInventoryYStart = 145
+        private const val playerHotbarYStart = 203
 
         private const val upgradeInventoryXStart = 190
         private const val upgradeInventoryYStart = 8
