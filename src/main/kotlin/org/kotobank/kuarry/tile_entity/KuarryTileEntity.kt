@@ -21,7 +21,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
     }
 
 
-    private val energyStorage = EnergyStorage(10000, 32, 32)
+    private val energyStorage = EnergyStorage(102400, 1024, 1024)
 
     internal val inventoryWidth = 9
     internal val inventoryHeight = 3
