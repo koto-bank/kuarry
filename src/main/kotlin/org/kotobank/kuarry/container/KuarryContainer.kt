@@ -9,7 +9,7 @@ import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.SlotItemHandler
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 
-class KuarryContainer(inventoryPlayer: InventoryPlayer, tileEntity: KuarryTileEntity) : Container() {
+class KuarryContainer(inventoryPlayer: InventoryPlayer, val tileEntity: KuarryTileEntity) : Container() {
 
     companion object {
         private const val xStart = 8

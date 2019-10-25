@@ -2,6 +2,8 @@ package org.kotobank.kuarry.tile_entity
 
 import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.network.NetworkManager
+import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ITickable
@@ -11,15 +13,17 @@ import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.energy.*
 import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.ItemStackHandler
-import org.kotobank.kuarry.KuarryMod
 
 class KuarryTileEntity : TileEntity(), ITickable {
 
     companion object {
         internal const val upgradeInventoryWidth = 2
         internal const val upgradeInventoryHeight = 3
+
+        internal const val packetEntityID = 0
     }
 
+    private var lastEnergyStored = 0
     private val energyStorage = EnergyStorage(102400, 1024, 1024)
 
     internal val inventoryWidth = 9
@@ -82,6 +86,15 @@ class KuarryTileEntity : TileEntity(), ITickable {
             if (updateCount >= 5) {
                 updateCount = 0
 
+                // If the energy amount changed, send that new amount to the client
+                if (lastEnergyStored != energyStorage.energyStored) {
+                    lastEnergyStored = energyStorage.energyStored
+
+                    val state = world.getBlockState(pos)
+                    world.notifyBlockUpdate(pos, state, state, packetEntityID)
+                    markDirty()
+                }
+
                 val chunk = world.getChunkFromBlockCoords(pos)
 
                 if (!this::currentChunkPos.isInitialized || currentChunkPos != chunk.pos) {
@@ -118,5 +131,18 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 // The exit condition is to not go through bedrock
             }
         }
+    }
+
+    override fun getUpdateTag(): NBTTagCompound {
+        return writeToNBT(NBTTagCompound())
+    }
+
+    override fun getUpdatePacket(): SPacketUpdateTileEntity? {
+        return SPacketUpdateTileEntity(pos, packetEntityID, updateTag)
+    }
+
+    override fun onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity) {
+        super.onDataPacket(net, pkt)
+        handleUpdateTag(pkt.nbtCompound)
     }
 }

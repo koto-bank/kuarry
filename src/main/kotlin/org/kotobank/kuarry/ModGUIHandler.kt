@@ -27,8 +27,7 @@ class ModGUIHandler : IGuiHandler {
     override fun getClientGuiElement(ID: Int, player: EntityPlayer?, world: World?, x: Int, y: Int, z: Int): Any? {
         return when (ID) {
             KUARRY -> KuarryGUIContainer(
-                    getServerGuiElement(ID, player, world, x, y, z)!!,
-                    player!!.inventory
+                    getServerGuiElement(ID, player, world, x, y, z)!!
             )
             else -> null
         }

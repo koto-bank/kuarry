@@ -11,12 +11,9 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumHand
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.text.TextComponentString
 import net.minecraft.world.World
-import net.minecraftforge.energy.CapabilityEnergy
-import net.minecraftforge.energy.EnergyStorage
 import org.kotobank.kuarry.KuarryMod
-import org.kotobank.kuarry.KuarryModGUIHandler
+import org.kotobank.kuarry.ModGUIHandler
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 
 class KuarryBlock(material: Material, registryName: String) : Block(material) {
@@ -45,7 +42,7 @@ class KuarryBlock(material: Material, registryName: String) : Block(material) {
                                   playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing,
                                   hitX: Float, hitY: Float, hitZ: Float): Boolean {
         if (!worldIn.isRemote) {
-            playerIn.openGui(KuarryMod, KuarryModGUIHandler.KUARRY, worldIn, pos.x, pos.y, pos.z)
+            playerIn.openGui(KuarryMod, ModGUIHandler.KUARRY, worldIn, pos.x, pos.y, pos.z)
         }
 
         return true;
