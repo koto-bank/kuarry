@@ -19,7 +19,7 @@ object KuarryMod {
     fun preInit(event: FMLPreInitializationEvent) {
         KuarryMod.logger = event.modLog
 
-        NetworkRegistry.INSTANCE.registerGuiHandler(this, KuarryModGUIHandler())
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, ModGUIHandler())
     }
 
     @EventHandler

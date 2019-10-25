@@ -9,7 +9,7 @@ import org.kotobank.kuarry.container.KuarryContainer
 import org.kotobank.kuarry.container.KuarryGUIContainer
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 
-class KuarryModGUIHandler : IGuiHandler {
+class ModGUIHandler : IGuiHandler {
     companion object {
         val KUARRY = 0
     }
