@@ -21,9 +21,4 @@ object KuarryMod {
 
         NetworkRegistry.INSTANCE.registerGuiHandler(this, ModGUIHandler())
     }
-
-    @EventHandler
-    fun init(event: FMLInitializationEvent) {
-        KuarryMod.logger!!.info("DIRT BLOCK >> {}", Blocks.DIRT.registryName)
-    }
 }
