@@ -1,5 +1,6 @@
 package org.kotobank.kuarry.tile_entity
 
+import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
@@ -51,6 +52,8 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 Blocks.LAVA,
                 Blocks.FLOWING_LAVA
         )
+
+        internal const val baseRequiredEnergy = 1000
     }
 
     private var lastEnergyStored = 0
@@ -139,61 +142,9 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 do {
                     val blockPos = BlockPos(x, y, z)
                     val blockState = chunk.getBlockState(blockPos)
-                    val block = blockState.block
 
-                    val fullBlacklist = hardBlacklistedBlocks + defaultBlacklistedBlocks
-
-
-                    if (block !in fullBlacklist && block !is IFluidBlock) {
-                        KuarryMod.logger.info(blockState.block.localizedName)
-
-                        var drops = NonNullList.create<ItemStack>()
-                        block.getDrops(drops, world, pos, blockState, 0)
-
-                        // Some blocks don't drop anything, so check if there are any drops at all
-                        if (drops.isNotEmpty()) {
-
-                            var allPut = false
-                            slotLoop@ for (i in 0 until inventoryHeight) {
-                                // The width counter, reset every step.
-                                // Not advanced UNLESS the item cannot be put into the slot.
-                                // This ensures that if there are multiple ItemStacks that can be put into the
-                                // same slot, they will be.
-                                var j = 0
-                                while (j < inventoryWidth) {
-                                    val positionInInventory = (j * inventoryHeight) + i
-
-                                    if (inventory.insertItem(positionInInventory, drops.first(), false) == ItemStack.EMPTY) {
-                                        // If the item has successfully been put into the inventory, remove it from the drops list
-                                        drops.removeAt(0)
-
-                                        // Exit when there are no more items
-                                        if (drops.isEmpty()) {
-                                            allPut = true
-                                            break@slotLoop
-                                        }
-                                    } else {
-                                        // The item could not have been put, advance the width slot
-                                        j++
-                                    }
-                                }
-                            }
-                            if (!allPut) {
-                                for (remainingDrop in drops) {
-                                    // If there is no space inside the kuarry, spawn all dropped items
-                                    // as entities in the world on top of the kuarry block
-                                    world.spawnEntity(
-                                            EntityItem(world, pos.x.toDouble(), (pos.y + 1).toDouble(), pos.z.toDouble(), remainingDrop)
-                                    )
-                                }
-                            }
-                        }
-
-                        // TODO: something smart here
-                        world.setBlockState(blockPos, Blocks.STONE.defaultState)
-
-                        break
-                    }
+                    // If the block was successfully mined, stop
+                    if (processBlock(blockPos, blockState)) break
 
                     when {
                         x < currentChunkPos.xEnd ->
@@ -212,6 +163,89 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 // The exit condition is to not go through bedrock
             }
         }
+    }
+
+    /** Processes a single block.
+     *
+     * @return Whether the block was mined or not
+     * */
+    private fun processBlock(blockPos: BlockPos, blockState: IBlockState): Boolean {
+        val block = blockState.block
+
+        val fullBlacklist = hardBlacklistedBlocks + defaultBlacklistedBlocks
+
+        // Skip the block if it's blacklisted or is a fluid
+        if (block in fullBlacklist || block is IFluidBlock) return false
+
+        KuarryMod.logger.info(blockState.block.localizedName)
+
+        // Harvesting something with pick/shovel should not cost more,
+        // otherwise double the energy count
+        val toolHarvestModifier = when (block.getHarvestTool(blockState)) {
+            "pickaxe", "shovel", null -> 1
+            else -> 2
+        }
+        // Don't want to have 0 as a modifier, as it would break the math later on, so make it 1
+        val levelHarvestModifier = block.getHarvestLevel(blockState).let { if (it == 0) 1 else it }
+
+
+        var requiredEnergy = baseRequiredEnergy * toolHarvestModifier * levelHarvestModifier
+
+        // Not enough energy to mine the block, skip it
+        if (energyStorage.energyStored < requiredEnergy) return false
+
+        // Take out all the energy required, in multiple iterations if needed (by subtracting the
+        // already extracted energy from the rest)
+        while (requiredEnergy > 0) {
+            requiredEnergy -= energyStorage.extractEnergy(requiredEnergy, false)
+        }
+
+        var drops = NonNullList.create<ItemStack>()
+        block.getDrops(drops, world, pos, blockState, 0)
+
+        // Some blocks don't drop anything, so check if there are any drops at all
+        if (drops.isNotEmpty()) {
+            var allPut = false
+            slotLoop@ for (i in 0 until inventoryHeight) {
+                // The width counter, reset every step.
+                // Not advanced UNLESS the item cannot be put into the slot.
+                // This ensures that if there are multiple ItemStacks that can be put into the
+                // same slot, they will be.
+                var j = 0
+                while (j < inventoryWidth) {
+                    val positionInInventory = (j * inventoryHeight) + i
+
+                    if (inventory.insertItem(positionInInventory, drops.first(), false) == ItemStack.EMPTY) {
+                        // If the item has successfully been put into the inventory, remove it from the drops list
+                        drops.removeAt(0)
+
+                        // Exit when there are no more items
+                        if (drops.isEmpty()) {
+                            allPut = true
+                            break@slotLoop
+                        }
+                    } else {
+                        // The item could not have been put, advance the width slot
+                        j++
+                    }
+                }
+            }
+            if (!allPut) {
+                for (remainingDrop in drops) {
+                    // If there is no space inside the kuarry, spawn all dropped items
+                    // as entities in the world on top of the kuarry block
+                    world.spawnEntity(
+                            EntityItem(world, pos.x.toDouble(), (pos.y + 1).toDouble(), pos.z.toDouble(), remainingDrop)
+                    )
+                }
+            }
+        }
+
+        // TODO: something smart here
+        world.setBlockState(blockPos, Blocks.STONE.defaultState)
+
+        return true
+
     }
 
     override fun getUpdateTag(): NBTTagCompound {
