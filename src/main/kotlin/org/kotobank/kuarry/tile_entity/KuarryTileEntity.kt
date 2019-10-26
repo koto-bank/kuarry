@@ -1,18 +1,22 @@
 package org.kotobank.kuarry.tile_entity
 
+import net.minecraft.entity.item.EntityItem
 import net.minecraft.init.Blocks
+import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ITickable
+import net.minecraft.util.NonNullList
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.ChunkPos
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.energy.*
 import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.ItemStackHandler
+import org.kotobank.kuarry.KuarryMod
 
 class KuarryTileEntity : TileEntity(), ITickable {
 
@@ -21,6 +25,31 @@ class KuarryTileEntity : TileEntity(), ITickable {
         internal const val upgradeInventoryHeight = 3
 
         internal const val packetEntityID = 0
+
+        /** The blocks that cannot be un-blacklisted by an external filter */
+        private val hardBlacklistedBlocks = listOf(
+                Blocks.BEDROCK,
+                Blocks.AIR
+        )
+
+        /** The default blacklist of blocks */
+        private val defaultBlacklistedBlocks = listOf(
+                Blocks.TALLGRASS,
+                Blocks.GRASS,
+                Blocks.GRASS_PATH,
+                Blocks.DIRT,
+                Blocks.STONE,
+                Blocks.GRAVEL,
+                Blocks.SAND,
+                Blocks.SANDSTONE,
+                Blocks.END_STONE,
+                Blocks.NETHERRACK,
+
+                Blocks.WATER,
+                Blocks.FLOWING_WATER,
+                Blocks.LAVA,
+                Blocks.FLOWING_LAVA
+        )
     }
 
     private var lastEnergyStored = 0
@@ -28,9 +57,10 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
     internal val inventoryWidth = 9
     internal val inventoryHeight = 3
+    internal val inventorySize = inventoryWidth * inventoryHeight
 
     /** A chest-sized inventory for inner item storage */
-    private val inventory = ItemStackHandler(inventoryWidth * inventoryHeight)
+    private val inventory = ItemStackHandler(inventorySize)
 
     /** A small inventory for upgrades not exposed via getCapability */
     internal val upgradeInventory = ItemStackHandler(upgradeInventoryWidth * upgradeInventoryHeight)
@@ -83,7 +113,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
         if (!world.isRemote) {
             updateCount = updateCount.inc()
 
-            if (updateCount >= 5) {
+            if (updateCount >= 50) {
                 updateCount = 0
 
                 // If the energy amount changed, send that new amount to the client
@@ -108,23 +138,72 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 do {
                     val blockPos = BlockPos(x, y, z)
                     val blockState = chunk.getBlockState(blockPos)
+                    val block = blockState.block
 
-                    if (blockState != Blocks.AIR.defaultState && blockState != Blocks.BEDROCK.defaultState) {
-                        world.destroyBlock(blockPos, false)
+                    val fullBlacklist = hardBlacklistedBlocks + defaultBlacklistedBlocks
+
+                    if (block !in fullBlacklist) {
+                        KuarryMod.logger.info(blockState.block.localizedName)
+
+                        var drops = NonNullList.create<ItemStack>()
+                        block.getDrops(drops, world, pos, blockState, 0)
+
+                        // Some blocks don't drop anything, so check if there are any drops at all
+                        if (drops.isNotEmpty()) {
+
+                            var allPut = false
+                            slotLoop@ for (i in 0 until inventoryHeight) {
+                                // The width counter, reset every step.
+                                // Not advanced UNLESS the item cannot be put into the slot.
+                                // This ensures that if there are multiple ItemStacks that can be put into the
+                                // same slot, they will be.
+                                var j = 0
+                                while (j < inventoryWidth) {
+                                    val positionInInventory = (j * inventoryHeight) + i
+
+                                    if (inventory.insertItem(positionInInventory, drops.first(), false) == ItemStack.EMPTY) {
+                                        // If the item has successfully been put into the inventory, remove it from the drops list
+                                        drops.removeAt(0)
+
+                                        // Exit when there are no more items
+                                        if (drops.isEmpty()) {
+                                            allPut = true
+                                            break@slotLoop
+                                        }
+                                    } else {
+                                        // The item could not have been put, advance the width slot
+                                        j++
+                                    }
+                                }
+                            }
+                            if (!allPut) {
+                                for (remainingDrop in drops) {
+                                    // If there is no space inside the kuarry, spawn all dropped items
+                                    // as entities in the world on top of the kuarry block
+                                    world.spawnEntity(
+                                            EntityItem(world, pos.x.toDouble(), (pos.y + 1).toDouble(), pos.z.toDouble(), remainingDrop)
+                                    )
+                                }
+                            }
+                        }
+
+                        // TODO: something smart here
+                        world.setBlockState(blockPos, Blocks.STONE.defaultState)
+
                         break
                     }
 
                     when {
                         x < currentChunkPos.xEnd ->
-                            x = x.inc()
+                            x++
                         z < currentChunkPos.zEnd -> {
                             x = currentChunkPos.xStart
-                            z = z.inc()
+                            z++
                         }
                         else -> {
-                            x = currentChunkPos.xStart
-                            z = currentChunkPos.zStart
-                            y = y.dec()
+                            x++
+                            z++
+                            y--
                         }
                     }
                 } while (y >= 5)
