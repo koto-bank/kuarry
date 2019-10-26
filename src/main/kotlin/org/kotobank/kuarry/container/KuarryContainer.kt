@@ -90,6 +90,11 @@ class KuarryContainer(inventoryPlayer: InventoryPlayer, val tileEntity: KuarryTi
                                     override fun onSlotChanged() {
                                         tileEntity.markDirty()
                                     }
+
+                                    override fun isItemValid(stack: ItemStack): Boolean {
+                                        // TODO: implement checking for upgrades and only accept them
+                                        return false
+                                    }
                                 }
                         )
                 )
