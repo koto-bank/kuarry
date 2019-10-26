@@ -14,6 +14,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.ChunkPos
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.energy.*
+import net.minecraftforge.fluids.IFluidBlock
 import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.ItemStackHandler
 import org.kotobank.kuarry.KuarryMod
@@ -142,7 +143,8 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
                     val fullBlacklist = hardBlacklistedBlocks + defaultBlacklistedBlocks
 
-                    if (block !in fullBlacklist) {
+
+                    if (block !in fullBlacklist && block !is IFluidBlock) {
                         KuarryMod.logger.info(blockState.block.localizedName)
 
                         var drops = NonNullList.create<ItemStack>()
