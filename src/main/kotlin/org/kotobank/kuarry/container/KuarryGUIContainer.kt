@@ -75,6 +75,10 @@ class KuarryGUIContainer(private val container: Container) : GuiContainer(contai
                 }
             }
         }
+
+        // Need to subtract guiLeft/Top here because mouse position is counted from the
+        // beginning of the gui, not from the beginning of the screen
+        renderHoveredToolTip(mouseX - guiLeft, mouseY - guiTop)
     }
 
 
