@@ -18,7 +18,7 @@ import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 
 class KuarryBlock(material: Material, registryName: String) : Block(material) {
     companion object {
-        final val FACING: PropertyDirection =
+        val FACING: PropertyDirection =
                 PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL)
 
         val tileEntityClass = KuarryTileEntity::class.java
