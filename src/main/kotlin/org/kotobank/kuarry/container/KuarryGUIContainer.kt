@@ -80,8 +80,8 @@ class KuarryGUIContainer(private val container: Container) : GuiContainer(contai
 
     private fun drawTooltip(x: Int, y: Int, vararg lines: String) {
         GlStateManager.disableLighting()
-        // TODO: fix tooltip position
-        GuiUtils.drawHoveringText(lines.toList(), x, y, width - guiLeft, height, -1, fontRenderer)
+        // Again here, subtracting guiLeft/Top to translate the coordinates into screen coordinates
+        GuiUtils.drawHoveringText(lines.toList(), x - guiLeft , y - guiTop, mc.displayWidth, mc.displayHeight, -1, fontRenderer)
         GlStateManager.enableLighting()
     }
 }
