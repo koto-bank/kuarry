@@ -12,6 +12,9 @@ import org.kotobank.kuarry.ModIcons
 import org.kotobank.kuarry.ModPackets
 import org.kotobank.kuarry.packet.ChangeKuarryActivationMode
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity.ActivationMode
+import net.minecraft.init.SoundEvents
+import net.minecraft.client.audio.PositionedSoundRecord
+
 
 class KuarryGUIContainer(private val container: Container) : GuiContainer(container) {
     companion object {
@@ -94,11 +97,22 @@ class KuarryGUIContainer(private val container: Container) : GuiContainer(contai
         if (container is KuarryContainer) {
             val te = container.tileEntity
 
-            when {
-                inBounds(guiLeft + redstoneButtonPos.first, guiTop + redstoneButtonPos.second, buttonSize, buttonSize, mouseX, mouseY) ->
+            val buttonPressed = when {
+                inBounds(guiLeft + redstoneButtonPos.first, guiTop + redstoneButtonPos.second, buttonSize, buttonSize, mouseX, mouseY) -> {
                     ModPackets.networkChannel.sendToServer(ChangeKuarryActivationMode(te.pos))
 
-                else -> super.mouseClicked(mouseX, mouseY, mouseButton)
+                    true
+                }
+
+                else -> {
+                    super.mouseClicked(mouseX, mouseY, mouseButton)
+
+                    false
+                }
+            }
+
+            if (buttonPressed) {
+                mc.soundHandler.playSound(PositionedSoundRecord.getRecord(SoundEvents.UI_BUTTON_CLICK, 1f, 0.3f))
             }
         }
     }
