@@ -16,9 +16,20 @@ object KuarryModItems {
 
     @SubscribeEvent
     fun registerItems(event: Register<Item>) {
-        val item = ItemBlock(KuarryModBlocks.kuarry).setRegistryName(KuarryMod.MODID, "kuarry")
-        event.registry.registerAll(item)
 
-        ModelLoader.setCustomModelResourceLocation(item, 0, ModelResourceLocation(item.registryName, "inventory"))
+        listOf(
+                Pair("kuarry", ItemBlock(KuarryModBlocks.kuarry)),
+
+                Pair("kuarry_casing", Item())
+        ).forEach { (name, item) ->
+            item.apply {
+                setRegistryName(KuarryMod.MODID, name)
+                setUnlocalizedName(name)
+
+                event.registry.register(this)
+
+                ModelLoader.setCustomModelResourceLocation(this, 0, ModelResourceLocation(this.registryName!!, "inventory"))
+            }
+        }
     }
 }
