@@ -8,6 +8,10 @@ import net.minecraft.util.ResourceLocation
 import net.minecraftforge.energy.CapabilityEnergy
 import net.minecraftforge.fml.client.config.GuiUtils
 import org.kotobank.kuarry.KuarryMod
+import org.kotobank.kuarry.ModIcons
+import org.kotobank.kuarry.ModPackets
+import org.kotobank.kuarry.packet.ChangeKuarryActivationMode
+import org.kotobank.kuarry.tile_entity.KuarryTileEntity.ActivationMode
 
 class KuarryGUIContainer(private val container: Container) : GuiContainer(container) {
     companion object {
@@ -25,6 +29,9 @@ class KuarryGUIContainer(private val container: Container) : GuiContainer(contai
 
         fun inBounds(x: Int, y: Int, w: Int, h: Int, ox: Int, oy: Int) =
                 ox >= x && ox <= x + w && oy >= y && oy <= y + h
+
+        private val redstoneButtonPos = Pair(10, 10)
+        private const val buttonSize = 16
     }
 
     init {
@@ -40,10 +47,8 @@ class KuarryGUIContainer(private val container: Container) : GuiContainer(contai
         drawDefaultBackground();
 
         mc.textureManager.bindTexture(backgroundTexture)
-        val x = (width - xSize) / 2
-        val y = (height - ySize) / 2
 
-        drawTexturedModalRect(x, y, 0, 0, xSize, ySize)
+        drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize)
 
         if (container is KuarryContainer) {
             val energyCapability = container.tileEntity.getCapability(CapabilityEnergy.ENERGY, EnumFacing.NORTH)
@@ -55,23 +60,26 @@ class KuarryGUIContainer(private val container: Container) : GuiContainer(contai
                 val scaledHeight = ((currentEnergy.toFloat() / maxEnergy.toFloat()) * energyBarHeight).toInt()
 
                 drawTexturedModalRect(
-                        x + energyBarPlaceX, y + energyBarTopY + energyBarHeight - scaledHeight,
+                        guiLeft + energyBarPlaceX, guiTop + energyBarTopY + energyBarHeight - scaledHeight,
                         energyBarTextureX, energyBarTopY + energyBarHeight - scaledHeight,
                         energyBarWidth, scaledHeight
-                        )
+                )
             }
         }
     }
 
     override fun drawGuiContainerForegroundLayer(mouseX: Int, mouseY: Int) {
-        val x = (width - xSize) / 2
-        val y = (height - ySize) / 2
+        if (container is KuarryContainer) {
+            redstoneButtonPos.let {(x, y) ->
+                KuarryRedstoneButton(x, y, mouseX - guiLeft, mouseY - guiTop, this, container.tileEntity.activationMode)
+            }
+        }
 
-        if (inBounds(x + energyBarPlaceX, y + energyBarTopY, energyBarWidth, energyBarHeight, mouseX, mouseY)) {
+        if (inBounds(guiLeft + energyBarPlaceX, guiTop + energyBarTopY, energyBarWidth, energyBarHeight, mouseX, mouseY)) {
             if (container is KuarryContainer) {
                 val energyCapability = container.tileEntity.getCapability(CapabilityEnergy.ENERGY, EnumFacing.NORTH)
                 if (energyCapability != null) {
-                    drawTooltip(mouseX, mouseY, "${energyCapability.energyStored}/${energyCapability.maxEnergyStored}RF")
+                    drawTooltip(mouseX - guiLeft, mouseY - guiTop, "${energyCapability.energyStored}/${energyCapability.maxEnergyStored}RF")
                 }
             }
         }
@@ -81,11 +89,53 @@ class KuarryGUIContainer(private val container: Container) : GuiContainer(contai
         renderHoveredToolTip(mouseX - guiLeft, mouseY - guiTop)
     }
 
+    override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
+
+        if (container is KuarryContainer) {
+            val te = container.tileEntity
+
+            when {
+                inBounds(guiLeft + redstoneButtonPos.first, guiTop + redstoneButtonPos.second, buttonSize, buttonSize, mouseX, mouseY) ->
+                    ModPackets.networkChannel.sendToServer(ChangeKuarryActivationMode(te.pos))
+
+                else -> super.mouseClicked(mouseX, mouseY, mouseButton)
+            }
+        }
+    }
+
 
     private fun drawTooltip(x: Int, y: Int, vararg lines: String) {
         GlStateManager.disableLighting()
         // Again here, subtracting guiLeft/Top to translate the coordinates into screen coordinates
-        GuiUtils.drawHoveringText(lines.toList(), x - guiLeft , y - guiTop, mc.displayWidth, mc.displayHeight, -1, fontRenderer)
+        GuiUtils.drawHoveringText(lines.toList(), x , y, mc.displayWidth, mc.displayHeight, -1, fontRenderer)
         GlStateManager.enableLighting()
+    }
+
+
+    inner class KuarryRedstoneButton(x: Int, y: Int, mouseX: Int, mouseY: Int, container: GuiContainer, activationMode: ActivationMode) {
+        init {
+            with(container) {
+                val hovered = inBounds(x, y, buttonSize, buttonSize, mouseX, mouseY)
+
+                if (hovered) {
+                    drawTexturedModalRect(x, y, ModIcons.buttonHighlight, buttonSize, buttonSize)
+                } else {
+                    drawTexturedModalRect(x, y, ModIcons.button, buttonSize, buttonSize)
+                }
+
+                val (icon, text) =
+                        when (activationMode) {
+                            ActivationMode.AlwaysOn -> Pair(ModIcons.iconRSIgnore, "Always enabled")
+                            ActivationMode.DisableWithRS -> Pair(ModIcons.iconRSWithout, "Disable with redstone signal")
+                            ActivationMode.EnableWithRS -> Pair(ModIcons.iconRSWith, "Enable with redstone signal")
+                            ActivationMode.AlwaysOff -> Pair(ModIcons.iconDisable, "Always disabled")
+                        }
+                drawTexturedModalRect(x, y, icon, buttonSize, buttonSize)
+
+                if (hovered) {
+                    drawTooltip(mouseX, mouseY, text)
+                }
+            }
+        }
     }
 }

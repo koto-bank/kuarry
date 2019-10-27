@@ -21,7 +21,6 @@ import net.minecraftforge.items.ItemStackHandler
 import org.kotobank.kuarry.KuarryMod
 
 class KuarryTileEntity : TileEntity(), ITickable {
-
     companion object {
         internal const val upgradeInventoryWidth = 2
         internal const val upgradeInventoryHeight = 3
@@ -69,6 +68,26 @@ class KuarryTileEntity : TileEntity(), ITickable {
     /** A small inventory for upgrades not exposed via getCapability */
     internal val upgradeInventory = ItemStackHandler(upgradeInventoryWidth * upgradeInventoryHeight)
 
+    enum class ActivationMode {
+        AlwaysOn, EnableWithRS, DisableWithRS, AlwaysOff
+    }
+    internal var activationMode = ActivationMode.AlwaysOn
+
+    /** Switches the [activationMode] circularly and notifies the client about the change.
+     *
+     * In order, [ActivationMode.AlwaysOn] -> [ActivationMode.EnableWithRS] -> [ActivationMode.DisableWithRS] -> [ActivationMode.AlwaysOff], and then back
+     */
+    internal fun switchActivationMode() {
+        activationMode = when (activationMode) {
+            ActivationMode.AlwaysOn -> ActivationMode.EnableWithRS
+            ActivationMode.EnableWithRS -> ActivationMode.DisableWithRS
+            ActivationMode.DisableWithRS -> ActivationMode.AlwaysOff
+            ActivationMode.AlwaysOff -> ActivationMode.AlwaysOn
+        }
+
+        notifyClientAndMarkDirty()
+    }
+
     override fun hasCapability(capability: Capability<*>, facing: EnumFacing?) =
         when (capability) {
             CapabilityEnergy.ENERGY, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY -> true
@@ -94,6 +113,8 @@ class KuarryTileEntity : TileEntity(), ITickable {
             CapabilityEnergy.ENERGY.readNBT(energyStorage, EnumFacing.NORTH, getTag("energy"))
             inventory.deserializeNBT(getCompoundTag("inventory"))
             upgradeInventory.deserializeNBT(getCompoundTag("upgrade_inventory"))
+
+            activationMode = ActivationMode.valueOf(getString("activation_mode"))
         }
 
         super.readFromNBT(compound)
@@ -104,6 +125,8 @@ class KuarryTileEntity : TileEntity(), ITickable {
             setTag("energy", CapabilityEnergy.ENERGY.writeNBT(energyStorage, EnumFacing.NORTH)!!)
             setTag("inventory", inventory.serializeNBT())
             setTag("upgrade_inventory", upgradeInventory.serializeNBT())
+
+            setString("activation_mode", activationMode.name)
         }
 
         return super.writeToNBT(compound)
@@ -124,9 +147,14 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 if (lastEnergyStored != energyStorage.energyStored) {
                     lastEnergyStored = energyStorage.energyStored
 
-                    val state = world.getBlockState(pos)
-                    world.notifyBlockUpdate(pos, state, state, packetEntityID)
-                    markDirty()
+                    notifyClientAndMarkDirty()
+                }
+
+                when (activationMode) {
+                    ActivationMode.AlwaysOff -> return
+                    ActivationMode.DisableWithRS -> if (world.isBlockPowered(pos)) return
+                    ActivationMode.EnableWithRS -> if (!world.isBlockPowered(pos)) return
+                    // Don't check if always on, as it's implied if non of these match
                 }
 
                 val chunk = world.getChunkFromBlockCoords(pos)
@@ -165,6 +193,12 @@ class KuarryTileEntity : TileEntity(), ITickable {
         }
     }
 
+    private fun notifyClientAndMarkDirty() {
+        val state = world.getBlockState(pos)
+        world.notifyBlockUpdate(pos, state, state, packetEntityID)
+        markDirty()
+    }
+
     /** Processes a single block.
      *
      * @return Whether the block was mined or not
@@ -176,8 +210,6 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
         // Skip the block if it's blacklisted or is a fluid
         if (block in fullBlacklist || block is IFluidBlock) return false
-
-        KuarryMod.logger.info(blockState.block.localizedName)
 
         // Harvesting something with pick/shovel should not cost more,
         // otherwise double the energy count
@@ -193,6 +225,8 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
         // Not enough energy to mine the block, skip it
         if (energyStorage.energyStored < requiredEnergy) return false
+
+        KuarryMod.logger.info(blockState.block.localizedName)
 
         // Take out all the energy required, in multiple iterations if needed (by subtracting the
         // already extracted energy from the rest)
