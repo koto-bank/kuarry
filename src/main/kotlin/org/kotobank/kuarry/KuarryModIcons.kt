@@ -11,7 +11,7 @@ import net.minecraftforge.fml.relauncher.SideOnly
 
 @SideOnly(Side.CLIENT)
 @Mod.EventBusSubscriber(modid = KuarryMod.MODID)
-object ModIcons {
+object KuarryModIcons {
 
     @SubscribeEvent
     fun textureStitchPre(event: TextureStitchEvent.Pre) =

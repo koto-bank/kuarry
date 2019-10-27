@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder
 import org.kotobank.kuarry.block.KuarryBlock
 
 @Mod.EventBusSubscriber(modid = KuarryMod.MODID)
-object ModBlocks {
+object KuarryModBlocks {
     @ObjectHolder("${KuarryMod.MODID}:kuarry")
     lateinit var kuarry: Block
 

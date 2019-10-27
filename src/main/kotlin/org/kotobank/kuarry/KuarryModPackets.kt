@@ -4,7 +4,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry
 import net.minecraftforge.fml.relauncher.Side
 import org.kotobank.kuarry.packet.*
 
-object ModPackets {
+object KuarryModPackets {
     internal val networkChannel = NetworkRegistry.INSTANCE.newSimpleChannel(KuarryMod.MODID)
 
     internal fun register() {

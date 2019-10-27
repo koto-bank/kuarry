@@ -10,13 +10,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder
 
 @Mod.EventBusSubscriber(modid = KuarryMod.MODID)
-object ModItems {
+object KuarryModItems {
     @ObjectHolder("${KuarryMod.MODID}:kuarry")
     lateinit var kuarry: Item
 
     @SubscribeEvent
     fun registerItems(event: Register<Item>) {
-        val item = ItemBlock(ModBlocks.kuarry).setRegistryName(KuarryMod.MODID, "kuarry")
+        val item = ItemBlock(KuarryModBlocks.kuarry).setRegistryName(KuarryMod.MODID, "kuarry")
         event.registry.registerAll(item)
 
         ModelLoader.setCustomModelResourceLocation(item, 0, ModelResourceLocation(item.registryName, "inventory"))

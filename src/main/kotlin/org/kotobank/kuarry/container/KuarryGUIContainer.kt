@@ -8,8 +8,8 @@ import net.minecraft.util.ResourceLocation
 import net.minecraftforge.energy.CapabilityEnergy
 import net.minecraftforge.fml.client.config.GuiUtils
 import org.kotobank.kuarry.KuarryMod
-import org.kotobank.kuarry.ModIcons
-import org.kotobank.kuarry.ModPackets
+import org.kotobank.kuarry.KuarryModIcons
+import org.kotobank.kuarry.KuarryModPackets
 import org.kotobank.kuarry.packet.ChangeKuarryActivationMode
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity.ActivationMode
 import net.minecraft.init.SoundEvents
@@ -99,7 +99,7 @@ class KuarryGUIContainer(private val container: Container) : GuiContainer(contai
 
             val buttonPressed = when {
                 inBounds(guiLeft + redstoneButtonPos.first, guiTop + redstoneButtonPos.second, buttonSize, buttonSize, mouseX, mouseY) -> {
-                    ModPackets.networkChannel.sendToServer(ChangeKuarryActivationMode(te.pos))
+                    KuarryModPackets.networkChannel.sendToServer(ChangeKuarryActivationMode(te.pos))
 
                     true
                 }
@@ -132,17 +132,17 @@ class KuarryGUIContainer(private val container: Container) : GuiContainer(contai
                 val hovered = inBounds(x, y, buttonSize, buttonSize, mouseX, mouseY)
 
                 if (hovered) {
-                    drawTexturedModalRect(x, y, ModIcons.buttonHighlight, buttonSize, buttonSize)
+                    drawTexturedModalRect(x, y, KuarryModIcons.buttonHighlight, buttonSize, buttonSize)
                 } else {
-                    drawTexturedModalRect(x, y, ModIcons.button, buttonSize, buttonSize)
+                    drawTexturedModalRect(x, y, KuarryModIcons.button, buttonSize, buttonSize)
                 }
 
                 val (icon, text) =
                         when (activationMode) {
-                            ActivationMode.AlwaysOn -> Pair(ModIcons.iconRSIgnore, "Always enabled")
-                            ActivationMode.DisableWithRS -> Pair(ModIcons.iconRSWithout, "Disable with redstone signal")
-                            ActivationMode.EnableWithRS -> Pair(ModIcons.iconRSWith, "Enable with redstone signal")
-                            ActivationMode.AlwaysOff -> Pair(ModIcons.iconDisable, "Always disabled")
+                            ActivationMode.AlwaysOn -> Pair(KuarryModIcons.iconRSIgnore, "Always enabled")
+                            ActivationMode.DisableWithRS -> Pair(KuarryModIcons.iconRSWithout, "Disable with redstone signal")
+                            ActivationMode.EnableWithRS -> Pair(KuarryModIcons.iconRSWith, "Enable with redstone signal")
+                            ActivationMode.AlwaysOff -> Pair(KuarryModIcons.iconDisable, "Always disabled")
                         }
                 drawTexturedModalRect(x, y, icon, buttonSize, buttonSize)
 

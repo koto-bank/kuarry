@@ -13,7 +13,7 @@ import net.minecraft.util.EnumHand
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import org.kotobank.kuarry.KuarryMod
-import org.kotobank.kuarry.ModGUIHandler
+import org.kotobank.kuarry.KuarryModGUIHandler
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 
 class KuarryBlock(material: Material, registryName: String) : Block(material) {
@@ -42,7 +42,7 @@ class KuarryBlock(material: Material, registryName: String) : Block(material) {
                                   playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing,
                                   hitX: Float, hitY: Float, hitZ: Float): Boolean {
         if (!worldIn.isRemote) {
-            playerIn.openGui(KuarryMod, ModGUIHandler.KUARRY, worldIn, pos.x, pos.y, pos.z)
+            playerIn.openGui(KuarryMod, KuarryModGUIHandler.KUARRY, worldIn, pos.x, pos.y, pos.z)
         }
 
         return true;
