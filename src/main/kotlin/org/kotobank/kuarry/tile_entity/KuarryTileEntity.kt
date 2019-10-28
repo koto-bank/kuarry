@@ -110,28 +110,42 @@ class KuarryTileEntity : TileEntity(), ITickable {
         }
     }
 
-    override fun readFromNBT(compound: NBTTagCompound) {
-        with (compound) {
-            CapabilityEnergy.ENERGY.readNBT(energyStorage, EnumFacing.NORTH, getTag("energy"))
-            inventory.deserializeNBT(getCompoundTag("inventory"))
-            upgradeInventory.deserializeNBT(getCompoundTag("upgrade_inventory"))
+    override fun readFromNBT(compound: NBTTagCompound): Unit =
+            super.readFromNBT(
+                    compound.apply {
+                        CapabilityEnergy.ENERGY.readNBT(energyStorage, EnumFacing.NORTH, getTag("energy"))
+                        inventory.deserializeNBT(getCompoundTag("inventory"))
+                        upgradeInventory.deserializeNBT(getCompoundTag("upgrade_inventory"))
 
-            activationMode = ActivationMode.valueOf(getString("activation_mode"))
-        }
+                        activationMode = ActivationMode.valueOf(getString("activation_mode"))
+                    }
+            )
 
-        super.readFromNBT(compound)
+    override fun writeToNBT(compound: NBTTagCompound): NBTTagCompound =
+            super.writeToNBT(
+                    compound.apply {
+                        setTag("energy", CapabilityEnergy.ENERGY.writeNBT(energyStorage, EnumFacing.NORTH)!!)
+                        setTag("inventory", inventory.serializeNBT())
+                        setTag("upgrade_inventory", upgradeInventory.serializeNBT())
+
+                        setString("activation_mode", activationMode.name)
+                    }
+            )
+
+    override fun getUpdateTag(): NBTTagCompound = writeToNBT(NBTTagCompound())
+
+    override fun getUpdatePacket(): SPacketUpdateTileEntity? =
+            SPacketUpdateTileEntity(pos, packetEntityID, updateTag)
+
+    override fun onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity) {
+        super.onDataPacket(net, pkt)
+        handleUpdateTag(pkt.nbtCompound)
     }
 
-    override fun writeToNBT(compound: NBTTagCompound): NBTTagCompound {
-        with (compound) {
-            setTag("energy", CapabilityEnergy.ENERGY.writeNBT(energyStorage, EnumFacing.NORTH)!!)
-            setTag("inventory", inventory.serializeNBT())
-            setTag("upgrade_inventory", upgradeInventory.serializeNBT())
-
-            setString("activation_mode", activationMode.name)
-        }
-
-        return super.writeToNBT(compound)
+    private fun notifyClientAndMarkDirty() {
+        val state = world.getBlockState(pos)
+        world.notifyBlockUpdate(pos, state, state, packetEntityID)
+        markDirty()
     }
 
     private var updateCount = 0
@@ -193,12 +207,6 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 // The exit condition is to not go through bedrock
             }
         }
-    }
-
-    private fun notifyClientAndMarkDirty() {
-        val state = world.getBlockState(pos)
-        world.notifyBlockUpdate(pos, state, state, packetEntityID)
-        markDirty()
     }
 
     /** Processes a single block.
@@ -282,18 +290,5 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
         return true
 
-    }
-
-    override fun getUpdateTag(): NBTTagCompound {
-        return writeToNBT(NBTTagCompound())
-    }
-
-    override fun getUpdatePacket(): SPacketUpdateTileEntity? {
-        return SPacketUpdateTileEntity(pos, packetEntityID, updateTag)
-    }
-
-    override fun onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity) {
-        super.onDataPacket(net, pkt)
-        handleUpdateTag(pkt.nbtCompound)
     }
 }
