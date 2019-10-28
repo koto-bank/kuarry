@@ -76,10 +76,8 @@ class KuarryGUIContainer(private val container: Container) : GuiContainer(contai
             redstoneButtonPos.let {(x, y) ->
                 KuarryRedstoneButton(x, y, mouseX - guiLeft, mouseY - guiTop, this, container.tileEntity.activationMode)
             }
-        }
 
-        if (inBounds(guiLeft + energyBarPlaceX, guiTop + energyBarTopY, energyBarWidth, energyBarHeight, mouseX, mouseY)) {
-            if (container is KuarryContainer) {
+            if (inBounds(guiLeft + energyBarPlaceX, guiTop + energyBarTopY, energyBarWidth, energyBarHeight, mouseX, mouseY)) {
                 val energyCapability = container.tileEntity.getCapability(CapabilityEnergy.ENERGY, EnumFacing.NORTH)
                 if (energyCapability != null) {
                     drawTooltip(mouseX - guiLeft, mouseY - guiTop, "${energyCapability.energyStored}/${energyCapability.maxEnergyStored}RF")
@@ -131,11 +129,12 @@ class KuarryGUIContainer(private val container: Container) : GuiContainer(contai
             with(container) {
                 val hovered = inBounds(x, y, buttonSize, buttonSize, mouseX, mouseY)
 
-                if (hovered) {
-                    drawTexturedModalRect(x, y, KuarryModIcons.buttonHighlight, buttonSize, buttonSize)
-                } else {
-                    drawTexturedModalRect(x, y, KuarryModIcons.button, buttonSize, buttonSize)
-                }
+                // This is REQUIRED for drawing textures from the atlas. It WILL obscurely fail to draw
+                // in specific situations otherwise.
+                mc.renderEngine.bindTexture(KuarryModIcons.atlasResourceLocation)
+
+                val buttonTex = if (hovered) KuarryModIcons.buttonHighlight else KuarryModIcons.button
+                drawTexturedModalRect(x, y, buttonTex, buttonSize, buttonSize)
 
                 val (icon, text) =
                         when (activationMode) {

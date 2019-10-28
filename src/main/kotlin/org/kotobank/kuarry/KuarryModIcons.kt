@@ -20,6 +20,9 @@ object KuarryModIcons {
     private fun TextureMap.registerIcon(icon: String): TextureAtlasSprite =
         registerSprite(ResourceLocation(KuarryMod.MODID, "gui/icons/$icon"))
 
+    /** This is the atlas resource location. The texture HAS to be bound to this location,
+     *  or things will fail to draw in certain specific situations. */
+    val atlasResourceLocation = ResourceLocation("textures/atlas/blocks.png")
 
     lateinit var button: TextureAtlasSprite
     lateinit var buttonHighlight: TextureAtlasSprite
