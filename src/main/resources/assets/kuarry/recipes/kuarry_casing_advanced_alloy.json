@@ -1,0 +1,22 @@
+{
+  "_comment": "A recipe for crafting kuarry plates for industrial craft's advanced alloy. IC2 uses ic2:crafting + data for some materials",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "pp",
+    "pd"
+  ],
+  "key": {
+    "p": {
+      "item": "ic2:crafting",
+      "data": 3
+    },
+    "d": {
+      "type": "forge:ore_dict",
+      "ore": "dyePink"
+    }
+  },
+  "result": {
+    "item": "kuarry:kuarry_casing",
+    "count": 4
+  }
+}
