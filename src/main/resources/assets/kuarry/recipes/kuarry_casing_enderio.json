@@ -1,0 +1,22 @@
+{
+  "_comment": "A recipe for crafting kuarry plates for thermal foundation's signalum",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ee",
+    "ed"
+  ],
+  "key": {
+    "e": {
+      "type": "forge:ore_dict",
+      "ore": "ingotEnergeticAlloy"
+    },
+    "d": {
+      "type": "forge:ore_dict",
+      "ore": "dyePink"
+    }
+  },
+  "result": {
+    "item": "kuarry:kuarry_casing",
+    "count": 4
+  }
+}
