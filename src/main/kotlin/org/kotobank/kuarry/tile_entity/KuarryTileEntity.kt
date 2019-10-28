@@ -167,10 +167,10 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 }
 
                 when (activationMode) {
+                    ActivationMode.AlwaysOn -> {}
                     ActivationMode.AlwaysOff -> return
                     ActivationMode.DisableWithRS -> if (world.isBlockPowered(pos)) return
                     ActivationMode.EnableWithRS -> if (!world.isBlockPowered(pos)) return
-                    // Don't check if always on, as it's implied if non of these match
                 }
 
                 val chunk = world.getChunkFromBlockCoords(pos)
