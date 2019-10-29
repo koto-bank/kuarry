@@ -31,6 +31,7 @@ class KuarryBlock(material: Material, registryName: String) : Block(material) {
 
         setHardness(2f)
         setResistance(5f)
+        setHarvestLevel("pickaxe", 1)
     }
 
     override fun hasTileEntity(state: IBlockState) = true
