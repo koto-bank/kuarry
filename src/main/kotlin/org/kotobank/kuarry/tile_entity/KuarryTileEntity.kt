@@ -134,25 +134,59 @@ class KuarryTileEntity : TileEntity(), ITickable {
                     }
             )
 
-    override fun getUpdateTag(): NBTTagCompound = writeToNBT(NBTTagCompound())
+    override fun getUpdateTag(): NBTTagCompound =
+            writeToNBT(NBTTagCompound()).apply {
+                // These are sent to client but are ephemeral and reset on world reload
+
+                setInteger("approx_res_count", approxResourceCount)
+                setInteger("approx_res_mined", approxResourcesMined)
+            }
 
     override fun getUpdatePacket(): SPacketUpdateTileEntity? =
             SPacketUpdateTileEntity(pos, packetEntityID, updateTag)
 
     override fun onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity) {
         super.onDataPacket(net, pkt)
+
+        // Handle the usual non-ephemeral properties
         handleUpdateTag(pkt.nbtCompound)
+
+        // Handle the properties that are not saved and therefore are not in readFromNBT
+
+        with(pkt.nbtCompound) {
+            approxResourceCount = getInteger("approx_res_count")
+            approxResourcesMined = getInteger("approx_res_mined")
+        }
     }
 
-    private fun notifyClientAndMarkDirty() {
+    /** Notify the client about the change in the block data. */
+    private fun notifyClient() {
         val state = world.getBlockState(pos)
         world.notifyBlockUpdate(pos, state, state, packetEntityID)
+    }
+
+    /** Both notify the client about the change in block data and mark the block dirty for the game to save it. */
+    private fun notifyClientAndMarkDirty() {
+        notifyClient()
         markDirty()
     }
 
+    /** An approximate total number of resources.
+     *
+     * Ephemeral, resets on world reload.
+     */
+    internal var approxResourceCount = -1
+
+    /** An approximate number of resources mined since world loading.
+     *
+     * The value is ephemeral and is reset on world reload.
+     */
+    internal var approxResourcesMined = 0
+
     private var updateCount = 0
 
-    private lateinit var currentChunkPos: ChunkPos
+    /** Tick count for the resource-count-in-the-chunk updates */
+    private var resourceCountUpdateCount = 0
 
     override fun update() {
         if (!world.isRemote) {
@@ -180,7 +214,34 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 // Process all blocks in the chunk
                 doWithAllBlocksInChunk(chunk, ::processBlock)
             }
+
+            // 6000 ~= 5 minutes
+            if (resourceCountUpdateCount >= 6000 || approxResourceCount == -1) {
+                resourceCountUpdateCount++
+
+                val chunk = world.getChunkFromBlockCoords(pos)
+
+                approxResourceCount = countAllMinable(chunk)
+
+                notifyClient()
+            }
         }
+    }
+
+    /** Counts the all the minable resources in the chunk for user-faced stats. */
+    private fun countAllMinable(chunk: Chunk): Int {
+        var amountOfBlocks = 0
+
+        doWithAllBlocksInChunk(chunk) { _, blockState ->
+            if (!isBlockBlacklisted(blockState.block)) {
+                amountOfBlocks++
+            }
+
+            // Continue until there are no more blocks in the chunk
+            false
+        }
+
+        return amountOfBlocks
     }
 
     /** Iterate over all (until y level 5) blocks calling the function on these blocks for side effects.
@@ -302,7 +363,10 @@ class KuarryTileEntity : TileEntity(), ITickable {
         // TODO: something smart here
         world.setBlockState(blockPos, Blocks.STONE.defaultState)
 
-        return true
+        // Increment the mined resource amount and notify the client about it
+        approxResourcesMined++
+        notifyClient()
 
+        return true
     }
 }

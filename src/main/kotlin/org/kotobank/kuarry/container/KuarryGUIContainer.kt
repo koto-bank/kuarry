@@ -73,10 +73,23 @@ class KuarryGUIContainer(private val container: Container) : GuiContainer(contai
 
     override fun drawGuiContainerForegroundLayer(mouseX: Int, mouseY: Int) {
         if (container is KuarryContainer) {
-            redstoneButtonPos.let {(x, y) ->
-                KuarryRedstoneButton(x, y, mouseX - guiLeft, mouseY - guiTop, this, container.tileEntity.activationMode)
+            val tileEntity = container.tileEntity
+
+            if (tileEntity.approxResourceCount != -1) {
+                drawString(
+                        mc.fontRenderer,
+                        "Approx. mined: ${tileEntity.approxResourcesMined}/${tileEntity.approxResourceCount}",
+                        30,
+                        10,
+                        0xFFFFFF
+                )
             }
 
+            redstoneButtonPos.let {(x, y) ->
+                KuarryRedstoneButton(x, y, mouseX - guiLeft, mouseY - guiTop, this, tileEntity.activationMode)
+            }
+
+            // Draw the energy bar tooltip when the mouse is over it
             if (inBounds(guiLeft + energyBarPlaceX, guiTop + energyBarTopY, energyBarWidth, energyBarHeight, mouseX, mouseY)) {
                 val energyCapability = container.tileEntity.getCapability(CapabilityEnergy.ENERGY, EnumFacing.NORTH)
                 if (energyCapability != null) {
