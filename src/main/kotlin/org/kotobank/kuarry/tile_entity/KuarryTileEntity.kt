@@ -208,8 +208,8 @@ class KuarryTileEntity : TileEntity(), ITickable {
                     z++
                 }
                 else -> {
-                    x++
-                    z++
+                    x = chunkPos.xStart
+                    z = chunkPos.zStart
                     y--
                 }
             }
