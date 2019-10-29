@@ -183,6 +183,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
      */
     internal var approxResourcesMined = 0
 
+    /** Tick count for general updates, to not run them too much */
     private var updateCount = 0
 
     /** Tick count for the resource-count-in-the-chunk updates */
@@ -190,7 +191,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
     override fun update() {
         if (!world.isRemote) {
-            updateCount = updateCount.inc()
+            updateCount++
 
             if (updateCount >= 50) {
                 updateCount = 0
