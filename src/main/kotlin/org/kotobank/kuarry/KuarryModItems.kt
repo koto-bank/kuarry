@@ -14,11 +14,15 @@ object KuarryModItems {
     @ObjectHolder("${KuarryMod.MODID}:kuarry")
     lateinit var kuarry: Item
 
+    @ObjectHolder("${KuarryMod.MODID}:denatured_stone")
+    lateinit var denatured_stone: Item
+
     @SubscribeEvent
     fun registerItems(event: Register<Item>) {
 
         listOf(
                 Pair("kuarry", ItemBlock(KuarryModBlocks.kuarry)),
+                Pair("denatured_stone", ItemBlock(KuarryModBlocks.denatured_stone)),
 
                 Pair("kuarry_casing", Item())
         ).forEach { (name, item) ->
