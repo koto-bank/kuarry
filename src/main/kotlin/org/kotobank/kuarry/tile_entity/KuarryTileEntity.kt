@@ -1,5 +1,6 @@
 package org.kotobank.kuarry.tile_entity
 
+import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.init.Blocks
@@ -12,7 +13,7 @@ import net.minecraft.util.EnumFacing
 import net.minecraft.util.ITickable
 import net.minecraft.util.NonNullList
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.ChunkPos
+import net.minecraft.world.chunk.Chunk
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.energy.*
 import net.minecraftforge.fluids.IFluidBlock
@@ -175,51 +176,63 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
                 val chunk = world.getChunkFromBlockCoords(pos)
 
-                if (!this::currentChunkPos.isInitialized || currentChunkPos != chunk.pos) {
-                    currentChunkPos = chunk.pos
-                }
-
-                var x = currentChunkPos.xStart
-                var z = currentChunkPos.zStart
-                var y = pos.y - 1
-
-                do {
-                    val blockPos = BlockPos(x, y, z)
-                    val blockState = chunk.getBlockState(blockPos)
-
-                    // If the block was successfully mined, stop
-                    if (processBlock(blockPos, blockState)) break
-
-                    when {
-                        x < currentChunkPos.xEnd ->
-                            x++
-                        z < currentChunkPos.zEnd -> {
-                            x = currentChunkPos.xStart
-                            z++
-                        }
-                        else -> {
-                            x++
-                            z++
-                            y--
-                        }
-                    }
-                } while (y >= 5)
-                // The exit condition is to not go through bedrock
+                // Process all blocks in the chunk
+                doWithAllBlocksInChunk(chunk, ::processBlock)
             }
         }
+    }
+
+    /** Iterate over all (until y level 5) blocks calling the function on these blocks for side effects.
+     *
+     * If the functions returns true, the iteration is stopped and the function returns.
+     */
+    private fun doWithAllBlocksInChunk(chunk: Chunk, func: (blockPos: BlockPos, blockState: IBlockState) -> Boolean) {
+        val chunkPos = chunk.pos
+
+        var x = chunkPos.xStart
+        var z = chunkPos.zStart
+        var y = pos.y - 1
+
+        do {
+            val blockPos = BlockPos(x, y, z)
+            val blockState = chunk.getBlockState(blockPos)
+
+            // Exit whenever the function returns true
+            if (func(blockPos, blockState)) break
+
+            when {
+                x < chunkPos.xEnd ->
+                    x++
+                z < chunkPos.zEnd -> {
+                    x = chunkPos.xStart
+                    z++
+                }
+                else -> {
+                    x++
+                    z++
+                    y--
+                }
+            }
+        } while (y >= 5)
+        // The exit condition is to not go through bedrock
+    }
+
+    /** Checks if the block is blacklisted by some filter and should not be mined. */
+    private fun isBlockBlacklisted(block: Block): Boolean {
+        val fullBlacklist = hardBlacklistedBlocks + defaultBlacklistedBlocks
+
+        return (block in fullBlacklist || block is IFluidBlock)
     }
 
     /** Processes a single block.
      *
      * @return Whether the block was mined or not
-     * */
+     */
     private fun processBlock(blockPos: BlockPos, blockState: IBlockState): Boolean {
         val block = blockState.block
 
-        val fullBlacklist = hardBlacklistedBlocks + defaultBlacklistedBlocks
-
         // Skip the block if it's blacklisted or is a fluid
-        if (block in fullBlacklist || block is IFluidBlock) return false
+        if (isBlockBlacklisted(block)) return false
 
         // Harvesting something with pick/shovel should not cost more,
         // otherwise double the energy count
