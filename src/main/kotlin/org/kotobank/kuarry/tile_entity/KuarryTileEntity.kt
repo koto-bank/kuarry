@@ -302,8 +302,8 @@ class KuarryTileEntity : TileEntity(), ITickable {
             "pickaxe", "shovel", null -> 1
             else -> 2
         }
-        // Don't want to have 0 as a modifier, as it would break the math later on, so make it 1
-        val levelHarvestModifier = block.getHarvestLevel(blockState).let { if (it == 0) 1 else it }
+        // Don't want to have 0 or -1 as a modifier, as it would break the math later on, so make it 1
+        val levelHarvestModifier = block.getHarvestLevel(blockState).let { if (it <= 0) 1 else it }
 
 
         var requiredEnergy = baseRequiredEnergy * toolHarvestModifier * levelHarvestModifier
