@@ -40,6 +40,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 Blocks.GRASS_PATH,
                 Blocks.DIRT,
                 Blocks.STONE,
+                Blocks.MONSTER_EGG,
                 Blocks.GRAVEL,
                 Blocks.SAND,
                 Blocks.SANDSTONE,
