@@ -67,10 +67,20 @@ class KuarryTileEntity : TileEntity(), ITickable {
     internal val inventorySize = inventoryWidth * inventoryHeight
 
     /** A chest-sized inventory for inner item storage */
-    private val inventory = ItemStackHandler(inventorySize)
+    private val inventory = object : ItemStackHandler(inventorySize) {
+        override fun onContentsChanged(slot: Int) {
+            super.onContentsChanged(slot)
+            markDirty()
+        }
+    }
 
     /** A small inventory for upgrades not exposed via getCapability */
-    internal val upgradeInventory = ItemStackHandler(upgradeInventoryWidth * upgradeInventoryHeight)
+    internal val upgradeInventory = object : ItemStackHandler(upgradeInventoryWidth * upgradeInventoryHeight) {
+        override fun onContentsChanged(slot: Int) {
+            super.onContentsChanged(slot)
+            markDirty()
+        }
+    }
 
     enum class ActivationMode {
         AlwaysOn, EnableWithRS, DisableWithRS, AlwaysOff
