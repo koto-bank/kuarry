@@ -22,7 +22,7 @@ def mc_version_short = "1.12", mc_version = "${mc_version_short}.2"
 
 version = "0.1"
 group = "org.kotobank.kuarry" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "kuarry_${mc_version}-${version}"
+archivesBaseName = "kuarry-${mc_version}"
 
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileJava {
