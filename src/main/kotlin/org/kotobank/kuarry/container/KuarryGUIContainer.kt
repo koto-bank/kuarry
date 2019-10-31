@@ -92,6 +92,9 @@ class KuarryGUIContainer(private val container: KuarryContainer) : GuiContainer(
             )
         }
 
+        buttons.forEach { it.draw(mouseX - guiLeft, mouseY - guiTop) }
+        buttons.forEach { it.drawTooltip(mouseX - guiLeft, mouseY - guiTop) }
+
         // Draw the energy bar tooltip when the mouse is over it
         if (inBounds(guiLeft + energyBarPlaceX, guiTop + energyBarTopY, energyBarWidth, energyBarHeight, mouseX, mouseY)) {
             val energyCapability = container.tileEntity.getCapability(CapabilityEnergy.ENERGY, EnumFacing.NORTH)
@@ -99,8 +102,6 @@ class KuarryGUIContainer(private val container: KuarryContainer) : GuiContainer(
                 drawTooltip(mouseX - guiLeft, mouseY - guiTop, "${energyCapability.energyStored}/${energyCapability.maxEnergyStored}RF")
             }
         }
-
-        buttons.forEach { it.draw(mouseX - guiLeft, mouseY - guiTop) }
 
         // Need to subtract guiLeft/Top here because mouse position is counted from the
         // beginning of the gui, not from the beginning of the screen
@@ -143,12 +144,16 @@ class KuarryGUIContainer(private val container: KuarryContainer) : GuiContainer(
             val buttonTex = if (hovered) KuarryModIcons.buttonHighlight else KuarryModIcons.button
             drawTexturedModalRect(x, y, buttonTex, buttonSize, buttonSize)
 
-            val (icon, tooltipText) = iconAndTooltip
+            val (icon, _) = iconAndTooltip
 
             drawTexturedModalRect(x, y, icon, buttonSize, buttonSize)
+        }
 
-            if (hovered) {
-                drawTooltip(mouseX, mouseY, tooltipText)
+        fun drawTooltip(mouseX: Int, mouseY: Int) {
+            if (isOnButton(mouseX, mouseY)) {
+                val (_, tooltip) = iconAndTooltip
+
+                drawTooltip(mouseX, mouseY, tooltip)
             }
         }
     }
