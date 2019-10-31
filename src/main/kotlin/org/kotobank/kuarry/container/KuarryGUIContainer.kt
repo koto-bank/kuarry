@@ -174,7 +174,7 @@ class KuarryGUIContainer(private val container: KuarryContainer) : GuiContainer(
             get() = if (container.tileEntity.renderBounds) {
                 Pair(KuarryModIcons.boundsEnable, "Show mining area boundaries")
             } else {
-                Pair(KuarryModIcons.boundsDisable, "Do not show mining area boundaries")
+                Pair(KuarryModIcons.boundsDisable, "Don't show mining area boundaries")
             }
 
         override fun onClick() {
