@@ -126,14 +126,21 @@ class KuarryGUIContainer(private val container: KuarryContainer) : GuiContainer(
     }
 
     private abstract inner class Button(private val x: Int, private val y: Int) {
+        /** Whether the specified [mouseX] and [mouseY] are floating over the button. */
         fun isOnButton(mouseX: Int, mouseY: Int) = inBounds(x, y, buttonSize, buttonSize, mouseX, mouseY)
 
+        /** Returns, depending on the TE, a pair consisting of an icon and a tooltip to use for the button */
         abstract val iconAndTooltip: Pair<TextureAtlasSprite, String>
 
+        /** An action to perform when the button is clicked.
+         *
+         * Plays a click sound by default. Implementations should call super to play a click sound.
+         */
         open fun onClick() {
             mc.soundHandler.playSound(PositionedSoundRecord.getRecord(SoundEvents.UI_BUTTON_CLICK, 1f, 0.3f))
         }
 
+        /** Draws the button and the icon from [iconAndTooltip]. */
         fun draw(mouseX: Int, mouseY: Int) {
             // This is REQUIRED for drawing textures from the atlas. It WILL obscurely fail to draw
             // in specific situations otherwise.
@@ -149,6 +156,7 @@ class KuarryGUIContainer(private val container: KuarryContainer) : GuiContainer(
             drawTexturedModalRect(x, y, icon, buttonSize, buttonSize)
         }
 
+        /** Draws the tooltip from [iconAndTooltip] if the mouse is floating over the button. */
         fun drawTooltip(mouseX: Int, mouseY: Int) {
             if (isOnButton(mouseX, mouseY)) {
                 val (_, tooltip) = iconAndTooltip
