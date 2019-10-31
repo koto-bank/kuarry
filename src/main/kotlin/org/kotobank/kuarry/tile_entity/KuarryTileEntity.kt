@@ -33,7 +33,9 @@ class KuarryTileEntity : TileEntity(), ITickable {
         /** The blocks that cannot be un-blacklisted by an external filter */
         private val hardBlacklistedBlocks = listOf(
                 Blocks.BEDROCK,
-                Blocks.AIR
+                Blocks.AIR,
+
+                KuarryModBlocks.denatured_stone
         )
 
         /** The default blacklist of blocks */
