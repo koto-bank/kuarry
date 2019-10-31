@@ -3,7 +3,8 @@
   "defaults": {
     "textures": {
       "front": "kuarry:block/kuarry_front",
-      "side": "kuarry:block/kuarry_side"
+      "side": "kuarry:block/kuarry_side",
+      "particle": "#side"
     }
   },
   "variants": {
