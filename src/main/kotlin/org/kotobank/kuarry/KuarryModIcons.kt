@@ -27,10 +27,10 @@ object KuarryModIcons {
     lateinit var button: TextureAtlasSprite
     lateinit var buttonHighlight: TextureAtlasSprite
 
-    lateinit var iconRSIgnore: TextureAtlasSprite
-    lateinit var iconRSWithout: TextureAtlasSprite
-    lateinit var iconRSWith: TextureAtlasSprite
-    lateinit var iconDisable: TextureAtlasSprite
+    lateinit var alwaysEnable: TextureAtlasSprite
+    lateinit var RSWithout: TextureAtlasSprite
+    lateinit var RSWith: TextureAtlasSprite
+    lateinit var alwaysDisable: TextureAtlasSprite
 
     lateinit var boundsDisable: TextureAtlasSprite
     lateinit var boundsEnable: TextureAtlasSprite
@@ -39,10 +39,11 @@ object KuarryModIcons {
         with (map) {
             button = registerIcon("button")
             buttonHighlight = registerIcon("button_highlight")
-            iconRSIgnore = registerIcon("activation_always_enable")
-            iconRSWithout = registerIcon("activation_rs_without")
-            iconRSWith = registerIcon("activation_rs_with")
-            iconDisable = registerIcon("activation_always_disable")
+
+            alwaysEnable = registerIcon("activation_always_enable")
+            RSWithout = registerIcon("activation_rs_without")
+            RSWith = registerIcon("activation_rs_with")
+            alwaysDisable = registerIcon("activation_always_disable")
 
             boundsDisable = registerIcon("bounds_disable")
             boundsEnable = registerIcon("bounds_enable")

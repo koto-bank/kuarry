@@ -157,10 +157,10 @@ class KuarryGUIContainer(private val container: KuarryContainer) : GuiContainer(
         override val iconAndTooltip
             get() =
                 when (container.tileEntity.activationMode) {
-                    ActivationMode.AlwaysOn -> Pair(KuarryModIcons.iconRSIgnore, "Always enabled")
-                    ActivationMode.DisableWithRS -> Pair(KuarryModIcons.iconRSWithout, "Disable with redstone signal")
-                    ActivationMode.EnableWithRS -> Pair(KuarryModIcons.iconRSWith, "Enable with redstone signal")
-                    ActivationMode.AlwaysOff -> Pair(KuarryModIcons.iconDisable, "Always disabled")
+                    ActivationMode.AlwaysOn -> Pair(KuarryModIcons.alwaysEnable, "Always enabled")
+                    ActivationMode.DisableWithRS -> Pair(KuarryModIcons.RSWithout, "Disable with redstone signal")
+                    ActivationMode.EnableWithRS -> Pair(KuarryModIcons.RSWith, "Enable with redstone signal")
+                    ActivationMode.AlwaysOff -> Pair(KuarryModIcons.alwaysDisable, "Always disabled")
                 }
 
         override fun onClick(): Unit =
