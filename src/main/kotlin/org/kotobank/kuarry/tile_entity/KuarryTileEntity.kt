@@ -21,6 +21,7 @@ import net.minecraftforge.fluids.IFluidBlock
 import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.ItemStackHandler
 import org.kotobank.kuarry.KuarryMod
+import org.kotobank.kuarry.KuarryModBlocks
 
 class KuarryTileEntity : TileEntity(), ITickable {
     companion object {
@@ -396,7 +397,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
         }
 
         // TODO: something smart here
-        world.setBlockState(blockPos, Blocks.STONE.defaultState)
+        world.setBlockState(blockPos, KuarryModBlocks.denatured_stone.defaultState)
 
         // Increment the mined resource amount and notify the client about it
         approxResourcesMined++
