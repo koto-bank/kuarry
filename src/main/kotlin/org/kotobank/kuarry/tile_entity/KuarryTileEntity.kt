@@ -229,6 +229,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
     override fun update() {
         if (!world.isRemote) {
             updateCount++
+            resourceCountUpdateCount++
 
             if (updateCount >= 50) {
                 updateCount = 0
@@ -254,8 +255,9 @@ class KuarryTileEntity : TileEntity(), ITickable {
             }
 
             // 6000 ~= 5 minutes
-            if (resourceCountUpdateCount >= 6000 || approxResourceCount == -1) {
-                resourceCountUpdateCount++
+            // 50 is to wait a little until the world loads on start
+            if (resourceCountUpdateCount >= 6000 || (approxResourceCount == -1 && resourceCountUpdateCount >= 50)) {
+                resourceCountUpdateCount = 0
 
                 val chunk = world.getChunkFromBlockCoords(pos)
 
