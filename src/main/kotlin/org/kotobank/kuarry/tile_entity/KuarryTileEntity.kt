@@ -12,6 +12,7 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ITickable
 import net.minecraft.util.NonNullList
+import net.minecraft.util.math.AxisAlignedBB
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.chunk.Chunk
 import net.minecraftforge.common.capabilities.Capability
@@ -82,6 +83,13 @@ class KuarryTileEntity : TileEntity(), ITickable {
         }
     }
 
+    /** Activation mode of the block.
+     *
+     * [ActivationMode.AlwaysOn] - Always enabled
+     * [ActivationMode.AlwaysOff] - Always disabled
+     * [ActivationMode.EnableWithRS] - Only enabled with redstone
+     * [ActivationMode.DisableWithRS] - Only enabled when there without redstone
+     */
     enum class ActivationMode {
         AlwaysOn, EnableWithRS, DisableWithRS, AlwaysOff
     }
@@ -100,6 +108,20 @@ class KuarryTileEntity : TileEntity(), ITickable {
         }
 
         notifyClientAndMarkDirty()
+    }
+
+    /** Whether the bounds of the mined region should be rendered.
+     *
+     * Ephemeral, but sent to the client. There's no reason to save this, since it's essentially
+     * just for the people to see the where the digging would happen
+     */
+    internal var renderBounds = false
+
+    /** Toggles the [renderBounds] on or off */
+    internal fun toggleRenderBounds() {
+        renderBounds = !renderBounds
+
+        notifyClient()
     }
 
     override fun hasCapability(capability: Capability<*>, facing: EnumFacing?) =
@@ -150,6 +172,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
                 setInteger("approx_res_count", approxResourceCount)
                 setInteger("approx_res_mined", approxResourcesMined)
+                setBoolean("render_bounds", renderBounds)
             }
 
     override fun getUpdatePacket(): SPacketUpdateTileEntity? =
@@ -166,6 +189,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
         with(pkt.nbtCompound) {
             approxResourceCount = getInteger("approx_res_count")
             approxResourcesMined = getInteger("approx_res_mined")
+            renderBounds = getBoolean("render_bounds")
         }
     }
 
@@ -379,5 +403,15 @@ class KuarryTileEntity : TileEntity(), ITickable {
         notifyClient()
 
         return true
+    }
+
+    override fun getRenderBoundingBox(): AxisAlignedBB {
+        val originalBB = super.getRenderBoundingBox()
+
+        if (renderBounds) {
+            return originalBB.grow(16.0, 5.0, 16.0);
+        }
+
+        return originalBB
     }
 }

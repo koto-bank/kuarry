@@ -2,7 +2,6 @@ package org.kotobank.kuarry.container
 
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.inventory.Container
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.energy.CapabilityEnergy
@@ -10,13 +9,14 @@ import net.minecraftforge.fml.client.config.GuiUtils
 import org.kotobank.kuarry.KuarryMod
 import org.kotobank.kuarry.KuarryModIcons
 import org.kotobank.kuarry.KuarryModPackets
-import org.kotobank.kuarry.packet.ChangeKuarryActivationMode
+import org.kotobank.kuarry.packet.SwitchKuarrySetting
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity.ActivationMode
 import net.minecraft.init.SoundEvents
 import net.minecraft.client.audio.PositionedSoundRecord
+import net.minecraft.client.renderer.texture.TextureAtlasSprite
 
 
-class KuarryGUIContainer(private val container: Container) : GuiContainer(container) {
+class KuarryGUIContainer(private val container: KuarryContainer) : GuiContainer(container) {
     companion object {
         private val backgroundTexture = ResourceLocation(KuarryMod.MODID, "textures/gui/kuarry.png")
 
@@ -34,7 +34,17 @@ class KuarryGUIContainer(private val container: Container) : GuiContainer(contai
                 ox >= x && ox <= x + w && oy >= y && oy <= y + h
 
         private val redstoneButtonPos = Pair(10, 10)
+        private val boundsButtonPos = Pair(10, 30)
         private const val buttonSize = 16
+    }
+
+    private val buttons: List<Button> = run {
+        container.tileEntity.run {
+            listOf(
+                    ActivationModeButton(10, 10),
+                    RenderBoundsButton(10, 30)
+            )
+        }
     }
 
     init {
@@ -53,50 +63,44 @@ class KuarryGUIContainer(private val container: Container) : GuiContainer(contai
 
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize)
 
-        if (container is KuarryContainer) {
-            val energyCapability = container.tileEntity.getCapability(CapabilityEnergy.ENERGY, EnumFacing.NORTH)
-            if (energyCapability != null) {
-                val maxEnergy = energyCapability.maxEnergyStored
-                val currentEnergy = energyCapability.energyStored
+        val energyCapability = container.tileEntity.getCapability(CapabilityEnergy.ENERGY, EnumFacing.NORTH)
+        if (energyCapability != null) {
+            val maxEnergy = energyCapability.maxEnergyStored
+            val currentEnergy = energyCapability.energyStored
 
-                // Scale the current amount of energy to the bar height
-                val scaledHeight = ((currentEnergy.toFloat() / maxEnergy.toFloat()) * energyBarHeight).toInt()
+            // Scale the current amount of energy to the bar height
+            val scaledHeight = ((currentEnergy.toFloat() / maxEnergy.toFloat()) * energyBarHeight).toInt()
 
-                drawTexturedModalRect(
-                        guiLeft + energyBarPlaceX, guiTop + energyBarTopY + energyBarHeight - scaledHeight,
-                        energyBarTextureX, energyBarTopY + energyBarHeight - scaledHeight,
-                        energyBarWidth, scaledHeight
-                )
-            }
+            drawTexturedModalRect(
+                    guiLeft + energyBarPlaceX, guiTop + energyBarTopY + energyBarHeight - scaledHeight,
+                    energyBarTextureX, energyBarTopY + energyBarHeight - scaledHeight,
+                    energyBarWidth, scaledHeight
+            )
         }
     }
 
     override fun drawGuiContainerForegroundLayer(mouseX: Int, mouseY: Int) {
-        if (container is KuarryContainer) {
-            val tileEntity = container.tileEntity
+        val tileEntity = container.tileEntity
 
-            if (tileEntity.approxResourceCount != -1) {
-                drawString(
-                        mc.fontRenderer,
-                        "Approx. mined: ${tileEntity.approxResourcesMined}/${tileEntity.approxResourceCount}",
-                        30,
-                        10,
-                        0xFFFFFF
-                )
-            }
+        if (tileEntity.approxResourceCount != -1) {
+            drawString(
+                    mc.fontRenderer,
+                    "Approx. mined: ${tileEntity.approxResourcesMined}/${tileEntity.approxResourceCount}",
+                    30,
+                    10,
+                    0xFFFFFF
+            )
+        }
 
-            redstoneButtonPos.let {(x, y) ->
-                KuarryRedstoneButton(x, y, mouseX - guiLeft, mouseY - guiTop, this, tileEntity.activationMode)
-            }
-
-            // Draw the energy bar tooltip when the mouse is over it
-            if (inBounds(guiLeft + energyBarPlaceX, guiTop + energyBarTopY, energyBarWidth, energyBarHeight, mouseX, mouseY)) {
-                val energyCapability = container.tileEntity.getCapability(CapabilityEnergy.ENERGY, EnumFacing.NORTH)
-                if (energyCapability != null) {
-                    drawTooltip(mouseX - guiLeft, mouseY - guiTop, "${energyCapability.energyStored}/${energyCapability.maxEnergyStored}RF")
-                }
+        // Draw the energy bar tooltip when the mouse is over it
+        if (inBounds(guiLeft + energyBarPlaceX, guiTop + energyBarTopY, energyBarWidth, energyBarHeight, mouseX, mouseY)) {
+            val energyCapability = container.tileEntity.getCapability(CapabilityEnergy.ENERGY, EnumFacing.NORTH)
+            if (energyCapability != null) {
+                drawTooltip(mouseX - guiLeft, mouseY - guiTop, "${energyCapability.energyStored}/${energyCapability.maxEnergyStored}RF")
             }
         }
+
+        buttons.forEach { it.draw(mouseX - guiLeft, mouseY - guiTop) }
 
         // Need to subtract guiLeft/Top here because mouse position is counted from the
         // beginning of the gui, not from the beginning of the screen
@@ -104,27 +108,11 @@ class KuarryGUIContainer(private val container: Container) : GuiContainer(contai
     }
 
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
-
-        if (container is KuarryContainer) {
-            val te = container.tileEntity
-
-            val buttonPressed = when {
-                inBounds(guiLeft + redstoneButtonPos.first, guiTop + redstoneButtonPos.second, buttonSize, buttonSize, mouseX, mouseY) -> {
-                    KuarryModPackets.networkChannel.sendToServer(ChangeKuarryActivationMode(te.pos))
-
-                    true
-                }
-
-                else -> {
-                    super.mouseClicked(mouseX, mouseY, mouseButton)
-
-                    false
-                }
-            }
-
-            if (buttonPressed) {
-                mc.soundHandler.playSound(PositionedSoundRecord.getRecord(SoundEvents.UI_BUTTON_CLICK, 1f, 0.3f))
-            }
+        val pressedButton = buttons.find { it.isOnButton(mouseX - guiLeft, mouseY - guiTop) }
+        if (pressedButton != null) {
+            pressedButton.onClick()
+        } else {
+            super.mouseClicked(mouseX, mouseY, mouseButton)
         }
     }
 
@@ -136,32 +124,63 @@ class KuarryGUIContainer(private val container: Container) : GuiContainer(contai
         GlStateManager.enableLighting()
     }
 
+    private abstract inner class Button(private val x: Int, private val y: Int) {
+        fun isOnButton(mouseX: Int, mouseY: Int) = inBounds(x, y, buttonSize, buttonSize, mouseX, mouseY)
 
-    inner class KuarryRedstoneButton(x: Int, y: Int, mouseX: Int, mouseY: Int, container: GuiContainer, activationMode: ActivationMode) {
-        init {
-            with(container) {
-                val hovered = inBounds(x, y, buttonSize, buttonSize, mouseX, mouseY)
+        abstract val iconAndTooltip: Pair<TextureAtlasSprite, String>
 
-                // This is REQUIRED for drawing textures from the atlas. It WILL obscurely fail to draw
-                // in specific situations otherwise.
-                mc.renderEngine.bindTexture(KuarryModIcons.atlasResourceLocation)
+        open fun onClick() {
+            mc.soundHandler.playSound(PositionedSoundRecord.getRecord(SoundEvents.UI_BUTTON_CLICK, 1f, 0.3f))
+        }
 
-                val buttonTex = if (hovered) KuarryModIcons.buttonHighlight else KuarryModIcons.button
-                drawTexturedModalRect(x, y, buttonTex, buttonSize, buttonSize)
+        fun draw(mouseX: Int, mouseY: Int) {
+            // This is REQUIRED for drawing textures from the atlas. It WILL obscurely fail to draw
+            // in specific situations otherwise.
+            mc.renderEngine.bindTexture(KuarryModIcons.atlasResourceLocation)
 
-                val (icon, text) =
-                        when (activationMode) {
-                            ActivationMode.AlwaysOn -> Pair(KuarryModIcons.iconRSIgnore, "Always enabled")
-                            ActivationMode.DisableWithRS -> Pair(KuarryModIcons.iconRSWithout, "Disable with redstone signal")
-                            ActivationMode.EnableWithRS -> Pair(KuarryModIcons.iconRSWith, "Enable with redstone signal")
-                            ActivationMode.AlwaysOff -> Pair(KuarryModIcons.iconDisable, "Always disabled")
-                        }
-                drawTexturedModalRect(x, y, icon, buttonSize, buttonSize)
+            val hovered = isOnButton(mouseX, mouseY)
 
-                if (hovered) {
-                    drawTooltip(mouseX, mouseY, text)
-                }
+            val buttonTex = if (hovered) KuarryModIcons.buttonHighlight else KuarryModIcons.button
+            drawTexturedModalRect(x, y, buttonTex, buttonSize, buttonSize)
+
+            val (icon, tooltipText) = iconAndTooltip
+
+            drawTexturedModalRect(x, y, icon, buttonSize, buttonSize)
+
+            if (hovered) {
+                drawTooltip(mouseX, mouseY, tooltipText)
             }
+        }
+    }
+
+    private inner class ActivationModeButton(x: Int, y: Int) : Button(x, y) {
+        override val iconAndTooltip
+            get() =
+                when (container.tileEntity.activationMode) {
+                    ActivationMode.AlwaysOn -> Pair(KuarryModIcons.iconRSIgnore, "Always enabled")
+                    ActivationMode.DisableWithRS -> Pair(KuarryModIcons.iconRSWithout, "Disable with redstone signal")
+                    ActivationMode.EnableWithRS -> Pair(KuarryModIcons.iconRSWith, "Enable with redstone signal")
+                    ActivationMode.AlwaysOff -> Pair(KuarryModIcons.iconDisable, "Always disabled")
+                }
+
+        override fun onClick(): Unit =
+            KuarryModPackets.networkChannel.sendToServer(
+                    SwitchKuarrySetting(container.tileEntity.pos, SwitchKuarrySetting.Setting.ActivationMode)
+            ).also { super.onClick() }
+    }
+
+    private inner class RenderBoundsButton(x: Int, y: Int) : Button(x, y) {
+        override val iconAndTooltip: Pair<TextureAtlasSprite, String>
+            get() = if (container.tileEntity.renderBounds) {
+                Pair(KuarryModIcons.boundsEnable, "Show mining area boundaries")
+            } else {
+                Pair(KuarryModIcons.boundsDisable, "Do not show mining area boundaries")
+            }
+
+        override fun onClick() {
+                KuarryModPackets.networkChannel.sendToServer(
+                        SwitchKuarrySetting(container.tileEntity.pos, SwitchKuarrySetting.Setting.RenderBounds)
+                ).also { super.onClick() }
         }
     }
 }

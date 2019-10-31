@@ -9,6 +9,6 @@ object KuarryModPackets {
 
     internal fun register() {
         var id = 0;
-        networkChannel.registerMessage(ChangeKuarryActivationMode.Handler(), ChangeKuarryActivationMode::class.java, id++, Side.SERVER)
+        networkChannel.registerMessage(SwitchKuarrySetting.Handler(), SwitchKuarrySetting::class.java, id++, Side.SERVER)
     }
 }

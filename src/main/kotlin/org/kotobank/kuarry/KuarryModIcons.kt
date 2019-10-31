@@ -32,6 +32,9 @@ object KuarryModIcons {
     lateinit var iconRSWith: TextureAtlasSprite
     lateinit var iconDisable: TextureAtlasSprite
 
+    lateinit var boundsDisable: TextureAtlasSprite
+    lateinit var boundsEnable: TextureAtlasSprite
+
     private fun registerIcons(map: TextureMap) {
         with (map) {
             button = registerIcon("button")
@@ -40,6 +43,9 @@ object KuarryModIcons {
             iconRSWithout = registerIcon("activation_rs_without")
             iconRSWith = registerIcon("activation_rs_with")
             iconDisable = registerIcon("activation_always_disable")
+
+            boundsDisable = registerIcon("bounds_disable")
+            boundsEnable = registerIcon("bounds_enable")
         }
     }
 }

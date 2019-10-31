@@ -11,24 +11,28 @@ import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 
 class KuarryModGUIHandler : IGuiHandler {
     companion object {
-        val KUARRY = 0
+        const val KUARRY = 0
     }
 
-    override fun getServerGuiElement(ID: Int, player: EntityPlayer?, world: World?, x: Int, y: Int, z: Int): Container? {
+    override fun getServerGuiElement(ID: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): Container? {
         return when (ID) {
             KUARRY -> KuarryContainer(
-                    player!!.inventory,
-                    @Suppress("UNCHECKED_CAST") world!!.getTileEntity(BlockPos(x, y, z)) as KuarryTileEntity
+                    player.inventory,
+                    @Suppress("UNCHECKED_CAST") world.getTileEntity(BlockPos(x, y, z)) as KuarryTileEntity
             )
             else -> null
         }
     }
 
-    override fun getClientGuiElement(ID: Int, player: EntityPlayer?, world: World?, x: Int, y: Int, z: Int): Any? {
+    override fun getClientGuiElement(ID: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): Any? {
         return when (ID) {
-            KUARRY -> KuarryGUIContainer(
-                    getServerGuiElement(ID, player, world, x, y, z)!!
-            )
+            KUARRY -> {
+                getServerGuiElement(ID, player, world, x, y, z)?.let {
+                    require(it is KuarryContainer)
+
+                    KuarryGUIContainer(it)
+                }
+            }
             else -> null
         }
     }
