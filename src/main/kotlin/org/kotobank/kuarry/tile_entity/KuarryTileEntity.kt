@@ -52,12 +52,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 Blocks.NETHERRACK,
 
                 Blocks.TALLGRASS,
-                Blocks.SNOW_LAYER,
-
-                Blocks.WATER,
-                Blocks.FLOWING_WATER,
-                Blocks.LAVA,
-                Blocks.FLOWING_LAVA
+                Blocks.SNOW_LAYER
         )
 
         internal const val baseRequiredEnergy = 1000
