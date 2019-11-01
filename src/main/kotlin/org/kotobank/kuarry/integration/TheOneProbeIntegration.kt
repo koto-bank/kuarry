@@ -24,13 +24,10 @@ class TheOneProbeIntegration {
                             if (blockState.block is KuarryBlock) {
                                 val te = world.getTileEntity(data.pos)
                                 if (te is KuarryTileEntity) {
-                                    probeInfo.horizontal()
-                                            .text("Resources mined")
-                                            .progress(
-                                                    te.approxResourcesMined,
-                                                    te.approxResourceCount,
-                                                    probeInfo.defaultProgressStyle().height(11)
-                                            )
+                                    if (te.approxResourcesLeft != -1) {
+                                        probeInfo.horizontal()
+                                                .text("Approx. left: ${te.approxResourcesLeft}")
+                                    }
                                 }
                             }
                         }

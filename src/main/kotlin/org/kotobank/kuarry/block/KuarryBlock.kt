@@ -16,7 +16,6 @@ import org.kotobank.kuarry.KuarryMod
 import org.kotobank.kuarry.KuarryModGUIHandler
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 import kotlin.math.ceil
-import kotlin.math.roundToInt
 
 class KuarryBlock(material: Material, registryName: String) : Block(material) {
     companion object {
@@ -70,15 +69,9 @@ class KuarryBlock(material: Material, registryName: String) : Block(material) {
     override fun getComparatorInputOverride(blockState: IBlockState, worldIn: World, pos: BlockPos): Int {
         val tileEntity = worldIn.getTileEntity(pos)
 
-        return if (tileEntity is KuarryTileEntity && tileEntity.approxResourceCount > 0) {
-            val remaining = tileEntity.approxResourceCount - tileEntity.approxResourcesMined
-
-            // Just in case. It should ALWAYS give 0 when there are no more resources
-            if (remaining != 0) {
-                ceil((remaining.toFloat() / tileEntity.approxResourceCount.toFloat()) * 15f).toInt()
-            } else {
-                0
-            }
+        // Give a strong comparator signal when there is no more resources to mine
+        return if (tileEntity is KuarryTileEntity && tileEntity.approxResourcesLeft == 0) {
+            15
         } else {
             0
         }

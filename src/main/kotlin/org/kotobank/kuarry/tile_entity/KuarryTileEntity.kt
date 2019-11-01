@@ -168,8 +168,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
             writeToNBT(NBTTagCompound()).apply {
                 // These are sent to client but are ephemeral and reset on world reload
 
-                setInteger("approx_res_count", approxResourceCount)
-                setInteger("approx_res_mined", approxResourcesMined)
+                setInteger("approx_res_left", approxResourcesLeft)
                 setBoolean("render_bounds", renderBounds)
             }
 
@@ -185,8 +184,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
         // Handle the properties that are not saved and therefore are not in readFromNBT
 
         with(pkt.nbtCompound) {
-            approxResourceCount = getInteger("approx_res_count")
-            approxResourcesMined = getInteger("approx_res_mined")
+            approxResourcesLeft = getInteger("approx_res_left")
             renderBounds = getBoolean("render_bounds")
         }
     }
@@ -207,13 +205,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
      *
      * Ephemeral, resets on world reload.
      */
-    internal var approxResourceCount = -1
-
-    /** An approximate number of resources mined since world loading.
-     *
-     * The value is ephemeral and is reset on world reload.
-     */
-    internal var approxResourcesMined = 0
+    internal var approxResourcesLeft = -1
 
     /** Tick count for general updates, to not run them too much */
     private var updateCount = 0
@@ -251,14 +243,16 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
             // 6000 ~= 5 minutes
             // 50 is to wait a little until the world loads on start
-            if (resourceCountUpdateCount >= 6000 || (approxResourceCount == -1 && resourceCountUpdateCount >= 50)) {
+            if (resourceCountUpdateCount >= 6000 || (approxResourcesLeft == -1 && resourceCountUpdateCount >= 50)) {
                 resourceCountUpdateCount = 0
 
                 val chunk = world.getChunkFromBlockCoords(pos)
 
-                approxResourceCount = countAllMinable(chunk)
+                approxResourcesLeft = countAllMinable(chunk)
 
-                notifyClient()
+                // Mark the block dirty to make comparator see it and
+                // notify the client about the amount of resources
+                notifyClientAndMarkDirty()
             }
         }
     }
@@ -398,9 +392,26 @@ class KuarryTileEntity : TileEntity(), ITickable {
         // TODO: something smart here
         world.setBlockState(blockPos, KuarryModBlocks.denatured_stone.defaultState)
 
-        // Increment the mined resource amount and notify the client about it
-        approxResourcesMined++
-        notifyClient()
+        approxResourcesLeft.dec().let {
+            when {
+                it > 0 -> approxResourcesLeft--
+                it == 0 -> {
+                    // If there are no more resources, mark block as dirty
+                    // so the comparator would see the signal
+                    approxResourcesLeft--
+                    markDirty()
+                }
+                it < 0 -> {
+                    // If there are less then zero resources, the resource count is probably wrong,
+                    // so recalculate it now and mark the block dirty it case it turns out to be zero
+                    approxResourcesLeft = countAllMinable(world.getChunkFromBlockCoords(blockPos))
+                    markDirty()
+                }
+            }
+
+            // Notify the client about the new amount of resources left
+            notifyClient()
+        }
 
         return true
     }

@@ -82,10 +82,10 @@ class KuarryGUIContainer(private val container: KuarryContainer) : GuiContainer(
     override fun drawGuiContainerForegroundLayer(mouseX: Int, mouseY: Int) {
         val tileEntity = container.tileEntity
 
-        if (tileEntity.approxResourceCount != -1) {
+        if (tileEntity.approxResourcesLeft != -1) {
             drawString(
                     mc.fontRenderer,
-                    "Approx. mined: ${tileEntity.approxResourcesMined}/${tileEntity.approxResourceCount}",
+                    "Approx. left: ${tileEntity.approxResourcesLeft}",
                     30,
                     10,
                     0xFFFFFF
