@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.SlotItemHandler
+import org.kotobank.kuarry.item.KuarryUpgrade
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 
 class KuarryContainer(inventoryPlayer: InventoryPlayer, val tileEntity: KuarryTileEntity) : Container() {
@@ -91,10 +92,8 @@ class KuarryContainer(inventoryPlayer: InventoryPlayer, val tileEntity: KuarryTi
                                         tileEntity.markDirty()
                                     }
 
-                                    override fun isItemValid(stack: ItemStack): Boolean {
-                                        // TODO: implement checking for upgrades and only accept them
-                                        return false
-                                    }
+                                    override fun isItemValid(stack: ItemStack) =
+                                            stack.item is KuarryUpgrade
                                 }
                         )
                 )

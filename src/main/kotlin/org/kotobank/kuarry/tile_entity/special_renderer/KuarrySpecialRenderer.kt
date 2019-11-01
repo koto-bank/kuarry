@@ -15,7 +15,7 @@ class KuarrySpecialRenderer : TileEntitySpecialRenderer<KuarryTileEntity>() {
         val chunk = world.getChunkFromBlockCoords(te.pos)
         val chunkPos = chunk.pos
 
-        // Find the difference between the block and the beginning of the chunk
+        // Find the difference between the block and the beginning of the first chunk
         val xDiff = (chunkPos.xStart - te.pos.x).toDouble()
         val zDiff = (chunkPos.zStart - te.pos.z).toDouble()
 
@@ -38,11 +38,15 @@ class KuarrySpecialRenderer : TileEntitySpecialRenderer<KuarryTileEntity>() {
         // Translate the drawing to the coordinates of the block
         bb.setTranslation(x, y, z)
 
-        // Draw the lines around the chunk borders
+        // Get the amount of chunks to expand the zone to.
+        // This is added to the base chunk and multiplied to get the whole zone covered
+        val (xExpansion, zExpansion) = te.xzChunkExpansion()
+
+        // Draw the lines around the chunks borders
         bb.pos(xDiff, 2.0, zDiff).endVertex()
-        bb.pos(xDiff + 16.0, 2.0, zDiff).endVertex()
-        bb.pos(xDiff + 16.0, 2.0, zDiff + 16.0).endVertex()
-        bb.pos(xDiff, 2.0, zDiff + 16.0).endVertex()
+        bb.pos(xDiff + (16.0 * (1 + xExpansion)), 2.0, zDiff).endVertex()
+        bb.pos(xDiff + (16.0 * (1 + xExpansion)), 2.0, (zDiff + (16.0 * (1 + zExpansion)))).endVertex()
+        bb.pos(xDiff, 2.0, zDiff + (16.0 * (1 + zExpansion))).endVertex()
 
         // Translate the coordinates back to the base ones
         bb.setTranslation(0.0, 0.0, 0.0)
@@ -52,4 +56,6 @@ class KuarrySpecialRenderer : TileEntitySpecialRenderer<KuarryTileEntity>() {
         GlStateManager.enableLighting()
         GlStateManager.enableTexture2D()
     }
+
+    override fun isGlobalRenderer(te: KuarryTileEntity) = true
 }

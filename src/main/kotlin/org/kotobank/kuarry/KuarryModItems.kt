@@ -8,6 +8,8 @@ import net.minecraftforge.event.RegistryEvent.Register
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder
+import org.kotobank.kuarry.item.KuarryXBoundariesUpgrade
+import org.kotobank.kuarry.item.KuarryZBoundariesUpgrade
 
 @Mod.EventBusSubscriber(modid = KuarryMod.MODID)
 object KuarryModItems {
@@ -19,12 +21,13 @@ object KuarryModItems {
 
     @SubscribeEvent
     fun registerItems(event: Register<Item>) {
-
         listOf(
                 Pair("kuarry", ItemBlock(KuarryModBlocks.kuarry)),
                 Pair("denatured_stone", ItemBlock(KuarryModBlocks.denatured_stone)),
 
-                Pair("kuarry_casing", Item())
+                Pair("kuarry_casing", Item()),
+                Pair("x_boundaries_upgrade", KuarryXBoundariesUpgrade()),
+                Pair("z_boundaries_upgrade", KuarryZBoundariesUpgrade())
         ).forEach { (name, item) ->
             item.apply {
                 setRegistryName(KuarryMod.MODID, name)

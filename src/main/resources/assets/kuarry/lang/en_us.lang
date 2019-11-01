@@ -2,3 +2,5 @@ tile.kuarry.name=Kuarry
 tile.denatured_stone.name=Denatured stone
 
 item.kuarry_casing.name=Kuarry casing
+item.x_boundaries_upgrade.name=X kuarry boundaries upgrade
+item.z_boundaries_upgrade.name=Z kuarry boundaries upgrade

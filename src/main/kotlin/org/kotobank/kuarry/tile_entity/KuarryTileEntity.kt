@@ -22,11 +22,14 @@ import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.ItemStackHandler
 import org.kotobank.kuarry.KuarryMod
 import org.kotobank.kuarry.KuarryModBlocks
+import org.kotobank.kuarry.item.KuarryXBoundariesUpgrade
+import org.kotobank.kuarry.item.KuarryZBoundariesUpgrade
 
 class KuarryTileEntity : TileEntity(), ITickable {
     companion object {
         internal const val upgradeInventoryWidth = 2
         internal const val upgradeInventoryHeight = 3
+        internal const val upgradeInventorySize = upgradeInventoryWidth * upgradeInventoryHeight
 
         internal const val packetEntityID = 0
 
@@ -213,6 +216,50 @@ class KuarryTileEntity : TileEntity(), ITickable {
     /** Tick count for the resource-count-in-the-chunk updates */
     private var resourceCountUpdateCount = 0
 
+    /** Count the amount of chunks added to X and Z by upgrades.  */
+    fun xzChunkExpansion(): Pair<Int, Int> {
+        var additionalXChunks = 0
+        var additionalZChunks = 0
+        for (i in 0 until upgradeInventorySize) {
+            val slotItemStack = upgradeInventory.getStackInSlot(i)
+
+            if (!slotItemStack.isEmpty) {
+                val itemCount = slotItemStack.count
+
+                when (slotItemStack.item) {
+                    is KuarryXBoundariesUpgrade -> additionalXChunks += itemCount
+                    is KuarryZBoundariesUpgrade -> additionalZChunks += itemCount
+                    else -> {}
+                }
+            }
+        }
+
+        return Pair(additionalXChunks, additionalZChunks)
+    }
+
+    /** Find and put in a list the chunks to be mined.
+     *
+     * The first chunk has the smallest coordinates and is used as the beginning
+     * when calculating the mining zone. The last chunk has the biggest coordinates
+     * and is used as the ending of the mining zone. These two might be the same chunk, if
+     * there are no upgrades.
+     */
+    private fun calculateMinedChunks(): List<Chunk> {
+        val (additionalXChunks, additionalZChunks) = xzChunkExpansion()
+
+        val kuarryChunk = world.getChunkFromBlockCoords(pos)
+        var chunks = mutableListOf<Chunk>()
+        for (x in 0..additionalXChunks) {
+            for (z in 0..additionalZChunks) {
+                chunks.add(world.getChunkFromChunkCoords(kuarryChunk.x + x, kuarryChunk.z + z))
+            }
+        }
+        // Supposedly, when chunks are added like this, they are always sorted, so the last one
+        // in the list should have the biggest coordinates (the end coordinates basically)
+
+        return chunks
+    }
+
     override fun update() {
         if (!world.isRemote) {
             updateCount++
@@ -235,33 +282,31 @@ class KuarryTileEntity : TileEntity(), ITickable {
                     ActivationMode.EnableWithRS -> if (!world.isBlockPowered(pos)) return
                 }
 
-                val chunk = world.getChunkFromBlockCoords(pos)
+                val minedChunks = calculateMinedChunks()
 
-                // Process all blocks in the chunk
-                doWithAllBlocksInChunk(chunk, ::processBlock)
-            }
+                // 6000 ~= 5 minutes
+                // 50 is to wait a little until the world loads on start
+                if (resourceCountUpdateCount >= 6000 || (approxResourcesLeft == -1 && resourceCountUpdateCount >= 50)) {
+                    resourceCountUpdateCount = 0
 
-            // 6000 ~= 5 minutes
-            // 50 is to wait a little until the world loads on start
-            if (resourceCountUpdateCount >= 6000 || (approxResourcesLeft == -1 && resourceCountUpdateCount >= 50)) {
-                resourceCountUpdateCount = 0
+                    approxResourcesLeft = countAllMinable(minedChunks)
 
-                val chunk = world.getChunkFromBlockCoords(pos)
+                    // Mark the block dirty to make comparator see it and
+                    // notify the client about the amount of resources
+                    notifyClientAndMarkDirty()
+                }
 
-                approxResourcesLeft = countAllMinable(chunk)
-
-                // Mark the block dirty to make comparator see it and
-                // notify the client about the amount of resources
-                notifyClientAndMarkDirty()
+                // Process all blocks in the chunks
+                doWithAllBlocksInChunks(minedChunks, ::processBlock)
             }
         }
     }
 
     /** Counts the all the minable resources in the chunk for user-faced stats. */
-    private fun countAllMinable(chunk: Chunk): Int {
+    private fun countAllMinable(minedChunks: List<Chunk>): Int {
         var amountOfBlocks = 0
 
-        doWithAllBlocksInChunk(chunk) { _, blockState ->
+        doWithAllBlocksInChunks(minedChunks) { _, blockState ->
             if (!isBlockBlacklisted(blockState.block)) {
                 amountOfBlocks++
             }
@@ -273,34 +318,41 @@ class KuarryTileEntity : TileEntity(), ITickable {
         return amountOfBlocks
     }
 
-    /** Iterate over all (until y level 5) blocks calling the function on these blocks for side effects.
+    /** Iterate over all the blocks in all the chunks, calling [func] on these blocks.
      *
-     * If the functions returns true, the iteration is stopped and the function returns.
+     * If [func] returns true, the iteration is stopped and this function returns.
      */
-    private fun doWithAllBlocksInChunk(chunk: Chunk, func: (blockPos: BlockPos, blockState: IBlockState) -> Boolean) {
-        val chunkPos = chunk.pos
+    private fun doWithAllBlocksInChunks(chunks: List<Chunk>, func: (blockPos: BlockPos, blockState: IBlockState) -> Boolean) {
+        val firstChunkPos = chunks.first().pos
+        val lastChunkPos = chunks.last().pos
 
-        var x = chunkPos.xStart
-        var z = chunkPos.zStart
+        val firstX = firstChunkPos.xStart
+        val firstZ = firstChunkPos.zStart
+
+        val lastX = lastChunkPos.xEnd
+        val lastZ = lastChunkPos.zEnd
+
+        var x = firstX
+        var z = firstZ
         var y = pos.y - 1
 
         do {
             val blockPos = BlockPos(x, y, z)
-            val blockState = chunk.getBlockState(blockPos)
+            val blockState = world.getBlockState(blockPos)
 
             // Exit whenever the function returns true
             if (func(blockPos, blockState)) break
 
             when {
-                x < chunkPos.xEnd ->
+                x < lastX ->
                     x++
-                z < chunkPos.zEnd -> {
-                    x = chunkPos.xStart
+                z < lastZ -> {
+                    x = firstX
                     z++
                 }
                 else -> {
-                    x = chunkPos.xStart
-                    z = chunkPos.zStart
+                    x = firstX
+                    z = firstZ
                     y--
                 }
             }
@@ -404,7 +456,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 it < 0 -> {
                     // If there are less then zero resources, the resource count is probably wrong,
                     // so recalculate it now and mark the block dirty it case it turns out to be zero
-                    approxResourcesLeft = countAllMinable(world.getChunkFromBlockCoords(blockPos))
+                    approxResourcesLeft = countAllMinable(calculateMinedChunks())
                     markDirty()
                 }
             }
@@ -420,7 +472,14 @@ class KuarryTileEntity : TileEntity(), ITickable {
         val originalBB = super.getRenderBoundingBox()
 
         if (renderBounds) {
-            return originalBB.grow(16.0, 5.0, 16.0);
+            val (additionalXChunks, additionalZChunks) = xzChunkExpansion()
+
+            // The box should be grown depending on the amount of upgrades
+            return originalBB.grow(
+                    16.0 * (1 + additionalXChunks),
+                    5.0,
+                    16.0 * (1 + additionalZChunks)
+            )
         }
 
         return originalBB
