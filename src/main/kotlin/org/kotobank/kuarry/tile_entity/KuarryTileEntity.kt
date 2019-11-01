@@ -304,7 +304,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
                     y--
                 }
             }
-        } while (y >= 5)
+        } while (y >= 0)
         // The exit condition is to not go through bedrock
     }
 
