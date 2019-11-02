@@ -5,6 +5,11 @@ import buildcraft.api.mj.IMjReceiver
 import buildcraft.api.mj.MjAPI
 import net.minecraftforge.energy.IEnergyStorage
 
+/** An implementation of buildcraft's [IMjReceiver].
+ *
+ * It proxies the energy to the [backingStorage], converting it 10RF = 1mJ
+ *
+ */
 class MjReceiverImpl(private val backingStorage: IEnergyStorage) : IMjReceiver {
     val capConnector = MjAPI.CAP_RECEIVER
     val capReceiver = MjAPI.CAP_CONNECTOR
