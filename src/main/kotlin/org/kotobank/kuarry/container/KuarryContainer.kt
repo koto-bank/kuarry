@@ -97,8 +97,8 @@ class KuarryContainer(inventoryPlayer: InventoryPlayer, val tileEntity: KuarryTi
                                             // Find if any OTHER slot has that same upgrade. If so,
                                             // don't allow putting another on in a different slot
                                             var alreadyHas = false
-                                            for (i in 0 until KuarryTileEntity.upgradeInventorySize) {
-                                                if (i != positionInInventory && upgradeInventory.getStackInSlot(i).item == stack.item) {
+                                            for (ii in 0 until KuarryTileEntity.upgradeInventorySize) {
+                                                if (ii != positionInInventory && upgradeInventory.getStackInSlot(ii).item == stack.item) {
                                                     alreadyHas = true
                                                     break
                                                 }
