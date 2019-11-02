@@ -52,13 +52,14 @@ repositories {
     maven { url = "http://maven.ic2.player.to/" } // IC2
 
     maven { url "http://maven.tterrag.com/" } // TOP
+    maven { url "https://mod-buildcraft.com/maven" } // BC
 }
 
 
 def cofh_core_version = "4.6.3.27", cofh_world_version = "1.3.1.7", redstone_flux_version = "2.1.0.6",
         thermal_foundation_version = "2.6.3.27", thermal_expansion_version = "5.5.4.43", thermal_dynamics_version = "2.5.5.21",
         jei_version = "4.15.0.291", ccl_version = "3.2.3.358",
-        ic2_version = "2.8.170-ex112", top_version = "1.4.28-17"
+        ic2_version = "2.8.170-ex112", top_version = "1.4.28-17", bc_version = "7.99.24.1"
 
 dependencies {
     compile group: "net.shadowfacts", name: "Forgelin", version: "1.8.4"
@@ -76,6 +77,9 @@ dependencies {
     runtime "cofh:ThermalDynamics:${mc_version}-${thermal_dynamics_version}:universal"
 
     runtime "net.industrial-craft:industrialcraft-2:${ic2_version}"
+
+    runtime "com.mod-buildcraft:buildcraft-all:${bc_version}"
+    provided "com.mod-buildcraft:buildcraft-api:${bc_version}"
 
     compile "mcjty.theoneprobe:TheOneProbe-1.12:${mc_version_short}-${top_version}"
 

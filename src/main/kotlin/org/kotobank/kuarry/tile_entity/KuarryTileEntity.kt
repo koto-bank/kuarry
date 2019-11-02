@@ -9,21 +9,17 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.EnumFacing
-import net.minecraft.util.ITickable
-import net.minecraft.util.NonNullList
-import net.minecraft.util.math.AxisAlignedBB
-import net.minecraft.util.math.BlockPos
+import net.minecraft.util.*
+import net.minecraft.util.math.*
 import net.minecraft.world.chunk.Chunk
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.energy.*
+import net.minecraftforge.items.*
 import net.minecraftforge.fluids.IFluidBlock
-import net.minecraftforge.items.CapabilityItemHandler
-import net.minecraftforge.items.ItemStackHandler
-import org.kotobank.kuarry.KuarryMod
-import org.kotobank.kuarry.KuarryModBlocks
-import org.kotobank.kuarry.item.KuarryXBoundariesUpgrade
-import org.kotobank.kuarry.item.KuarryZBoundariesUpgrade
+import net.minecraftforge.fml.common.Loader
+import org.kotobank.kuarry.*
+import org.kotobank.kuarry.item.*
+import org.kotobank.kuarry.integration.MjReceiverImpl
 
 class KuarryTileEntity : TileEntity(), ITickable {
     companion object {
@@ -63,6 +59,9 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
     private var lastEnergyStored = 0
     private val energyStorage = EnergyStorage(100000, 2000)
+
+    /** IMjReceiver implementation for BuildCraft compatibility */
+    private lateinit var mjEnergyStorage: MjReceiverImpl
 
     internal val inventoryWidth = 9
     internal val inventoryHeight = 3
@@ -125,23 +124,37 @@ class KuarryTileEntity : TileEntity(), ITickable {
         notifyClient()
     }
 
-    override fun hasCapability(capability: Capability<*>, facing: EnumFacing?) =
-        when (capability) {
-            CapabilityEnergy.ENERGY, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY -> true
-            else -> super.hasCapability(capability, facing)
+    override fun onLoad() {
+        if (Loader.isModLoaded("buildcraftcore")) {
+            mjEnergyStorage = MjReceiverImpl(energyStorage)
         }
+    }
 
+    override fun hasCapability(capability: Capability<*>, facing: EnumFacing?): Boolean {
+        return when (capability) {
+            CapabilityEnergy.ENERGY, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY -> true
+            else -> when {
+                Loader.isModLoaded("buildcraftcore") &&
+                        (capability == mjEnergyStorage.capConnector || capability == mjEnergyStorage.capReceiver) -> true
+                else -> super.hasCapability(capability, facing)
+            }
 
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
     override fun <T : Any?> getCapability(capability: Capability<T>, facing: EnumFacing?): T? {
         return when (capability) {
             CapabilityEnergy.ENERGY ->
-                @Suppress("UNCHECKED_CAST")
                 energyStorage as T
             CapabilityItemHandler.ITEM_HANDLER_CAPABILITY ->
-                @Suppress("UNCHECKED_CAST")
                 inventory as T
-            else ->
-                super.getCapability(capability, facing)
+            else -> when {
+                Loader.isModLoaded("buildcraftcore") &&
+                        (capability == mjEnergyStorage.capConnector || capability == mjEnergyStorage.capReceiver) ->
+                    mjEnergyStorage as T
+                else -> super.getCapability(capability, facing)
+            }
         }
     }
 
