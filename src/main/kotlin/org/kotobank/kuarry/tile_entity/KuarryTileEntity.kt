@@ -55,6 +55,10 @@ class KuarryTileEntity : TileEntity(), ITickable {
         )
 
         internal const val baseRequiredEnergy = 1000
+
+        internal const val inventoryWidth = 9
+        internal const val inventoryHeight = 3
+        internal const val inventorySize = inventoryWidth * inventoryHeight
     }
 
     private var lastEnergyStored = 0
@@ -63,12 +67,8 @@ class KuarryTileEntity : TileEntity(), ITickable {
     /** IMjReceiver implementation for BuildCraft compatibility */
     private lateinit var mjEnergyStorage: MjReceiverImpl
 
-    internal val inventoryWidth = 9
-    internal val inventoryHeight = 3
-    internal val inventorySize = inventoryWidth * inventoryHeight
-
     /** A chest-sized inventory for inner item storage */
-    private val inventory = object : ItemStackHandler(inventorySize) {
+    internal val inventory = object : ItemStackHandler(inventorySize) {
         override fun onContentsChanged(slot: Int) {
             super.onContentsChanged(slot)
             markDirty()
@@ -162,27 +162,32 @@ class KuarryTileEntity : TileEntity(), ITickable {
         }
     }
 
-    override fun readFromNBT(compound: NBTTagCompound): Unit =
-            super.readFromNBT(
-                    compound.apply {
-                        CapabilityEnergy.ENERGY.readNBT(energyStorage, EnumFacing.NORTH, getTag("energy"))
-                        inventory.deserializeNBT(getCompoundTag("inventory"))
-                        upgradeInventory.deserializeNBT(getCompoundTag("upgrade_inventory"))
+    /** Write NBT data that is mod's and not game's. */
+    internal fun writeModNBT(compound: NBTTagCompound): NBTTagCompound =
+            compound.apply {
+                setTag("energy", CapabilityEnergy.ENERGY.writeNBT(energyStorage, EnumFacing.NORTH)!!)
+                setTag("inventory", inventory.serializeNBT())
+                setTag("upgrade_inventory", upgradeInventory.serializeNBT())
 
-                        activationMode = ActivationMode.valueOf(getString("activation_mode"))
-                    }
-            )
+                setString("activation_mode", activationMode.name)
+            }
+
+    /** Read mod's NBT data, but not game's NBT data. */
+    internal fun readModNBT(compound: NBTTagCompound): Unit {
+        compound.apply {
+            CapabilityEnergy.ENERGY.readNBT(energyStorage, EnumFacing.NORTH, getTag("energy"))
+            inventory.deserializeNBT(getCompoundTag("inventory"))
+            upgradeInventory.deserializeNBT(getCompoundTag("upgrade_inventory"))
+
+            activationMode = ActivationMode.valueOf(getString("activation_mode"))
+        }
+    }
+
+    override fun readFromNBT(compound: NBTTagCompound): Unit =
+            super.readFromNBT(compound).also { readModNBT(compound) }
 
     override fun writeToNBT(compound: NBTTagCompound): NBTTagCompound =
-            super.writeToNBT(
-                    compound.apply {
-                        setTag("energy", CapabilityEnergy.ENERGY.writeNBT(energyStorage, EnumFacing.NORTH)!!)
-                        setTag("inventory", inventory.serializeNBT())
-                        setTag("upgrade_inventory", upgradeInventory.serializeNBT())
-
-                        setString("activation_mode", activationMode.name)
-                    }
-            )
+            super.writeToNBT(compound).let(::writeModNBT)
 
     override fun getUpdateTag(): NBTTagCompound =
             writeToNBT(NBTTagCompound()).apply {

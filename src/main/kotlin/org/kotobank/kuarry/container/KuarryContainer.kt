@@ -29,9 +29,9 @@ class KuarryContainer(inventoryPlayer: InventoryPlayer, val tileEntity: KuarryTi
         val inventory = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.NORTH)
 
         // Add all the slots from the kuarry inventory
-        for (i in 0 until tileEntity.inventoryHeight) {
-            for (j in 0 until tileEntity.inventoryWidth) {
-                val positionInInventory = (j * tileEntity.inventoryHeight) + i
+        for (i in 0 until KuarryTileEntity.inventoryHeight) {
+            for (j in 0 until KuarryTileEntity.inventoryWidth) {
+                val positionInInventory = (j * KuarryTileEntity.inventoryHeight) + i
 
                 addSlotToContainer(
                         addSlotToContainer(
