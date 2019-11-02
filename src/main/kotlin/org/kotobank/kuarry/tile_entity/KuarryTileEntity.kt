@@ -125,8 +125,12 @@ class KuarryTileEntity : TileEntity(), ITickable {
     }
 
     override fun onLoad() {
-        if (Loader.isModLoaded("buildcraftcore")) {
-            mjEnergyStorage = MjReceiverImpl(energyStorage)
+        if (world.isRemote) {
+            if (Loader.isModLoaded("buildcraftcore")) {
+                mjEnergyStorage = MjReceiverImpl(energyStorage)
+            }
+
+            approxResourcesLeft = countAllMinable(calculateMinedChunks())
         }
     }
 
@@ -299,7 +303,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
                 // 6000 ~= 5 minutes
                 // 50 is to wait a little until the world loads on start
-                if (resourceCountUpdateCount >= 6000 || (approxResourcesLeft == -1 && resourceCountUpdateCount >= 50)) {
+                if (resourceCountUpdateCount >= 6000) {
                     resourceCountUpdateCount = 0
 
                     approxResourcesLeft = countAllMinable(minedChunks)
