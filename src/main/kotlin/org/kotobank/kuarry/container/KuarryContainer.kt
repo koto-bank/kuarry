@@ -92,8 +92,21 @@ class KuarryContainer(inventoryPlayer: InventoryPlayer, val tileEntity: KuarryTi
                                         tileEntity.markDirty()
                                     }
 
-                                    override fun isItemValid(stack: ItemStack) =
-                                            stack.item is KuarryUpgrade
+                                    override fun isItemValid(stack: ItemStack): Boolean {
+                                        return if (stack.item is KuarryUpgrade) {
+                                            // Find if any OTHER slot has that same upgrade. If so,
+                                            // don't allow putting another on in a different slot
+                                            var alreadyHas = false
+                                            for (i in 0 until KuarryTileEntity.upgradeInventorySize) {
+                                                if (i != positionInInventory && upgradeInventory.getStackInSlot(i).item == stack.item) {
+                                                    alreadyHas = true
+                                                    break
+                                                }
+                                            }
+
+                                            return !alreadyHas
+                                        } else { false }
+                                    }
                                 }
                         )
                 )
