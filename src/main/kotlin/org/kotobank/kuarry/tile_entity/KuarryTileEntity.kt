@@ -58,7 +58,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
     }
 
     private var lastEnergyStored = 0
-    private val energyStorage = EnergyStorage(100000, 2000)
+    private val energyStorage = EnergyStorage(100000, 100, 5000)
 
     /** IMjReceiver implementation for BuildCraft compatibility */
     private lateinit var mjEnergyStorage: MjReceiverImpl
