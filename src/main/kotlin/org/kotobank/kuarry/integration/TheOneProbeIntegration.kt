@@ -21,13 +21,11 @@ class TheOneProbeIntegration {
                     object : IProbeInfoProvider {
                         override fun getID() = "${KuarryMod.MODID}:kuarry_provider"
                         override fun addProbeInfo(mode: ProbeMode, probeInfo: IProbeInfo, player: EntityPlayer, world: World, blockState: IBlockState, data: IProbeHitData) {
-                            if (blockState.block is KuarryBlock) {
+                            if (mode == ProbeMode.EXTENDED && blockState.block is KuarryBlock) {
                                 val te = world.getTileEntity(data.pos)
-                                if (te is KuarryTileEntity) {
-                                    if (te.approxResourcesLeft != -1) {
-                                        probeInfo.horizontal()
-                                                .text("Approx. left: ${te.approxResourcesLeft}")
-                                    }
+                                if (te is KuarryTileEntity && te.approxResourcesLeft != -1) {
+                                    probeInfo.horizontal()
+                                            .text("Approx. left: ${te.approxResourcesLeft}")
                                 }
                             }
                         }
