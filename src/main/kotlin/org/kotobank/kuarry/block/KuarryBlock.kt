@@ -19,8 +19,6 @@ import org.kotobank.kuarry.KuarryMod
 import org.kotobank.kuarry.KuarryModGUIHandler
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraftforge.energy.CapabilityEnergy
-import net.minecraftforge.energy.EnergyStorage
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
