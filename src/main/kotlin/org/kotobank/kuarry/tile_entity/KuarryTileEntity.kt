@@ -1,6 +1,7 @@
 package org.kotobank.kuarry.tile_entity
 
 import net.minecraft.block.Block
+import net.minecraft.block.SilkTouchHarvest
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.init.Blocks
@@ -238,26 +239,33 @@ class KuarryTileEntity : TileEntity(), ITickable {
     /** Tick count for the resource-count-in-the-chunk updates */
     private var resourceCountUpdateCount = 0
 
-    /** Count the amount of chunks added to X and Z by upgrades.  */
-    fun xzChunkExpansion(): Pair<Int, Int> {
-        var additionalXChunks = 0
-        var additionalZChunks = 0
+    /** Counts the amount of upgrades of specified type in the upgrade inventory. */
+    private inline fun <reified T : KuarryUpgrade> upgradesInInventory(): Int {
+        var res = 0;
+
         for (i in 0 until upgradeInventorySize) {
             val slotItemStack = upgradeInventory.getStackInSlot(i)
 
             if (!slotItemStack.isEmpty) {
                 val itemCount = slotItemStack.count
-
-                when (slotItemStack.item) {
-                    is KuarryXBoundariesUpgrade -> additionalXChunks += itemCount
-                    is KuarryZBoundariesUpgrade -> additionalZChunks += itemCount
-                    else -> {}
+                if (slotItemStack.item::class == T::class) {
+                    res += itemCount;
                 }
             }
         }
 
-        return Pair(additionalXChunks, additionalZChunks)
+        return res
     }
+
+    /** Count the amount of chunks added to X and Z by upgrades.
+     *
+     * The amount is equal to the amount of these upgrades, this function is
+     * a convenient way to get both values.
+     */
+    fun xzChunkExpansion(): Pair<Int, Int> = Pair(
+            upgradesInInventory<KuarryXBoundariesUpgrade>(),
+            upgradesInInventory<KuarryZBoundariesUpgrade>()
+    )
 
     /** Find and put in a list the chunks to be mined.
      *
@@ -423,7 +431,13 @@ class KuarryTileEntity : TileEntity(), ITickable {
         }
 
         var drops = NonNullList.create<ItemStack>()
-        block.getDrops(drops, world, pos, blockState, 0)
+        if (upgradesInInventory<KuarrySilkTouchUpgrade>() < 1) {
+            // If there's no silk touch upgrade, process the block as if it was mined
+            block.getDrops(drops, world, pos, blockState, 0)
+        } else {
+            // If there is silk touch, collect it as if with silk touch
+            drops.add(SilkTouchHarvest.getSilkTouchDrop(block, blockState))
+        }
 
         // Some blocks don't drop anything, so check if there are any drops at all
         if (drops.isNotEmpty()) {

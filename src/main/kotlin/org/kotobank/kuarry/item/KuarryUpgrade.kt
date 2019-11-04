@@ -5,24 +5,30 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.world.World
 
-open class KuarryUpgrade : Item()
+abstract class KuarryUpgrade : Item() {
+    open val stackSize = 1
 
-class KuarryXBoundariesUpgrade : KuarryUpgrade() {
     init {
-        maxStackSize = 2
+        maxStackSize = stackSize;
     }
 
+    open val tooltipStrings = listOf<String>()
+
     override fun addInformation(stack: ItemStack, worldIn: World?, tooltip: MutableList<String>, flagIn: ITooltipFlag) {
-        tooltip.add("Upgrades the kuarry to mine one more chunk along the X dimension.")
+        tooltip.addAll(tooltipStrings)
     }
 }
 
-class KuarryZBoundariesUpgrade : KuarryUpgrade() {
-    init {
-        maxStackSize = 2
-    }
+class KuarryXBoundariesUpgrade : KuarryUpgrade() {
+    override val stackSize = 2
+    override val tooltipStrings = listOf("Upgrades the kuarry to mine one more chunk along the X dimension")
+}
 
-    override fun addInformation(stack: ItemStack, worldIn: World?, tooltip: MutableList<String>, flagIn: ITooltipFlag) {
-        tooltip.add("Upgrades the kuarry to mine one more chunk along the Z dimension.")
-    }
+class KuarryZBoundariesUpgrade : KuarryUpgrade() {
+    override val stackSize = 2
+    override val tooltipStrings = listOf("Upgrades the kuarry to mine one more chunk along the Z dimension")
+}
+
+class KuarrySilkTouchUpgrade : KuarryUpgrade() {
+    override val tooltipStrings = listOf("Makes the kuarry retrieve the blocks as they are, instead of mining them")
 }

@@ -8,8 +8,7 @@ import net.minecraftforge.event.RegistryEvent.Register
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder
-import org.kotobank.kuarry.item.KuarryXBoundariesUpgrade
-import org.kotobank.kuarry.item.KuarryZBoundariesUpgrade
+import org.kotobank.kuarry.item.*
 
 @Mod.EventBusSubscriber(modid = KuarryMod.MODID)
 object KuarryModItems {
@@ -27,7 +26,8 @@ object KuarryModItems {
 
                 Pair("kuarry_casing", Item()),
                 Pair("x_boundaries_upgrade", KuarryXBoundariesUpgrade()),
-                Pair("z_boundaries_upgrade", KuarryZBoundariesUpgrade())
+                Pair("z_boundaries_upgrade", KuarryZBoundariesUpgrade()),
+                Pair("silk_touch_upgrade", KuarrySilkTouchUpgrade())
         ).forEach { (name, item) ->
             item.apply {
                 setRegistryName(KuarryMod.MODID, name)
