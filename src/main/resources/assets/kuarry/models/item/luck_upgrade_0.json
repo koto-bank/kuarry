@@ -1,0 +1,7 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "kuarry:item/luck_upgrade",
+    "layer1": "kuarry:item/1_overlay"
+  }
+}

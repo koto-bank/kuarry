@@ -38,5 +38,14 @@ object KuarryModItems {
                 ModelLoader.setCustomModelResourceLocation(this, 0, ModelResourceLocation(this.registryName!!, "inventory"))
             }
         }
+
+        // The luck upgrade is a special case: it has subitems and the models have to be registered
+        // for their names and not for the base name
+        with(KuarryLuckUpgrade()) {
+            setRegistryName(KuarryMod.MODID, "luck_upgrade")
+            setUnlocalizedName("luck_upgrade")
+            event.registry.register(this)
+            registerSubitemModels()
+        }
     }
 }

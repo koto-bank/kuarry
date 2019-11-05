@@ -5,6 +5,7 @@ import net.minecraft.block.SilkTouchHarvest
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.init.Blocks
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.NetworkManager
@@ -21,6 +22,7 @@ import net.minecraftforge.fml.common.Loader
 import org.kotobank.kuarry.*
 import org.kotobank.kuarry.item.*
 import org.kotobank.kuarry.integration.MjReceiverImpl
+import kotlin.reflect.KClass
 
 class KuarryTileEntity : TileEntity(), ITickable {
     companion object {
@@ -239,23 +241,28 @@ class KuarryTileEntity : TileEntity(), ITickable {
     /** Tick count for the resource-count-in-the-chunk updates */
     private var resourceCountUpdateCount = 0
 
-    /** Counts the amount of upgrades of specified type in the upgrade inventory. */
-    private inline fun <reified T : KuarryUpgrade> upgradesInInventory(): Int {
-        var res = 0;
-
+    /** Finds an upgrade in the inventory, or null if there was none.
+     *
+     * The inventory _should_ not contain more than one [ItemStack] of any upgrade,
+     * therefore this function returns the first upgrade found.
+     */
+    internal fun upgradeInInventory(upgradeC: KClass<out Item>): ItemStack? {
         for (i in 0 until upgradeInventorySize) {
             val slotItemStack = upgradeInventory.getStackInSlot(i)
-
-            if (!slotItemStack.isEmpty) {
-                val itemCount = slotItemStack.count
-                if (slotItemStack.item::class == T::class) {
-                    res += itemCount;
-                }
+            if (!slotItemStack.isEmpty && slotItemStack.item::class == upgradeC) {
+                return slotItemStack
             }
         }
 
-        return res
+        return null
     }
+
+    /** Counts the amount of upgrades of specified type in the upgrade inventory. */
+    internal fun upgradeCountInInventory(upgradeC: KClass<out Item>): Int =
+            upgradeInInventory(upgradeC)?.count ?: 0
+
+    /** A convenience function with a generic parameter that calls the [KClass]-receiving version. */
+    internal inline fun <reified T : KuarryUpgrade> upgradeCountInInventory() = upgradeCountInInventory(T::class)
 
     /** Count the amount of chunks added to X and Z by upgrades.
      *
@@ -263,8 +270,8 @@ class KuarryTileEntity : TileEntity(), ITickable {
      * a convenient way to get both values.
      */
     fun xzChunkExpansion(): Pair<Int, Int> = Pair(
-            upgradesInInventory<KuarryXBoundariesUpgrade>(),
-            upgradesInInventory<KuarryZBoundariesUpgrade>()
+            upgradeCountInInventory<KuarryXBoundariesUpgrade>(),
+            upgradeCountInInventory<KuarryZBoundariesUpgrade>()
     )
 
     /** Find and put in a list the chunks to be mined.
@@ -431,9 +438,22 @@ class KuarryTileEntity : TileEntity(), ITickable {
         }
 
         var drops = NonNullList.create<ItemStack>()
-        if (upgradesInInventory<KuarrySilkTouchUpgrade>() < 1) {
+        if (upgradeCountInInventory<KuarrySilkTouchUpgrade>() < 1) {
+            // Get the fortune level, depending on the upgrades.
+            // The levels are mapped to metadata + 1 and invalid number
+            // is treated as level 1
+            val fortune =
+                    upgradeInInventory(KuarryLuckUpgrade::class)?.let {
+                        when (it.metadata) {
+                            0 -> 1
+                            1 -> 2
+                            2 -> 3
+                            else -> 1
+                        }
+                    } ?: 0
+
             // If there's no silk touch upgrade, process the block as if it was mined
-            block.getDrops(drops, world, pos, blockState, 0)
+            block.getDrops(drops, world, pos, blockState, fortune)
         } else {
             // If there is silk touch, collect it as if with silk touch
             drops.add(SilkTouchHarvest.getSilkTouchDrop(block, blockState))
