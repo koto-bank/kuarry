@@ -25,7 +25,7 @@ class SwitchKuarrySetting(var pos: BlockPos, var setting: Setting) : IMessage {
     }
 
     override fun fromBytes(buf: ByteBuf?) {
-        setting = Setting.valueOf( ByteBufUtils.readUTF8String(buf))
+        setting = Setting.valueOf(ByteBufUtils.readUTF8String(buf))
         pos = BlockPos.fromLong(buf!!.readLong())
     }
 

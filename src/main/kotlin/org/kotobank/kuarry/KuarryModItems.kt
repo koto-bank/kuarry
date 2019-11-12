@@ -15,20 +15,27 @@ object KuarryModItems {
     @ObjectHolder("${KuarryMod.MODID}:kuarry")
     lateinit var kuarry: Item
 
-    @ObjectHolder("${KuarryMod.MODID}:denatured_stone")
-    lateinit var denatured_stone: Item
-
     @SubscribeEvent
     fun registerItems(event: Register<Item>) {
-        listOf(
-                Pair("kuarry", ItemBlock(KuarryModBlocks.kuarry)),
-                Pair("denatured_stone", ItemBlock(KuarryModBlocks.denatured_stone)),
+        val upgrades =
+                listOf(
+                        Pair("x_boundaries_upgrade", KuarryXBoundariesUpgrade()),
+                        Pair("z_boundaries_upgrade", KuarryZBoundariesUpgrade()),
+                        Pair("silk_touch_upgrade", KuarrySilkTouchUpgrade()),
+                        Pair("custom_filter", KuarryCustomFilter())
+                )
+        // Set each upgrade's max stack size
+        upgrades.forEach { (_, item) -> item.setMaxStackSize(item.stackSize) }
 
-                Pair("kuarry_casing", Item()),
-                Pair("x_boundaries_upgrade", KuarryXBoundariesUpgrade()),
-                Pair("z_boundaries_upgrade", KuarryZBoundariesUpgrade()),
-                Pair("silk_touch_upgrade", KuarrySilkTouchUpgrade())
-        ).forEach { (name, item) ->
+        val items =
+                listOf(
+                        Pair("kuarry", ItemBlock(KuarryModBlocks.kuarry)),
+                        Pair("denatured_stone", ItemBlock(KuarryModBlocks.denatured_stone)),
+
+                        Pair("kuarry_casing", Item())
+                )
+
+        (items + upgrades).forEach { (name, item) ->
             item.apply {
                 setRegistryName(KuarryMod.MODID, name)
                 setUnlocalizedName(name)
@@ -42,6 +49,7 @@ object KuarryModItems {
         // The luck upgrade is a special case: it has subitems and the models have to be registered
         // for their names and not for the base name
         with(KuarryLuckUpgrade()) {
+            setMaxStackSize(stackSize)
             setRegistryName(KuarryMod.MODID, "luck_upgrade")
             setUnlocalizedName("luck_upgrade")
             event.registry.register(this)

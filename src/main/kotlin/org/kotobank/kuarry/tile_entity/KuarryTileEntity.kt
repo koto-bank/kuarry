@@ -344,7 +344,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
         var amountOfBlocks = 0
 
         doWithAllBlocksInChunks(minedChunks) { _, blockState ->
-            if (!isBlockBlacklisted(blockState.block)) {
+            if (isBlockAllowed(blockState.block)) {
                 amountOfBlocks++
             }
 
@@ -397,11 +397,43 @@ class KuarryTileEntity : TileEntity(), ITickable {
         // The exit condition is to not go through bedrock
     }
 
-    /** Checks if the block is blacklisted by some filter and should not be mined. */
-    private fun isBlockBlacklisted(block: Block): Boolean {
-        val fullBlacklist = hardBlacklistedBlocks + defaultBlacklistedBlocks
+    /** Checks if the block is allowed by black/whitelisting and should be mined. */
+    private fun isBlockAllowed(block: Block): Boolean {
+        // Blacklist all fluids
+        // TODO: allow fluids somehow?
+        if (block is IFluidBlock) return false
 
-        return (block in fullBlacklist || block is IFluidBlock)
+        val customFilter = upgradeInInventory(KuarryCustomFilter::class)
+
+        val mode = customFilter?.let(KuarryCustomFilter.Companion::mode) ?: KuarryCustomFilter.Mode.Blacklist
+
+        return if (customFilter != null) {
+            val cap = customFilter.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)!!
+
+            // A list of blocks gotten from the ItemStacks in the inventory
+            val filterBlocks =
+                    List(cap.slots) { i ->
+                        // Take the itemstack in a slot and if it has a block, return that block. Otherwise return null.
+                        cap.getStackInSlot(i)
+                                .takeUnless { it.isEmpty }
+                                ?.let { Block.getBlockFromItem(it.item) }
+                                ?.takeUnless { it == Blocks.AIR }
+                    }.filterNotNull()
+
+            when (mode) {
+                KuarryCustomFilter.Mode.Blacklist ->
+                    // TODO: handle combination of the default and custom blacklists
+                    // Check if the block is not hard-blacklisted or user-blacklisted
+                    block !in (hardBlacklistedBlocks + filterBlocks)
+                KuarryCustomFilter.Mode.Whitelist ->
+                    // If the block is hard-blacklisted, don't allow it even with a whitelist.
+                    // Otherwise, allow only the blocks in the whitelist.
+                    block !in hardBlacklistedBlocks && block in filterBlocks
+            }
+        } else {
+            // Disallow blocks that are hard or user blacklisted
+            block !in (hardBlacklistedBlocks + defaultBlacklistedBlocks)
+        }
     }
 
     /** Processes a single block.
@@ -412,7 +444,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
         val block = blockState.block
 
         // Skip the block if it's blacklisted or is a fluid
-        if (isBlockBlacklisted(block)) return false
+        if (!isBlockAllowed(block)) return false
 
         // Harvesting something with pick/shovel should not cost more,
         // otherwise double the energy count
