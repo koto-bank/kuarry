@@ -43,6 +43,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
         /** The default blacklist of blocks */
         internal val defaultBlacklistedBlocks = listOf(
                 Blocks.GRASS,
+                Blocks.MYCELIUM,
                 Blocks.GRASS_PATH,
                 Blocks.DIRT,
                 Blocks.STONE,
