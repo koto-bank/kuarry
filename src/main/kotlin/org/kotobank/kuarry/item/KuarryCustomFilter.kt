@@ -25,31 +25,49 @@ class KuarryCustomFilter : KuarryUpgrade() {
 
         val defaultNBT = NBTTagCompound().apply {
             setString("mode", Mode.Blacklist.name)
+            setString("blacklist_mode", BlacklistMode.Additional.name)
         }
 
         /** Gets the [Mode] of the filter from the [ItemStack]'s NBT. */
         fun mode(stack: ItemStack) =
                 Mode.valueOf((stack.tagCompound ?: defaultNBT).getString("mode"))
 
+        /** Gets the [BlacklistMode] of the filter from the [ItemStack]'s NBT. */
+        fun blacklistMode(stack: ItemStack) =
+                BlacklistMode.valueOf((stack.tagCompound ?: defaultNBT).getString("blacklist_mode"))
+
+        private fun switchString(itemStack: ItemStack, field: String, tfFunction: (oldValue: String) -> String) {
+            itemStack.tagCompound =
+                    (itemStack.tagCompound ?: defaultNBT).apply {
+                        setString(field, tfFunction(getString(field)))
+                    }
+        }
+
         fun switchMode(itemStack: ItemStack) {
-            val compound = itemStack.tagCompound ?: defaultNBT
-
-            with (compound) {
-                setString(
-                        "mode",
-                        when (mode(itemStack)) {
-                            Mode.Blacklist -> Mode.Whitelist
-                            Mode.Whitelist -> Mode.Blacklist
-                        }.name
-                )
+            switchString(itemStack, "mode") { oldVal ->
+                when (Mode.valueOf(oldVal)) {
+                    Mode.Blacklist -> Mode.Whitelist
+                    Mode.Whitelist -> Mode.Blacklist
+                }.name
             }
+        }
 
-            itemStack.tagCompound = compound
+        fun switchBlacklistMode(itemStack: ItemStack) {
+            switchString(itemStack, "blacklist_mode") { oldVal ->
+                when (BlacklistMode.valueOf(oldVal)) {
+                    BlacklistMode.Additional -> BlacklistMode.Only
+                    BlacklistMode.Only -> BlacklistMode.Additional
+                }.name
+            }
         }
     }
 
     enum class Mode {
         Whitelist, Blacklist
+    }
+
+    enum class BlacklistMode {
+        Only, Additional
     }
 
     override fun onItemRightClick(worldIn: World, playerIn: EntityPlayer, handIn: EnumHand): ActionResult<ItemStack> =

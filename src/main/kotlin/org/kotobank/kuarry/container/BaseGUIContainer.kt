@@ -74,7 +74,7 @@ abstract class BaseGUIContainer(protected open val container: Container) : GuiCo
     protected fun drawTooltip(x: Int, y: Int, vararg lines: String) {
         GlStateManager.disableLighting()
         // Again here, subtracting guiLeft/Top to translate the coordinates into screen coordinates
-        GuiUtils.drawHoveringText(lines.toList(), x , y, mc.displayWidth, mc.displayHeight, -1, fontRenderer)
+        GuiUtils.drawHoveringText(lines.toList(), x , y, mc.displayWidth, mc.displayHeight, 250, fontRenderer)
         GlStateManager.enableLighting()
     }
 
@@ -85,7 +85,7 @@ abstract class BaseGUIContainer(protected open val container: Container) : GuiCo
      */
     protected abstract inner class Button(private val x: Int, private val y: Int) {
         /** Whether the specified [mouseX] and [mouseY] are floating over the button. */
-        fun isOnButton(mouseX: Int, mouseY: Int) = inBounds(x, y, buttonSize, buttonSize, mouseX, mouseY)
+        open fun isOnButton(mouseX: Int, mouseY: Int) = inBounds(x, y, buttonSize, buttonSize, mouseX, mouseY)
 
         /** Returns, depending on some custom circumstances, a pair consisting of an icon and a tooltip to use for the button */
         abstract val iconAndTooltip: Pair<TextureAtlasSprite, String>
@@ -102,7 +102,7 @@ abstract class BaseGUIContainer(protected open val container: Container) : GuiCo
         }
 
         /** Draws the button and the icon from [iconAndTooltip]. */
-        fun draw(mouseX: Int, mouseY: Int) {
+        open fun draw(mouseX: Int, mouseY: Int) {
             // This is REQUIRED for drawing textures from the atlas. It WILL obscurely fail to draw
             // in specific situations otherwise.
             mc.renderEngine.bindTexture(KuarryModIcons.atlasResourceLocation)
@@ -118,7 +118,7 @@ abstract class BaseGUIContainer(protected open val container: Container) : GuiCo
         }
 
         /** Draws the tooltip from [iconAndTooltip] if the mouse is floating over the button. */
-        fun drawTooltip(mouseX: Int, mouseY: Int) {
+        open fun drawTooltip(mouseX: Int, mouseY: Int) {
             if (isOnButton(mouseX, mouseY)) {
                 val (_, tooltip) = iconAndTooltip
 

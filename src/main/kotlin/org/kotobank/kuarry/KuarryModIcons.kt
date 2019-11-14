@@ -38,6 +38,9 @@ object KuarryModIcons {
     lateinit var blacklist: TextureAtlasSprite
     lateinit var whitelist: TextureAtlasSprite
 
+    lateinit var blacklistAdditional: TextureAtlasSprite
+    lateinit var blacklistOnly: TextureAtlasSprite
+
     private fun registerIcons(map: TextureMap) {
         with (map) {
             button = registerIcon("button")
@@ -53,6 +56,9 @@ object KuarryModIcons {
 
             blacklist = registerIcon("blacklist")
             whitelist = registerIcon("whitelist")
+
+            blacklistAdditional = registerIcon("blacklist_additional")
+            blacklistOnly = registerIcon("blacklist_only")
         }
     }
 }

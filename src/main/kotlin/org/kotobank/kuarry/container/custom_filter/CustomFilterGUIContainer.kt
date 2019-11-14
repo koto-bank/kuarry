@@ -1,13 +1,14 @@
 package org.kotobank.kuarry.container.custom_filter
 
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.ResourceLocation
+import net.minecraft.util.text.TextFormatting
 import org.kotobank.kuarry.KuarryMod
 import org.kotobank.kuarry.KuarryModIcons
 import org.kotobank.kuarry.KuarryModPackets
 import org.kotobank.kuarry.container.BaseGUIContainer
 import org.kotobank.kuarry.item.KuarryCustomFilter
 import org.kotobank.kuarry.packet.SwitchCustomFilterSetting
+import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 
 class CustomFilterGUIContainer(override val container: CustomFilterContainer) : BaseGUIContainer(container) {
     override val actualXSize = 175
@@ -16,7 +17,8 @@ class CustomFilterGUIContainer(override val container: CustomFilterContainer) : 
     override val backgroundTexture = ResourceLocation(KuarryMod.MODID, "textures/gui/custom_filter.png")
 
     override val buttons = listOf(
-            ModeButton(8, 69)
+            ModeButton(7, 69),
+            BlacklistModeButton(7 + 16 + 4, 69)
     )
 
     private val filter
@@ -54,6 +56,67 @@ class CustomFilterGUIContainer(override val container: CustomFilterContainer) : 
             )
 
             super.onClick()
+        }
+    }
+
+    protected inner class BlacklistModeButton(x: Int, y: Int) : Button(x, y) {
+        override val iconAndTooltip
+            get() =
+                when (KuarryCustomFilter.blacklistMode(filter)) {
+                    KuarryCustomFilter.BlacklistMode.Only -> Pair(
+                            KuarryModIcons.blacklistOnly,
+                            "Only blacklist the specified blocks, overriding the default blacklist"
+                    )
+                    KuarryCustomFilter.BlacklistMode.Additional ->  Pair(
+                            KuarryModIcons.blacklistAdditional,
+                            "Blacklist the specified blocks, plus the blocks blacklisted by default"
+                    )
+                }
+
+        override val additionalTooltipLines
+            get() =
+                when (KuarryCustomFilter.blacklistMode(filter)) {
+                    KuarryCustomFilter.BlacklistMode.Only -> emptyArray()
+                    KuarryCustomFilter.BlacklistMode.Additional -> {
+                        // Join tne names of the blacklisted blocks together with commas, the game
+                        // will make newlines by itself.
+
+                        val defaultBlacklistStr =
+                                KuarryTileEntity.defaultBlacklistedBlocks.joinToString { it.localizedName }
+
+                        // Show the default blacklist after the help text, with a colored header
+                        arrayOf(
+                                "",
+                                "${TextFormatting.BLUE}${TextFormatting.BOLD}Default blacklist",
+                                defaultBlacklistStr
+                        )
+                    }
+                }
+
+        private val isBlacklistMode
+            get() = KuarryCustomFilter.mode(filter) == KuarryCustomFilter.Mode.Blacklist
+
+        // The functions below are overridden to only do something when filter mode = blacklist
+
+        override fun onClick() {
+            if (isBlacklistMode) {
+                KuarryModPackets.networkChannel.sendToServer(
+                        SwitchCustomFilterSetting(SwitchCustomFilterSetting.Setting.BlacklistMode)
+                )
+
+                super.onClick()
+            }
+        }
+
+        override fun isOnButton(mouseX: Int, mouseY: Int): Boolean =
+            if (isBlacklistMode) super.isOnButton(mouseX, mouseY) else false
+
+        override fun draw(mouseX: Int, mouseY: Int) {
+            if (isBlacklistMode) super.draw(mouseX, mouseY)
+        }
+
+        override fun drawTooltip(mouseX: Int, mouseY: Int) {
+            if (isBlacklistMode) super.drawTooltip(mouseX, mouseY)
         }
     }
 }

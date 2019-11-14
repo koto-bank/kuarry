@@ -13,7 +13,7 @@ class SwitchCustomFilterSetting(var setting: Setting) : IMessage {
 
     /** The setting to switch in the TE */
     enum class Setting {
-        Empty, Mode
+        Empty, Mode, BlacklistMode
     }
 
     override fun toBytes(buf: ByteBuf) {
@@ -35,6 +35,7 @@ class SwitchCustomFilterSetting(var setting: Setting) : IMessage {
                     when (message.setting) {
                         Setting.Empty -> {}
                         Setting.Mode -> KuarryCustomFilter.switchMode(mainHand)
+                        Setting.BlacklistMode -> KuarryCustomFilter.switchBlacklistMode(mainHand)
                     }
                 }
             }

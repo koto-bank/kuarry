@@ -41,7 +41,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
         )
 
         /** The default blacklist of blocks */
-        private val defaultBlacklistedBlocks = listOf(
+        internal val defaultBlacklistedBlocks = listOf(
                 Blocks.GRASS,
                 Blocks.GRASS_PATH,
                 Blocks.DIRT,
@@ -405,6 +405,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
         val customFilter = upgradeInInventory(KuarryCustomFilter::class)
 
+        // If there's a custom filter, get its mode, otherwise default to blacklist
         val mode = customFilter?.let(KuarryCustomFilter.Companion::mode) ?: KuarryCustomFilter.Mode.Blacklist
 
         return if (customFilter != null) {
@@ -420,11 +421,19 @@ class KuarryTileEntity : TileEntity(), ITickable {
                                 ?.takeUnless { it == Blocks.AIR }
                     }.filterNotNull()
 
+            val blacklistMode = KuarryCustomFilter.blacklistMode(customFilter)
+
             when (mode) {
                 KuarryCustomFilter.Mode.Blacklist ->
-                    // TODO: handle combination of the default and custom blacklists
                     // Check if the block is not hard-blacklisted or user-blacklisted
-                    block !in (hardBlacklistedBlocks + filterBlocks)
+                    when (blacklistMode) {
+                        // Add the default blacklist to the provided blacklist
+                        KuarryCustomFilter.BlacklistMode.Additional ->
+                            block !in (hardBlacklistedBlocks + defaultBlacklistedBlocks + filterBlocks)
+                        // Only use the provided blacklist
+                        KuarryCustomFilter.BlacklistMode.Only ->
+                            block !in (hardBlacklistedBlocks + filterBlocks)
+                    }
                 KuarryCustomFilter.Mode.Whitelist ->
                     // If the block is hard-blacklisted, don't allow it even with a whitelist.
                     // Otherwise, allow only the blocks in the whitelist.
