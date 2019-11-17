@@ -22,7 +22,8 @@ object KuarryModItems {
                         Pair("x_boundaries_upgrade", KuarryXBoundariesUpgrade()),
                         Pair("z_boundaries_upgrade", KuarryZBoundariesUpgrade()),
                         Pair("silk_touch_upgrade", KuarrySilkTouchUpgrade()),
-                        Pair("custom_filter", KuarryCustomFilter())
+                        Pair("custom_filter", KuarryCustomFilter()),
+                        Pair("speed_upgrade", KuarrySpeedUpgrade())
                 )
         // Set each upgrade's max stack size
         upgrades.forEach { (_, item) -> item.setMaxStackSize(item.stackSize) }

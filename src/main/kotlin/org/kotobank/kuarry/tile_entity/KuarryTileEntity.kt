@@ -66,7 +66,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
     }
 
     private var lastEnergyStored = 0
-    private val energyStorage = EnergyStorage(100000, 100, 5000)
+    private val energyStorage = EnergyStorage(100000, 2000, 5000)
 
     /** IMjReceiver implementation for BuildCraft compatibility */
     private lateinit var mjEnergyStorage: MjReceiverImpl
@@ -236,8 +236,11 @@ class KuarryTileEntity : TileEntity(), ITickable {
      */
     internal var approxResourcesLeft = -1
 
-    /** Tick count for general updates, to not run them too much */
+    /** Tick count for general updating stuff, to not do them 20 times a second. */
     private var updateCount = 0
+
+    /** Tick count for general updates, to not run them too much */
+    private var mineUpdateCount = 0
 
     /** Tick count for the resource-count-in-the-chunk updates */
     private var resourceCountUpdateCount = 0
@@ -301,42 +304,55 @@ class KuarryTileEntity : TileEntity(), ITickable {
     override fun update() {
         if (!world.isRemote) {
             updateCount++
+            mineUpdateCount++
             resourceCountUpdateCount++
 
-            if (updateCount >= 50) {
-                updateCount = 0
+            // Check everything ~4 times a second
+            if (updateCount < 5) return
+            updateCount = 0
 
-                // If the energy amount changed, send that new amount to the client
-                if (lastEnergyStored != energyStorage.energyStored) {
-                    lastEnergyStored = energyStorage.energyStored
+            // If the energy amount changed, send that new amount to the client
+            if (lastEnergyStored != energyStorage.energyStored) {
+                lastEnergyStored = energyStorage.energyStored
 
-                    notifyClientAndMarkDirty()
-                }
-
-                when (activationMode) {
-                    ActivationMode.AlwaysOn -> {}
-                    ActivationMode.AlwaysOff -> return
-                    ActivationMode.DisableWithRS -> if (world.isBlockPowered(pos)) return
-                    ActivationMode.EnableWithRS -> if (!world.isBlockPowered(pos)) return
-                }
-
-                val minedChunks = calculateMinedChunks()
-
-                // 6000 ~= 5 minutes
-                // 50 is to wait a little until the world loads on start
-                if (resourceCountUpdateCount >= 6000) {
-                    resourceCountUpdateCount = 0
-
-                    approxResourcesLeft = countAllMinable(minedChunks)
-
-                    // Mark the block dirty to make comparator see it and
-                    // notify the client about the amount of resources
-                    notifyClientAndMarkDirty()
-                }
-
-                // Process all blocks in the chunks
-                doWithAllBlocksInChunks(minedChunks, ::processBlock)
+                notifyClientAndMarkDirty()
             }
+
+            // Calculate the amount of ticks subtracted with speed upgrades
+            val ticksSubtracted = run {
+                val speedUpgradeCount = upgradeCountInInventory<KuarrySpeedUpgrade>()
+
+                // Should max out at 50, therefore speeding it up to a block per second
+                10 * speedUpgradeCount
+            }
+
+            // Exit if it's not time to mine yet
+            if (mineUpdateCount < 70 - ticksSubtracted) return
+            mineUpdateCount = 0
+
+            when (activationMode) {
+                ActivationMode.AlwaysOn -> {}
+                ActivationMode.AlwaysOff -> return
+                ActivationMode.DisableWithRS -> if (world.isBlockPowered(pos)) return
+                ActivationMode.EnableWithRS -> if (!world.isBlockPowered(pos)) return
+            }
+
+            val minedChunks = calculateMinedChunks()
+
+            // 6000 ~= 5 minutes
+            // 50 is to wait a little until the world loads on start
+            if (resourceCountUpdateCount >= 6000) {
+                resourceCountUpdateCount = 0
+
+                approxResourcesLeft = countAllMinable(minedChunks)
+
+                // Mark the block dirty to make comparator see it and
+                // notify the client about the amount of resources
+                notifyClientAndMarkDirty()
+            }
+
+            // Process all blocks in the chunks
+            doWithAllBlocksInChunks(minedChunks, ::processBlock)
         }
     }
 
@@ -466,12 +482,29 @@ class KuarryTileEntity : TileEntity(), ITickable {
         val levelHarvestModifier = block.getHarvestLevel(blockState).let { if (it <= 0) 1 else it }
 
 
-        var requiredEnergy = baseRequiredEnergy * toolHarvestModifier * levelHarvestModifier
+        var requiredEnergy = run {
+            // Get the starting energy from all the other modifiers
+            var energy = baseRequiredEnergy * toolHarvestModifier * levelHarvestModifier
+
+            // Go through the upgrade inventory and add all the energy required by the upgrades
+            for (i in 0 until upgradeInventorySize) {
+                val stack = upgradeInventory.getStackInSlot(i)
+                if (!stack.isEmpty) {
+                    val item = stack.item
+                    require(item is KuarryUpgrade)
+
+                    energy = item.energyUsageWithUpgrade(energy, stack)
+                }
+            }
+
+            energy
+        }
 
         // Not enough energy to mine the block, skip it
         if (energyStorage.energyStored < requiredEnergy) return false
 
-        KuarryMod.logger.info(blockState.block.localizedName)
+
+        KuarryMod.logger.info(requiredEnergy)
 
         // Take out all the energy required, in multiple iterations if needed (by subtracting the
         // already extracted energy from the rest)
