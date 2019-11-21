@@ -1,0 +1,29 @@
+{
+  "_comment": "A recipe for crafting the kuarry speed upgrade",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "gRg",
+    "csc",
+    "gRg"
+  ],
+  "key": {
+    "c": {
+      "item": "kuarry:kuarry_casing"
+    },
+    "s": {
+      "item": "minecraft:sugar"
+    },
+    "R": {
+      "type": "forge:ore_dict",
+      "ore": "blockRedstone"
+    },
+    "g": {
+      "type": "forge:ore_dict",
+      "ore": "ingotGold"
+    }
+  },
+  "result": {
+    "item": "kuarry:speed_upgrade",
+    "count": 1
+  }
+}
