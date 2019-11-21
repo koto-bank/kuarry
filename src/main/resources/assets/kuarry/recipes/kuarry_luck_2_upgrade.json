@@ -1,0 +1,30 @@
+{
+  "_comment": "A recipe for crafting the Luck 2 upgrade",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ldl",
+    "epe",
+    "ldl"
+  ],
+  "key": {
+    "p": {
+      "item": "kuarry:luck_upgrade",
+      "data": 0
+    },
+    "l": {
+      "item": "minecraft:dye",
+      "data": 4
+    },
+    "e": {
+      "item": "minecraft:emerald"
+    },
+    "d": {
+      "item": "minecraft:diamond"
+    }
+  },
+  "result": {
+    "item": "kuarry:luck_upgrade",
+    "data": 1,
+    "count": 1
+  }
+}
