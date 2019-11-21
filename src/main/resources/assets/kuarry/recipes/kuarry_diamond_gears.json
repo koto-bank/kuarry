@@ -1,0 +1,29 @@
+{
+  "_comment": "A recipe for the kuarry with diamond gears",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "cec",
+    "GgG",
+    "cec"
+  ],
+  "key": {
+    "c": {
+      "item": "kuarry:kuarry_casing"
+    },
+    "G": {
+      "type": "forge:ore_dict",
+      "ore": "gearDiamond"
+    },
+    "e": {
+      "item": "minecraft:ender_eye"
+    },
+    "g": {
+      "type": "forge:ore_dict",
+      "ore": "blockGlass"
+    }
+  },
+  "result": {
+    "item": "kuarry:kuarry",
+    "count": 1
+  }
+}

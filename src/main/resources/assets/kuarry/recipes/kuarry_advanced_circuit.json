@@ -1,0 +1,29 @@
+{
+  "_comment": "A recipe for the kuarry with IC2's advanced circuit",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "cec",
+    "CgC",
+    "cec"
+  ],
+  "key": {
+    "c": {
+      "item": "kuarry:kuarry_casing"
+    },
+    "C": {
+      "type": "forge:ore_dict",
+      "ore": "circuitAdvanced"
+    },
+    "e": {
+      "item": "minecraft:ender_eye"
+    },
+    "g": {
+      "type": "forge:ore_dict",
+      "ore": "blockGlass"
+    }
+  },
+  "result": {
+    "item": "kuarry:kuarry",
+    "count": 1
+  }
+}
