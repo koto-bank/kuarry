@@ -1,5 +1,5 @@
 {
-  "_comment": "A recipe for crafting kuarry plates for industrial craft's advanced alloy. IC2 uses ic2:crafting + data for some materials",
+  "_comment": "A recipe for crafting kuarry plates for industrial craft's advanced alloy",
   "type": "minecraft:crafting_shaped",
   "pattern": [
     "pp",
@@ -7,8 +7,8 @@
   ],
   "key": {
     "p": {
-      "item": "ic2:crafting",
-      "data": 3
+      "type": "forge:ore_dict",
+      "ore": "plateAdvancedAlloy"
     },
     "d": {
       "type": "forge:ore_dict",
