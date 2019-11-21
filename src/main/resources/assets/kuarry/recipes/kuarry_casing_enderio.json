@@ -1,5 +1,5 @@
 {
-  "_comment": "A recipe for crafting kuarry plates for thermal foundation's signalum",
+  "_comment": "A recipe for crafting kuarry plates for thermal EnderIO's energetic alloy",
   "type": "minecraft:crafting_shaped",
   "pattern": [
     "ee",
