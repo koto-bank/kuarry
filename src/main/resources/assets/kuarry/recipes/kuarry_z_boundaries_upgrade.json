@@ -1,0 +1,13 @@
+{
+  "_comment": "A recipe for crafting the Z boundaries upgrade from the X upgrade",
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "kuarry:x_boundaries_upgrade"
+    }
+  ],
+  "result": {
+    "item": "kuarry:z_boundaries_upgrade",
+    "count": 1
+  }
+}
