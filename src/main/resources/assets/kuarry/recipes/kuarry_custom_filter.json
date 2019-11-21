@@ -1,0 +1,27 @@
+{
+  "_comment": "A recipe for crafting the custom filter",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "sts",
+    "crc",
+    "sts"
+  ],
+  "key": {
+    "c": {
+      "item": "kuarry:kuarry_casing"
+    },
+    "s": {
+      "item": "minecraft:stick"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "t": {
+      "item": "minecraft:string"
+    }
+  },
+  "result": {
+    "item": "kuarry:custom_filter",
+    "count": 1
+  }
+}
