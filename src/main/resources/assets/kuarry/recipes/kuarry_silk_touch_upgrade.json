@@ -1,0 +1,28 @@
+{
+  "_comment": "A recipe for crafting the silk touch upgrade",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "sgs",
+    "crc",
+    "sgs"
+  ],
+  "key": {
+    "c": {
+      "item": "kuarry:kuarry_casing"
+    },
+    "s": {
+      "item": "minecraft:string"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "g": {
+      "type": "forge:ore_dict",
+      "ore": "ingotGold"
+    }
+  },
+  "result": {
+    "item": "kuarry:silk_touch_upgrade",
+    "count": 1
+  }
+}
