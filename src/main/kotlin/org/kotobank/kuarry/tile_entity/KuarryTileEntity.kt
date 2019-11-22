@@ -503,9 +503,6 @@ class KuarryTileEntity : TileEntity(), ITickable {
         // Not enough energy to mine the block, skip it
         if (energyStorage.energyStored < requiredEnergy) return false
 
-
-        KuarryMod.logger.info(requiredEnergy)
-
         // Take out all the energy required, in multiple iterations if needed (by subtracting the
         // already extracted energy from the rest)
         while (requiredEnergy > 0) {
