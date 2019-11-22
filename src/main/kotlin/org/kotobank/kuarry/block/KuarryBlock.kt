@@ -134,27 +134,25 @@ class KuarryBlock(material: Material, registryName: String) : Block(material) {
         }
 
         // Only react if it's a tooltip for the kuarry block
-        if (itemStack.item == KuarryModItems.kuarry) {
-            val compound = itemStack.tagCompound
-            if (compound != null) {
-                val energyStored = compound.getInteger("energy")
-                val itemCount = run {
-                    val handler = ItemStackHandler(KuarryTileEntity.inventorySize)
-                    handler.deserializeNBT(compound.getCompoundTag("inventory"))
+        val compound = itemStack.tagCompound
+        if (compound != null) {
+            val energyStored = compound.getInteger("energy")
+            val itemCount = run {
+                val handler = ItemStackHandler(KuarryTileEntity.inventorySize)
+                handler.deserializeNBT(compound.getCompoundTag("inventory"))
 
-                    var itemC = 0
-                    for (i in 0 until KuarryTileEntity.inventorySize)
-                        itemC += handler.getStackInSlot(i).count
+                var itemC = 0
+                for (i in 0 until KuarryTileEntity.inventorySize)
+                    itemC += handler.getStackInSlot(i).count
 
-                    itemC
-                }
-
-                tooltip.addAll(listOf(
-                        "",
-                        "${TextFormatting.BLUE}Energy stored: ${energyStored}RF",
-                        "${TextFormatting.BLUE}Items stored: $itemCount"
-                ))
+                itemC
             }
+
+            tooltip.addAll(listOf(
+                    "",
+                    "${TextFormatting.BLUE}Energy stored: ${energyStored}RF",
+                    "${TextFormatting.BLUE}Items stored: $itemCount"
+            ))
         }
     }
 }
