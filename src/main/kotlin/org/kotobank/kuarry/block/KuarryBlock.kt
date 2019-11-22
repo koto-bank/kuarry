@@ -5,6 +5,7 @@ import net.minecraft.block.material.Material
 import net.minecraft.block.properties.PropertyDirection
 import net.minecraft.block.state.BlockStateContainer
 import net.minecraft.block.state.IBlockState
+import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
@@ -20,6 +21,7 @@ import org.kotobank.kuarry.KuarryMod
 import org.kotobank.kuarry.KuarryModGUIHandler
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.text.TextFormatting
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import net.minecraftforge.items.ItemStackHandler
@@ -122,10 +124,14 @@ class KuarryBlock(material: Material, registryName: String) : Block(material) {
 
     @SideOnly(Side.CLIENT)
     override fun addInformation(itemStack: ItemStack, player: World?, tooltip: MutableList<String>, advanced: ITooltipFlag) {
-        tooltip.add(
-                "It sucks resources out from the bowels of earth, and leaving just a frothy stone-like sponge in place of matter. " +
-                        "Who knows, what will crawl out tomorrow, woken up by the cleeky intruders from the surface?"
-        )
+        if (GuiScreen.isShiftKeyDown()) {
+            tooltip.add(
+                    "It sucks resources out from the bowels of earth, and leaving just a frothy stone-like sponge in place of matter. " +
+                            "Who knows, what will crawl out tomorrow, woken up by the cleeky intruders from the surface?"
+            )
+        } else {
+            tooltip.add("[Hold ${TextFormatting.YELLOW}${TextFormatting.ITALIC}Shift${TextFormatting.RESET} for a detailed description]")
+        }
 
         // Only react if it's a tooltip for the kuarry block
         if (itemStack.item == KuarryModItems.kuarry) {
@@ -144,8 +150,9 @@ class KuarryBlock(material: Material, registryName: String) : Block(material) {
                 }
 
                 tooltip.addAll(listOf(
-                        "Energy stored: ${energyStored}RF",
-                        "Items stored: $itemCount"
+                        "",
+                        "${TextFormatting.BLUE}Energy stored: ${energyStored}RF",
+                        "${TextFormatting.BLUE}Items stored: $itemCount"
                 ))
             }
         }
