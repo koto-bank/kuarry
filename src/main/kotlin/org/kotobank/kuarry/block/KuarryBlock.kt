@@ -5,6 +5,7 @@ import net.minecraft.block.material.Material
 import net.minecraft.block.properties.PropertyDirection
 import net.minecraft.block.state.BlockStateContainer
 import net.minecraft.block.state.IBlockState
+import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
@@ -19,46 +20,17 @@ import org.kotobank.kuarry.KuarryMod
 import org.kotobank.kuarry.KuarryModGUIHandler
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.fml.common.Mod
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 import net.minecraftforge.items.ItemStackHandler
 import org.kotobank.kuarry.KuarryModItems
 
-@Mod.EventBusSubscriber(modid = KuarryMod.MODID)
 class KuarryBlock(material: Material, registryName: String) : Block(material) {
     companion object {
         val FACING: PropertyDirection =
                 PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL)
 
         val tileEntityClass = KuarryTileEntity::class.java
-
-        /** A function that adds tooltips to the kuarry item if it has metadata. */
-        @SubscribeEvent
-        internal fun onTooltip(event: ItemTooltipEvent) {
-            // Only react if it's a tooltip for the kuarry block
-            if (event.itemStack.item == KuarryModItems.kuarry) {
-                val compound = event.itemStack.tagCompound
-                if (compound != null) {
-                    val energyStored = compound.getInteger("energy")
-                    val itemCount = run {
-                        val handler = ItemStackHandler(KuarryTileEntity.inventorySize)
-                        handler.deserializeNBT(compound.getCompoundTag("inventory"))
-
-                        var itemC = 0
-                        for (i in 0 until KuarryTileEntity.inventorySize)
-                            itemC += handler.getStackInSlot(i).count
-
-                        itemC
-                    }
-
-                    event.toolTip.addAll(listOf(
-                            "Energy stored: ${energyStored}RF",
-                            "Items stored: $itemCount"
-                    ))
-                }
-            }
-        }
     }
 
     init {
@@ -145,6 +117,37 @@ class KuarryBlock(material: Material, registryName: String) : Block(material) {
         val compound = stack.tagCompound
         if (tileEntity is KuarryTileEntity && compound != null) {
             tileEntity.readModNBT(compound)
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    override fun addInformation(itemStack: ItemStack, player: World?, tooltip: MutableList<String>, advanced: ITooltipFlag) {
+        tooltip.add(
+                "It sucks resources out from the bowels of earth, and leaving just a frothy stone-like sponge in place of matter. " +
+                        "Who knows, what will crawl out tomorrow, woken up by the cleeky intruders from the surface?"
+        )
+
+        // Only react if it's a tooltip for the kuarry block
+        if (itemStack.item == KuarryModItems.kuarry) {
+            val compound = itemStack.tagCompound
+            if (compound != null) {
+                val energyStored = compound.getInteger("energy")
+                val itemCount = run {
+                    val handler = ItemStackHandler(KuarryTileEntity.inventorySize)
+                    handler.deserializeNBT(compound.getCompoundTag("inventory"))
+
+                    var itemC = 0
+                    for (i in 0 until KuarryTileEntity.inventorySize)
+                        itemC += handler.getStackInSlot(i).count
+
+                    itemC
+                }
+
+                tooltip.addAll(listOf(
+                        "Energy stored: ${energyStored}RF",
+                        "Items stored: $itemCount"
+                ))
+            }
         }
     }
 }
