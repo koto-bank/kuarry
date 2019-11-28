@@ -126,7 +126,7 @@ class KuarryBlock(material: Material, registryName: String) : Block(material) {
     override fun addInformation(itemStack: ItemStack, player: World?, tooltip: MutableList<String>, advanced: ITooltipFlag) {
         if (GuiScreen.isShiftKeyDown()) {
             tooltip.add(
-                    "It sucks resources out from the bowels of earth, and leaving just a frothy stone-like sponge in place of matter. " +
+                    "It sucks resources out from the bowels of earth, and leaves just a frothy stone-like sponge in place of matter. " +
                             "Who knows, what will crawl out tomorrow, woken up by the cleeky intruders from the surface?"
             )
         } else {
