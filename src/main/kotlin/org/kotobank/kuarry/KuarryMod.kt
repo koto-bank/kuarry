@@ -14,7 +14,7 @@ import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 import org.kotobank.kuarry.tile_entity.special_renderer.KuarrySpecialRenderer
 
 @Mod(modid = KuarryMod.MODID, name = KuarryMod.NAME, version = KuarryMod.VERSION, modLanguageAdapter = "net.shadowfacts.forgelin.KotlinAdapter",
-        dependencies = "after:theoneprobe;required-after:forgelin;")
+        dependencies = "required-after:forgelin;")
 object KuarryMod {
     const val MODID = "kuarry"
     const val NAME = "Kuarry"
