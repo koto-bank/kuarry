@@ -48,11 +48,11 @@ repositories {
 
     maven { url = "http://chickenbones.net/maven/" } // CCL
     maven { url = "http://maven.covers1624.net" } // COFH
-    maven { url = "http://dvs1.progwml6.com/files/maven" } // JEI
+    maven { url = "http://dvs1.progwml6.com/files/maven/" } // JEI
     maven { url = "http://maven.ic2.player.to/" } // IC2
 
     maven { url "http://maven.tterrag.com/" } // TOP
-    maven { url "https://mod-buildcraft.com/maven" } // BC
+    maven { url "https://mod-buildcraft.com/maven/" } // BC
 }
 
 
