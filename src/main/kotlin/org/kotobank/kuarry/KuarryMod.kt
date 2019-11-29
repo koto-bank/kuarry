@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.network.NetworkRegistry
 import net.minecraftforge.fml.relauncher.Side
 import org.apache.logging.log4j.Logger
+import org.kotobank.kuarry.integration.ThaumcraftIntegration
 import org.kotobank.kuarry.integration.TheOneProbeIntegration
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 import org.kotobank.kuarry.tile_entity.special_renderer.KuarrySpecialRenderer
@@ -35,6 +36,10 @@ object KuarryMod {
 
         if (Loader.isModLoaded("theoneprobe")) {
             TheOneProbeIntegration()
+        }
+
+        if (Loader.isModLoaded("thaumcraft")) {
+            ThaumcraftIntegration.registerForTCEvents()
         }
     }
 }

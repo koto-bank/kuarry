@@ -8,12 +8,14 @@ import net.minecraftforge.event.RegistryEvent.Register
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import org.kotobank.kuarry.item.*
 
 @Mod.EventBusSubscriber(modid = KuarryMod.MODID)
 object KuarryModItems {
+
     private val upgrades by lazy {
         listOf(
                 Pair("x_boundaries_upgrade", KuarryXBoundariesUpgrade()),
@@ -60,6 +62,14 @@ object KuarryModItems {
             event.registry.register(this)
         }
     }
+
+    // The fields are named by their IDs
+    @ObjectHolder("${KuarryMod.MODID}:kuarry_casing")
+    lateinit var kuarry_casing: Item
+    @ObjectHolder("${KuarryMod.MODID}:x_boundaries_upgrade")
+    lateinit var x_boundaries_upgrade: Item
+    @ObjectHolder("${KuarryMod.MODID}:z_boundaries_upgrade")
+    lateinit var z_boundaries_upgrade: Item
 }
 
 @Mod.EventBusSubscriber(Side.CLIENT, modid = KuarryMod.MODID)
