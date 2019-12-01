@@ -11,8 +11,10 @@ import net.minecraftforge.energy.IEnergyStorage
  *
  */
 class MjReceiverImpl(private val backingStorage: IEnergyStorage) : IMjReceiver {
-    val capConnector = MjAPI.CAP_RECEIVER
-    val capReceiver = MjAPI.CAP_CONNECTOR
+    companion object {
+        val capConnector = MjAPI.CAP_RECEIVER
+        val capReceiver = MjAPI.CAP_CONNECTOR
+    }
 
     override fun canConnect(other: IMjConnector) = true
 

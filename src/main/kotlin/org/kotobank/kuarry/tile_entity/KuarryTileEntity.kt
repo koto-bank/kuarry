@@ -69,7 +69,12 @@ class KuarryTileEntity : TileEntity(), ITickable {
     private val energyStorage = EnergyStorage(100000, 2000, 5000)
 
     /** IMjReceiver implementation for BuildCraft compatibility */
-    private lateinit var mjEnergyStorage: MjReceiverImpl
+    private val mjEnergyStorage: MjReceiverImpl? by lazy {
+        if (Loader.isModLoaded("buildcraftcore"))
+            MjReceiverImpl(energyStorage)
+        else
+            null
+    }
 
     /** A chest-sized inventory for inner item storage */
     internal val inventory = object : ItemStackHandler(inventorySize) {
@@ -130,9 +135,6 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
     override fun onLoad() {
         if (world.isRemote) {
-            if (Loader.isModLoaded("buildcraftcore")) {
-                mjEnergyStorage = MjReceiverImpl(energyStorage)
-            }
 
             approxResourcesLeft = countAllMinable(calculateMinedChunks())
         }
@@ -143,7 +145,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
             CapabilityEnergy.ENERGY, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY -> true
             else -> when {
                 Loader.isModLoaded("buildcraftcore") &&
-                        (capability == mjEnergyStorage.capConnector || capability == mjEnergyStorage.capReceiver) -> true
+                        (capability == MjReceiverImpl.capConnector || capability == MjReceiverImpl.capReceiver) -> true
                 else -> super.hasCapability(capability, facing)
             }
 
@@ -159,7 +161,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 inventory as T
             else -> when {
                 Loader.isModLoaded("buildcraftcore") &&
-                        (capability == mjEnergyStorage.capConnector || capability == mjEnergyStorage.capReceiver) ->
+                        (capability == MjReceiverImpl.capConnector || capability == MjReceiverImpl.capReceiver) ->
                     mjEnergyStorage as T
                 else -> super.getCapability(capability, facing)
             }
