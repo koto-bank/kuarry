@@ -133,11 +133,16 @@ class KuarryTileEntity : TileEntity(), ITickable {
         notifyClient()
     }
 
-    override fun onLoad() {
-        if (world.isRemote) {
+    /** Whether the resource count should be updated in the next [update] run. */
+    private var shouldUpdateResourcesLeft = true
 
-            approxResourcesLeft = countAllMinable(calculateMinedChunks())
-        }
+    /** Recalculates [approxResourcesLeft]. */
+    private fun updateResourcesLeft() {
+        approxResourcesLeft = countAllMinable(calculateMinedChunks())
+
+        // Mark the block dirty to make comparator see it and
+        // notify the client about the amount of resources
+        notifyClientAndMarkDirty()
     }
 
     override fun hasCapability(capability: Capability<*>, facing: EnumFacing?): Boolean {
@@ -245,7 +250,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
     private var mineUpdateCount = 0
 
     /** Tick count for the resource-count-in-the-chunk updates */
-    private var resourceCountUpdateCount = 0
+    private var resourcesLeftUpdateCount = 0
 
     /** Finds an upgrade in the inventory, or null if there was none.
      *
@@ -307,7 +312,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
         if (!world.isRemote) {
             updateCount++
             mineUpdateCount++
-            resourceCountUpdateCount++
+            resourcesLeftUpdateCount++
 
             // Check everything ~4 times a second
             if (updateCount < 5) return
@@ -319,6 +324,16 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
                 notifyClientAndMarkDirty()
             }
+
+            // 6000 ~= 5 minutes
+            // 50 is to wait a little until the world loads on start
+            if (resourcesLeftUpdateCount >= 6000) {
+                shouldUpdateResourcesLeft = true
+                resourcesLeftUpdateCount = 0
+            }
+
+            // Update resource count if anything requested it
+            if (shouldUpdateResourcesLeft) updateResourcesLeft()
 
             // Calculate the amount of ticks subtracted with speed upgrades
             val ticksSubtracted = run {
@@ -340,18 +355,6 @@ class KuarryTileEntity : TileEntity(), ITickable {
             }
 
             val minedChunks = calculateMinedChunks()
-
-            // 6000 ~= 5 minutes
-            // 50 is to wait a little until the world loads on start
-            if (resourceCountUpdateCount >= 6000) {
-                resourceCountUpdateCount = 0
-
-                approxResourcesLeft = countAllMinable(minedChunks)
-
-                // Mark the block dirty to make comparator see it and
-                // notify the client about the amount of resources
-                notifyClientAndMarkDirty()
-            }
 
             // Process all blocks in the chunks
             doWithAllBlocksInChunks(minedChunks, ::processBlock)
@@ -585,9 +588,8 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 }
                 it < 0 -> {
                     // If there are less then zero resources, the resource count is probably wrong,
-                    // so recalculate it now and mark the block dirty it case it turns out to be zero
-                    approxResourcesLeft = countAllMinable(calculateMinedChunks())
-                    markDirty()
+                    // so mark the resource count for recalculation on the next update cycle
+                    shouldUpdateResourcesLeft = true
                 }
             }
 
