@@ -20,6 +20,7 @@ import net.minecraftforge.items.*
 import net.minecraftforge.fluids.IFluidBlock
 import net.minecraftforge.fml.common.Loader
 import org.kotobank.kuarry.*
+import org.kotobank.kuarry.integration.autopushing.Autopusher
 import org.kotobank.kuarry.item.*
 import org.kotobank.kuarry.integration.MjReceiverImpl
 import kotlin.reflect.KClass
@@ -90,6 +91,13 @@ class KuarryTileEntity : TileEntity(), ITickable {
             super.onContentsChanged(slot)
             markDirty()
         }
+    }
+
+    private val autopusher by lazy {
+        if (Autopusher.isEnabled)
+            Autopusher(this, inventory, inventoryWidth, inventoryHeight)
+        else
+            null
     }
 
     /** Activation mode of the block.
@@ -344,6 +352,11 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
             // Update resource count if anything requested it
             if (shouldUpdateResourcesLeft) updateResourcesLeft()
+
+            // Try pushing resources to something that can handle autopushing
+            // TODO: make a configuration option to disable this
+            if (world.isBlockLoaded(pos))
+                autopusher?.tryPushing()
 
             // Calculate the amount of ticks subtracted with speed upgrades
             val ticksSubtracted = run {
