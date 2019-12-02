@@ -102,7 +102,16 @@ class KuarryTileEntity : TileEntity(), ITickable {
     enum class ActivationMode {
         AlwaysOn, EnableWithRS, DisableWithRS, AlwaysOff
     }
+    /** The kuarry [ActivationMode].
+     *
+     * Changing this notifies the client about the change.
+     */
     internal var activationMode = ActivationMode.AlwaysOn
+        set(value) {
+            field = value
+
+            notifyClientAndMarkDirty()
+        }
 
     /** Switches the [activationMode] circularly and notifies the client about the change.
      *
@@ -115,8 +124,6 @@ class KuarryTileEntity : TileEntity(), ITickable {
             ActivationMode.DisableWithRS -> ActivationMode.AlwaysOff
             ActivationMode.AlwaysOff -> ActivationMode.AlwaysOn
         }
-
-        notifyClientAndMarkDirty()
     }
 
     /** Whether the bounds of the mined region should be rendered.
@@ -227,8 +234,11 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
     /** Notify the client about the change in the block data. */
     private fun notifyClient() {
-        val state = world.getBlockState(pos)
-        world.notifyBlockUpdate(pos, state, state, packetEntityID)
+        // When is is called, the "world" might be null if it has not been initialized yet
+        // (e.g. when the world is loaded and the data is set from NBT)
+        world?.getBlockState(pos)?.let { state ->
+            world.notifyBlockUpdate(pos, state, state, packetEntityID)
+        }
     }
 
     /** Both notify the client about the change in block data and mark the block dirty for the game to save it. */
