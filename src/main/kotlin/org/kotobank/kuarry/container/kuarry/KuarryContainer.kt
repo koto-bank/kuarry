@@ -6,6 +6,7 @@ import net.minecraft.util.EnumFacing
 import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.SlotItemHandler
 import org.kotobank.kuarry.container.BaseContainer
+import org.kotobank.kuarry.helper.InventoryHelper
 import org.kotobank.kuarry.item.KuarryUpgrade
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 
@@ -26,7 +27,7 @@ class KuarryContainer(inventoryPlayer: InventoryPlayer, val tileEntity: KuarryTi
         val inventory = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.NORTH)
 
         // Add all the slots from the kuarry inventory
-        forEachPositionInInventory(KuarryTileEntity.inventoryWidth, KuarryTileEntity.inventoryHeight) {
+        InventoryHelper.forEachPositionInInventory(KuarryTileEntity.inventoryWidth, KuarryTileEntity.inventoryHeight) {
             positionInInventory, widthPos, heightPos ->
 
             addSlotToContainer(
@@ -49,7 +50,7 @@ class KuarryContainer(inventoryPlayer: InventoryPlayer, val tileEntity: KuarryTi
 
         // Add the upgrade inventory
         val upgradeInventory = tileEntity.upgradeInventory
-        forEachPositionInInventory(KuarryTileEntity.upgradeInventoryWidth, KuarryTileEntity.upgradeInventoryHeight) {
+        InventoryHelper.forEachPositionInInventory(KuarryTileEntity.upgradeInventoryWidth, KuarryTileEntity.upgradeInventoryHeight) {
             positionInInventory: Int, widthPos: Int, heightPos: Int ->
 
             addSlotToContainer(

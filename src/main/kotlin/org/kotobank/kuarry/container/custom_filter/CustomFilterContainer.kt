@@ -11,6 +11,7 @@ import net.minecraftforge.items.IItemHandler
 import net.minecraftforge.items.ItemStackHandler
 import net.minecraftforge.items.SlotItemHandler
 import org.kotobank.kuarry.container.BaseContainer
+import org.kotobank.kuarry.helper.InventoryHelper
 import org.kotobank.kuarry.item.KuarryCustomFilter
 
 /** The container for the custom filter.
@@ -36,7 +37,7 @@ class CustomFilterContainer(val player: EntityPlayer) : BaseContainer(player.inv
             player.heldItemMainhand.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null) as ItemStackHandler
 
     init {
-        forEachPositionInInventory(KuarryCustomFilter.inventoryWidth, KuarryCustomFilter.inventoryHeight) {
+        InventoryHelper.forEachPositionInInventory(KuarryCustomFilter.inventoryWidth, KuarryCustomFilter.inventoryHeight) {
             positionInInventory, widthPos, heightPos ->
 
             addSlotToContainer(
