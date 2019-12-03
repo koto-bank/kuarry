@@ -1,6 +1,7 @@
 package net.minecraft.block
 
 import net.minecraft.block.state.IBlockState
+import net.minecraft.item.ItemStack
 
 /** The class that resides in the [net.minecraft.block] package to gain access to the getSilkTouchDrop.
  *
@@ -9,7 +10,7 @@ import net.minecraft.block.state.IBlockState
  *
  * FIXME: find a better way to do this? This is obviously bad.
  */
-object SilkTouchHarvest {
-    internal fun getSilkTouchDrop(block: Block, blockState: IBlockState) =
+internal object SilkTouchHarvest {
+    fun getSilkTouchDrop(block: Block, blockState: IBlockState): ItemStack =
             block.getSilkTouchDrop(blockState)
 }
