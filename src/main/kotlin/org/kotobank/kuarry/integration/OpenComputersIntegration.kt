@@ -68,6 +68,24 @@ object OpenComputersDriver : DriverSidedTileEntity() {
             return arrayOf(result)
         }
 
+        @Callback(doc = "function():boolean -- Whether autopushing is enabled")
+        fun getAutopushing(context: Context, args: Arguments): Array<Any> =
+            arrayOf(tileEntity.autopush)
+
+        @Callback(doc = "function() -- Set whether autopushing is enabled")
+        fun setAutopushing(context: Context, args: Arguments): Array<Any>? {
+            tileEntity.autopush = args.checkBoolean(0)
+
+            return null
+        }
+
+        @Callback(doc = "function():boolean -- Toggle autopushing. Returns the new value.")
+        fun toggleAutopushing(context: Context, args: Arguments): Array<Any>? {
+            tileEntity.toggleAutopush()
+
+            return arrayOf(tileEntity.autopush)
+        }
+
         // TODO: Figure out a way to allow putting/getting upgrades to/from the upgrade inventory,
         // TODO: maybe unify them into a single inventory
     }

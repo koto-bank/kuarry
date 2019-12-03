@@ -150,6 +150,13 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
     /** Whether to automatically push item to pipes. */
     internal var autopush = false
+        get() =
+            Autopusher.isEnabled && field
+        set(value) {
+            field = value
+
+            notifyClientAndMarkDirty()
+        }
 
     /** Toggles [autopush] on or off. */
     internal fun toggleAutopush() {
