@@ -9,6 +9,7 @@ import org.kotobank.kuarry.KuarryModPackets
 import org.kotobank.kuarry.packet.SwitchKuarrySetting
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity.ActivationMode
 import org.kotobank.kuarry.container.BaseGUIContainer
+import org.kotobank.kuarry.integration.autopushing.Autopusher
 
 
 class KuarryGUIContainer(override val container: KuarryContainer) : BaseGUIContainer(container) {
@@ -30,7 +31,8 @@ class KuarryGUIContainer(override val container: KuarryContainer) : BaseGUIConta
             container.tileEntity.run {
                 listOf(
                         ActivationModeButton(10, 10),
-                        RenderBoundsButton(10, 30)
+                        RenderBoundsButton(10, 30),
+                        AutopushButton(10, 50)
                 )
             }
 
@@ -122,6 +124,25 @@ class KuarryGUIContainer(override val container: KuarryContainer) : BaseGUIConta
         override fun onClick() {
             KuarryModPackets.networkChannel.sendToServer(
                     SwitchKuarrySetting(container.tileEntity.pos, SwitchKuarrySetting.Setting.RenderBounds)
+            )
+            super.onClick()
+        }
+    }
+
+    private inner class AutopushButton(x: Int, y: Int) : Button(x, y) {
+        override val enabled: Boolean = Autopusher.isEnabled
+
+        override val iconAndTooltip
+            get() =
+                if (container.tileEntity.autopush) {
+                    Pair(KuarryModIcons.autopushEnable, "Automatically push items to pipes")
+                } else {
+                    Pair(KuarryModIcons.autopushDisable, "Don't automatically push items to pipes")
+                }
+
+        override fun onClick() {
+            KuarryModPackets.networkChannel.sendToServer(
+                    SwitchKuarrySetting(container.tileEntity.pos, SwitchKuarrySetting.Setting.Autopush)
             )
             super.onClick()
         }

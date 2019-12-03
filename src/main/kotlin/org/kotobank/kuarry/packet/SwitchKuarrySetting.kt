@@ -16,7 +16,7 @@ class SwitchKuarrySetting(var pos: BlockPos, var setting: Setting) : IMessage {
 
     /** The setting to switch in the TE */
     enum class Setting {
-        Empty, ActivationMode, RenderBounds
+        Empty, ActivationMode, RenderBounds, Autopush
     }
 
     override fun toBytes(buf: ByteBuf) {
@@ -43,6 +43,7 @@ class SwitchKuarrySetting(var pos: BlockPos, var setting: Setting) : IMessage {
                     Setting.Empty -> {}
                     Setting.ActivationMode -> tileEntity.switchActivationMode()
                     Setting.RenderBounds -> tileEntity.toggleRenderBounds()
+                    Setting.Autopush -> tileEntity.toggleAutopush()
                 }
             }
 

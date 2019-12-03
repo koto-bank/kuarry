@@ -148,6 +148,14 @@ class KuarryTileEntity : TileEntity(), ITickable {
         notifyClient()
     }
 
+    /** Whether to automatically push item to pipes. */
+    internal var autopush = false
+
+    /** Toggles [autopush] on or off. */
+    internal fun toggleAutopush() {
+        autopush = !autopush
+    }
+
     /** Whether the resource count should be updated in the next [update] run. */
     private var shouldUpdateResourcesLeft = true
 
@@ -196,6 +204,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 setTag("upgrade_inventory", upgradeInventory.serializeNBT())
 
                 setString("activation_mode", activationMode.name)
+                setBoolean("autopush", autopush)
             }
 
     /** Read mod's NBT data, but not game's NBT data. */
@@ -206,6 +215,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
             upgradeInventory.deserializeNBT(getCompoundTag("upgrade_inventory"))
 
             activationMode = ActivationMode.valueOf(getString("activation_mode"))
+            autopush = getBoolean("autopush")
         }
     }
 
@@ -354,9 +364,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
             if (shouldUpdateResourcesLeft) updateResourcesLeft()
 
             // Try pushing resources to something that can handle autopushing
-            // TODO: make a configuration option to disable this
-            if (world.isBlockLoaded(pos))
-                autopusher?.tryPushing()
+            if (autopush) autopusher?.tryPushing()
 
             // Calculate the amount of ticks subtracted with speed upgrades
             val ticksSubtracted = run {
