@@ -93,30 +93,19 @@ class CustomFilterGUIContainer(override val container: CustomFilterContainer) : 
                     }
                 }
 
-        private val isBlacklistMode
+        override val enabled
             get() = KuarryCustomFilter.mode(filter) == KuarryCustomFilter.Mode.Blacklist
 
-        // The functions below are overridden to only do something when filter mode = blacklist
+        // The function below is overridden to only do something when filter mode = blacklist
 
         override fun onClick() {
-            if (isBlacklistMode) {
+            if (enabled) {
                 KuarryModPackets.networkChannel.sendToServer(
                         SwitchCustomFilterSetting(SwitchCustomFilterSetting.Setting.BlacklistMode)
                 )
 
                 super.onClick()
             }
-        }
-
-        override fun isOnButton(mouseX: Int, mouseY: Int): Boolean =
-            if (isBlacklistMode) super.isOnButton(mouseX, mouseY) else false
-
-        override fun draw(mouseX: Int, mouseY: Int) {
-            if (isBlacklistMode) super.draw(mouseX, mouseY)
-        }
-
-        override fun drawTooltip(mouseX: Int, mouseY: Int) {
-            if (isBlacklistMode) super.drawTooltip(mouseX, mouseY)
         }
     }
 }

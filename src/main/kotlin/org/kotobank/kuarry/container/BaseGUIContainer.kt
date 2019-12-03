@@ -84,8 +84,8 @@ abstract class BaseGUIContainer(protected open val container: Container) : GuiCo
      * standard minecraft buttons. They will then be processed as explained in the [buttons] documentation string.
      */
     protected abstract inner class Button(private val x: Int, private val y: Int) {
-        /** Whether the specified [mouseX] and [mouseY] are floating over the button. */
-        open fun isOnButton(mouseX: Int, mouseY: Int) = inBounds(x, y, buttonSize, buttonSize, mouseX, mouseY)
+        /** Whether the button should be drawn. */
+        open val enabled = true
 
         /** Returns, depending on some custom circumstances, a pair consisting of an icon and a tooltip to use for the button */
         abstract val iconAndTooltip: Pair<TextureAtlasSprite, String>
@@ -93,16 +93,23 @@ abstract class BaseGUIContainer(protected open val container: Container) : GuiCo
         /** Additional lines to add to the tooltip besides the button name. */
         open val additionalTooltipLines = arrayOf<String>()
 
+        /** Whether the specified [mouseX] and [mouseY] are floating over the button. */
+        open fun isOnButton(mouseX: Int, mouseY: Int) = enabled && inBounds(x, y, buttonSize, buttonSize, mouseX, mouseY)
+
         /** An action to perform when the button is clicked.
          *
          * Plays a click sound by default. Implementations should call super to play a click sound.
          */
         open fun onClick() {
+            if (!enabled) return
+
             mc.soundHandler.playSound(PositionedSoundRecord.getRecord(SoundEvents.UI_BUTTON_CLICK, 1f, 0.3f))
         }
 
         /** Draws the button and the icon from [iconAndTooltip]. */
         open fun draw(mouseX: Int, mouseY: Int) {
+            if (!enabled) return
+
             // This is REQUIRED for drawing textures from the atlas. It WILL obscurely fail to draw
             // in specific situations otherwise.
             mc.renderEngine.bindTexture(KuarryModIcons.atlasResourceLocation)
@@ -119,6 +126,8 @@ abstract class BaseGUIContainer(protected open val container: Container) : GuiCo
 
         /** Draws the tooltip from [iconAndTooltip] if the mouse is floating over the button. */
         open fun drawTooltip(mouseX: Int, mouseY: Int) {
+            if (!enabled) return
+
             if (isOnButton(mouseX, mouseY)) {
                 val (_, tooltip) = iconAndTooltip
 
