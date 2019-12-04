@@ -20,7 +20,7 @@ apply plugin: 'kotlin'
 
 def mc_version_short = "1.12", mc_version = "${mc_version_short}.2"
 
-version = "0.1"
+version = "0.2"
 group = "org.kotobank.kuarry" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "kuarry-${mc_version}"
 
