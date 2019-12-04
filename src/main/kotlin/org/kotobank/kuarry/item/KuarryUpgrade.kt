@@ -94,8 +94,12 @@ class KuarryLuckUpgrade : KuarryUpgrade() {
     override fun getHasSubtypes() = true
 
     override fun getSubItems(tab: CreativeTabs, items: NonNullList<ItemStack>) {
-        for (level in 0..2) {
-            items.add(ItemStack(this, 1, level))
+        if (tab == creativeTab) {
+            for (level in 0..2) {
+                items.add(
+                        ItemStack(this, 1, level)
+                )
+            }
         }
     }
 
