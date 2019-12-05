@@ -70,8 +70,6 @@ class KuarryCustomFilter : KuarryUpgrade() {
         Only, Additional
     }
 
-    override val tooltipStrings = listOf("Allows filtering mined blocks")
-
     override fun onItemRightClick(worldIn: World, playerIn: EntityPlayer, handIn: EnumHand): ActionResult<ItemStack> =
             if (handIn == EnumHand.MAIN_HAND) {
                 // Open the GUI. Pass zero XYZ because they don't matter.

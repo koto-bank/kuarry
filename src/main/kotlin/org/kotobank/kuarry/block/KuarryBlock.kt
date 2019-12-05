@@ -6,6 +6,7 @@ import net.minecraft.block.properties.PropertyDirection
 import net.minecraft.block.state.BlockStateContainer
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.resources.I18n
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
@@ -25,7 +26,7 @@ import net.minecraft.util.text.TextFormatting
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import net.minecraftforge.items.ItemStackHandler
-import org.kotobank.kuarry.KuarryModItems
+import org.kotobank.kuarry.helper.TranslationHelper
 
 class KuarryBlock(material: Material, registryName: String) : Block(material) {
     companion object {
@@ -125,12 +126,9 @@ class KuarryBlock(material: Material, registryName: String) : Block(material) {
     @SideOnly(Side.CLIENT)
     override fun addInformation(itemStack: ItemStack, player: World?, tooltip: MutableList<String>, advanced: ITooltipFlag) {
         if (GuiScreen.isShiftKeyDown()) {
-            tooltip.add(
-                    "It sucks resources out from the bowels of earth, and leaves just a frothy stone-like sponge in place of matter. " +
-                            "Who knows, what will crawl out tomorrow, woken up by the cleeky intruders from the surface?"
-            )
+            tooltip.add(I18n.format("tile.kuarry.tooltips.description"))
         } else {
-            tooltip.add("[Hold ${TextFormatting.YELLOW}${TextFormatting.ITALIC}Shift${TextFormatting.RESET} for a detailed description]")
+            tooltip.add(TranslationHelper.shiftForDetailsTooltip)
         }
 
         // Only react if it's a tooltip for the kuarry block
@@ -149,9 +147,8 @@ class KuarryBlock(material: Material, registryName: String) : Block(material) {
             }
 
             tooltip.addAll(listOf(
-                    "",
-                    "${TextFormatting.BLUE}Energy stored: ${energyStored}RF",
-                    "${TextFormatting.BLUE}Items stored: $itemCount"
+                    "${I18n.format("tile.kuarry.tooltips.energy_stored", TextFormatting.BLUE)}: ${energyStored}RF",
+                    "${I18n.format("tile.kuarry.tooltips.items_stored", TextFormatting.BLUE)}: $itemCount"
             ))
         }
     }

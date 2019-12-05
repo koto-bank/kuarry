@@ -1,12 +1,41 @@
+#PARSE_ESCAPES
+
 tile.kuarry.name=Kuarry
+tile.kuarry.tooltips.description=It sucks resources out from the bowels of earth, and leaves just a frothy stone-like sponge in place of matter. \
+Who knows, what will crawl out tomorrow, woken up by the cleeky intruders from the surface?
+tile.kuarry.tooltips.energy_stored=%sEnergy stored
+tile.kuarry.tooltips.items_stored=%sItems stored
+
 tile.denatured_stone.name=Denatured stone
+tile.denatured_stone.description=Denatured stone is proven to be a very useful material\: it can be a cheap papier mache, \
+it can be smashed to pieces, or it can be the subject of a ten year long "How can we use denatured stone?" research with an immense budget. \
+Most importantly, however, is that it can sometimes drop gravel when broken.
 
 item.kuarry_casing.name=Kuarry casing
+
 item.x_boundaries_upgrade.name=Kuarry X boundaries upgrade
+item.x_boundaries_upgrade.description=Upgrades the kuarry to mine one more chunk along the X dimension
+
 item.z_boundaries_upgrade.name=Kuarry Z boundaries upgrade
+item.z_boundaries_upgrade.description=Upgrades the kuarry to mine one more chunk along the Z dimension
+
 item.silk_touch_upgrade.name=Kuarry silk touch upgrade
+item.silk_touch_upgrade.description=Makes the kuarry retrieve the blocks as they are, instead of mining them\n\
+Not compatible with the luck upgrade
+
 item.luck_upgrade_0.name=Kuarry luck upgade I
 item.luck_upgrade_1.name=Kuarry luck upgrade II
 item.luck_upgrade_2.name=Kuarry luck upgrade III
+item.luck_upgrade.description = Makes the kuarry mine more resources from some ores\n\
+Not compatible with the silk touch upgrade
+tooltips.luck_upgrade.about_energy_multiplication=Multiplies energy usage by %s per level
+
 item.custom_filter.name=Kuarry custom filter
+item.custom_filter.description=Allows filtering mined blocks
+
 item.speed_upgrade.name=Kuarry speed upgrade
+item.speed_upgrade.description=§c§lThe red one goes faster
+
+tooltips.about_energy_multiplication=Multiplies energy usage by %s
+
+tooltips.hold_shift_for_ext_desc=[Hold %1$sShift%2$s for a detailed description]

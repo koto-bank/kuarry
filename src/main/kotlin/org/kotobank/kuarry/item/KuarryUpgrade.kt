@@ -1,6 +1,7 @@
 package org.kotobank.kuarry.item
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation
+import net.minecraft.client.resources.I18n
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.item.Item
@@ -9,6 +10,8 @@ import net.minecraft.util.*
 import net.minecraft.util.text.TextFormatting
 import net.minecraft.world.World
 import net.minecraftforge.client.model.ModelLoader
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.reflect.KClass
@@ -24,11 +27,26 @@ abstract class KuarryUpgrade : Item() {
     /** Energy usage multiplier used with [energyUsageWithUpgrade]. */
     open val energyUsageMultiplier = 1f
 
-    open val tooltipStrings by lazy {
+    @get:SideOnly(Side.CLIENT)
+    protected open val energyUsageTooltip: String
+        get() = I18n.format(
+                "tooltips.about_energy_multiplication",
+                "${TextFormatting.BOLD}$energyUsageMultiplier"
+        )
+
+    @get:SideOnly(Side.CLIENT)
+    protected open val tooltipKey by lazy {
+        "${unlocalizedName}.description"
+    }
+
+    @get:SideOnly(Side.CLIENT)
+    protected val tooltipStrings: List<String> by lazy {
+        val tooltipList = mutableListOf(I18n.format(tooltipKey))
+
         if (energyUsageMultiplier > 1)
-            listOf("", "Multiplies energy usage by ${TextFormatting.BOLD}$energyUsageMultiplier")
-        else
-            emptyList()
+            tooltipList.addAll(listOf("", energyUsageTooltip))
+
+        tooltipList
     }
 
     /** Calculates energy usage for the upgrades, probably based on the [energyUsageMultiplier].
@@ -45,6 +63,7 @@ abstract class KuarryUpgrade : Item() {
             // For some reason there's no integer power function, so have to convert to float and back
             (currentEnergyUsage * (energyUsageMultiplier.pow(upgrades.count))).roundToInt()
 
+    @SideOnly(Side.CLIENT)
     override fun addInformation(stack: ItemStack, worldIn: World?, tooltip: MutableList<String>, flagIn: ITooltipFlag) {
         tooltip.addAll(tooltipStrings)
     }
@@ -53,23 +72,15 @@ abstract class KuarryUpgrade : Item() {
 class KuarryXBoundariesUpgrade : KuarryUpgrade() {
     override val stackSize = 2
     override val energyUsageMultiplier = 1.1f
-    override val tooltipStrings =
-            listOf("Upgrades the kuarry to mine one more chunk along the X dimension") + super.tooltipStrings
 }
 
 class KuarryZBoundariesUpgrade : KuarryUpgrade() {
     override val stackSize = 2
     override val energyUsageMultiplier = 1.1f
-    override val tooltipStrings =
-            listOf("Upgrades the kuarry to mine one more chunk along the Z dimension") + super.tooltipStrings
 }
 
 class KuarrySilkTouchUpgrade : KuarryUpgrade() {
     override val energyUsageMultiplier = 1.1f
-    override val tooltipStrings = listOf(
-            "Makes the kuarry retrieve the blocks as they are, instead of mining them",
-            "Not compatible with the luck upgrade"
-    ) + super.tooltipStrings
 
     override val incompatibleWith = KuarryLuckUpgrade::class
 }
@@ -86,10 +97,12 @@ class KuarryLuckUpgrade : KuarryUpgrade() {
         return (currentEnergyUsage * (energyUsageMultiplier.pow(level))).roundToInt()
     }
 
-    override val tooltipStrings = listOf(
-            "Makes the kuarry mine more resources from some ores",
-            "Not compatible with the silk touch upgrade"
-    ) + super.tooltipStrings
+    @get:SideOnly(Side.CLIENT)
+    override val energyUsageTooltip: String
+        get() = I18n.format(
+                "tooltips.luck_upgrade.about_energy_multiplication",
+                "${TextFormatting.BOLD}$energyUsageMultiplier${TextFormatting.RESET}${TextFormatting.GRAY}"
+        )
 
     override fun getHasSubtypes() = true
 
@@ -121,8 +134,4 @@ class KuarryLuckUpgrade : KuarryUpgrade() {
 class KuarrySpeedUpgrade : KuarryUpgrade() {
     override val stackSize = 5
     override val energyUsageMultiplier = 1.2f
-    override val tooltipStrings =
-            listOf(
-                    "${TextFormatting.RED}${TextFormatting.BOLD}The red one goes faster"
-            ) + super.tooltipStrings
 }
