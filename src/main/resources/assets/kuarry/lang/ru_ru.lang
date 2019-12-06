@@ -1,0 +1,57 @@
+#PARSE_ESCAPES
+
+tile.kuarry.name=Карьер
+tile.kuarry.tooltips.description=Высасывает ресурсы из недр земли и оставляет на их месте каменную пустышку. \
+Кто знает, что выберется из земли завтра, пробуженное дерзкими гостями сверху?
+tile.kuarry.tooltips.energy_stored=%sКол-во энергии внутри
+tile.kuarry.tooltips.items_stored=%sКол-во вещей внутри
+tile.kuarry.gui.always_enabled=Всегда включено
+tile.kuarry.gui.always_disabled=Всегда выключено
+tile.kuarry.gui.enable_with_rs=Включается сигналом редстоуна
+tile.kuarry.gui.disable_with_rs=Выключается сигналом редстоуна
+tile.kuarry.gui.render_bounds=Показывать границы копания
+tile.kuarry.gui.dont_render_bounds=Не показывать границы копания
+tile.kuarry.gui.autopush=Отправлять вещи по трубам автоматически
+tile.kuarry.gui.dont_autopush=Не отправлять вещи по трубам автоматически
+tile.kuarry.gui.approx_left=Прим. осталось
+
+tile.denatured_stone.name=Денатурированный камень
+tile.denatured_stone.description=Доказано, что денатурированный камень - очень полезный материал: его можно использовать как дешёвую альтернативу папье-маше, \
+разбить на кусочки, или потратить десять лет и огромный бюджет на исследование "Для чего можно использовать денатурированный камень?". \
+Самое важное его свойство, однако, это то, что иногда из него может выпасть гравий.
+
+item.kuarry_casing.name=Обшивка карьера
+
+item.x_boundaries_upgrade.name=Улучшение для расширения границ по оси X
+item.x_boundaries_upgrade.description=Улучшает карьер, позволяя копать на один чанк больше по оси X
+
+item.z_boundaries_upgrade.name=Улучшение для расширения границ по оси Z
+item.z_boundaries_upgrade.description=Улучшает карьер, позволяя копать на один чанк больше по оси Z
+
+item.silk_touch_upgrade.name=Улучшение "Шёлковое касание"
+item.silk_touch_upgrade.description=Позволяет карьеру собирать блоки как есть, вместо их выкапавания
+item.silk_touch_upgrade.description.incompat=Несовместимо с улучшенем "Удача"
+
+item.luck_upgrade_0.name=Улучшение "Удача" I
+item.luck_upgrade_1.name=Улучшение "Удача" II
+item.luck_upgrade_2.name=Улучшение "Удача" III
+item.luck_upgrade.description = Позволяет получать больше ресурсов из некоторых руд
+item.luck_upgrade.description.incompat=Несовместимо с улучшенем "Шёлковое касание"
+item.luck_upgrade.description.about_energy_multiplication=Увеличивает потрябляемую энергию в %s раза за каждый уровень
+
+item.custom_filter.name=Фильтр для карьера
+item.custom_filter.description=Позволяет фильтровать выкапываемые блоки
+item.custom_filter.gui.blacklist=Чёрный список
+item.custom_filter.gui.whitelist=Белый список
+item.custom_filter.gui.blacklist_description=Пропускать эти блоки при копании
+item.custom_filter.gui.whitelist_description=Копать только эти блоки
+item.custom_filter.gui.blacklist_mode_only=Игнорировать исключительно указанные блоки, не учитывая стандартный чёрный список
+item.custom_filter.gui.blacklist_mode_additional=Игнорировать указанные блоки, плюс блоки в стандартном чёрном списке
+item.custom_filter.gui.default_blacklist=Стандартный чёрный список
+
+item.speed_upgrade.name=Улучшение "Скорость"
+item.speed_upgrade.description=§c§lКрасный цвет делает всё быстрее
+
+tooltips.about_energy_multiplication=Увеличивает потребляемую энергия в %s раза
+
+tooltips.hold_shift_for_ext_desc=[Зажмите %1$sShift%2$s для подробного описания]
