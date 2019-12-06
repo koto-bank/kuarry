@@ -31,7 +31,7 @@ abstract class KuarryUpgrade : Item() {
     protected open val energyUsageTooltip: String
         get() = I18n.format(
                 "tooltips.about_energy_multiplication",
-                "${TextFormatting.BOLD}$energyUsageMultiplier"
+                "${TextFormatting.BOLD}$energyUsageMultiplier${TextFormatting.RESET}${TextFormatting.GRAY}"
         )
 
     @get:SideOnly(Side.CLIENT)
@@ -39,9 +39,16 @@ abstract class KuarryUpgrade : Item() {
         "${unlocalizedName}.description"
     }
 
+    protected open val incompatWithKey by lazy {
+        "${unlocalizedName}.description.incompat"
+    }
+
     @get:SideOnly(Side.CLIENT)
     protected val tooltipStrings: List<String> by lazy {
         val tooltipList = mutableListOf(I18n.format(tooltipKey))
+
+        if (incompatibleWith != null)
+            tooltipList.add(I18n.format(incompatWithKey))
 
         if (energyUsageMultiplier > 1)
             tooltipList.addAll(listOf("", energyUsageTooltip))
@@ -100,7 +107,7 @@ class KuarryLuckUpgrade : KuarryUpgrade() {
     @get:SideOnly(Side.CLIENT)
     override val energyUsageTooltip: String
         get() = I18n.format(
-                "tooltips.luck_upgrade.about_energy_multiplication",
+                "item.luck_upgrade.description.about_energy_multiplication",
                 "${TextFormatting.BOLD}$energyUsageMultiplier${TextFormatting.RESET}${TextFormatting.GRAY}"
         )
 
