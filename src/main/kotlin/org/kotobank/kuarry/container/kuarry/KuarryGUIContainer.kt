@@ -67,7 +67,7 @@ class KuarryGUIContainer(override val container: KuarryContainer) : BaseGUIConta
         if (tileEntity.approxResourcesLeft != -1) {
             drawString(
                     mc.fontRenderer,
-                    "Approx. left: ${tileEntity.approxResourcesLeft}",
+                    "${I18n.format("tile.kuarry.gui.approx_left")}: ${tileEntity.approxResourcesLeft}",
                     30,
                     10,
                     0xFFFFFF

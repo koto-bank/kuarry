@@ -5,7 +5,6 @@ tile.kuarry.tooltips.description=It sucks resources out from the bowels of earth
 Who knows, what will crawl out tomorrow, woken up by the cleeky intruders from the surface?
 tile.kuarry.tooltips.energy_stored=%sEnergy stored
 tile.kuarry.tooltips.items_stored=%sItems stored
-
 tile.kuarry.gui.always_enabled=Always enabled
 tile.kuarry.gui.always_disabled=Always disabled
 tile.kuarry.gui.enable_with_rs=Enable with redstone signal
@@ -14,6 +13,7 @@ tile.kuarry.gui.render_bounds=Show mining area boundaries
 tile.kuarry.gui.dont_render_bounds=Don't show mining area boundaries
 tile.kuarry.gui.autopush=Automatically push items to pipes
 tile.kuarry.gui.dont_autopush=Don't automatically push items to pipes
+tile.kuarry.gui.approx_left=Approx. left
 
 tile.denatured_stone.name=Denatured stone
 tile.denatured_stone.description=Denatured stone is proven to be a very useful material\: it can be a cheap papier mache, \
