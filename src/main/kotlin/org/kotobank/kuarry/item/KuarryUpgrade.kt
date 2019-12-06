@@ -39,12 +39,14 @@ abstract class KuarryUpgrade : Item() {
         "${unlocalizedName}.description"
     }
 
+    @get:SideOnly(Side.CLIENT)
     protected open val incompatWithKey by lazy {
         "${unlocalizedName}.description.incompat"
     }
 
     @get:SideOnly(Side.CLIENT)
-    protected val tooltipStrings: List<String> by lazy {
+    protected val tooltipStrings: List<String>
+    get() {
         val tooltipList = mutableListOf(I18n.format(tooltipKey))
 
         if (incompatibleWith != null)
@@ -53,7 +55,7 @@ abstract class KuarryUpgrade : Item() {
         if (energyUsageMultiplier > 1)
             tooltipList.addAll(listOf("", energyUsageTooltip))
 
-        tooltipList
+        return tooltipList
     }
 
     /** Calculates energy usage for the upgrades, probably based on the [energyUsageMultiplier].
