@@ -49,8 +49,7 @@ repositories {
     mavenCentral()
     maven {  url "http://maven.shadowfacts.net/" }
 
-    maven { url = "http://chickenbones.net/maven/" } // CCL
-    maven { url = "http://maven.covers1624.net" } // COFH
+    maven { url = "http://maven.covers1624.net" } // COFH, CCL
     maven { url = "http://dvs1.progwml6.com/files/maven/" } // JEI
     maven { url = "http://maven.ic2.player.to/" } // IC2
 
