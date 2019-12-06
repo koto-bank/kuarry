@@ -1,5 +1,6 @@
 package org.kotobank.kuarry.container.kuarry
 
+import net.minecraft.client.resources.I18n
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.energy.CapabilityEnergy
@@ -94,13 +95,13 @@ class KuarryGUIContainer(override val container: KuarryContainer) : BaseGUIConta
     }
 
     private inner class ActivationModeButton(x: Int, y: Int) : Button(x, y) {
-        override val iconAndTooltip
+        override val iconAndTooltipKey
             get() =
                 when (container.tileEntity.activationMode) {
-                    ActivationMode.AlwaysOn -> Pair(KuarryModIcons.alwaysEnable, "Always enabled")
-                    ActivationMode.DisableWithRS -> Pair(KuarryModIcons.RSWithout, "Disable with redstone signal")
-                    ActivationMode.EnableWithRS -> Pair(KuarryModIcons.RSWith, "Enable with redstone signal")
-                    ActivationMode.AlwaysOff -> Pair(KuarryModIcons.alwaysDisable, "Always disabled")
+                    ActivationMode.AlwaysOn -> Pair(KuarryModIcons.alwaysEnable, "tile.kuarry.gui.always_enabled")
+                    ActivationMode.DisableWithRS -> Pair(KuarryModIcons.RSWithout, "tile.kuarry.gui.disable_with_rs")
+                    ActivationMode.EnableWithRS -> Pair(KuarryModIcons.RSWith, "tile.kuarry.gui.enable_with_rs")
+                    ActivationMode.AlwaysOff -> Pair(KuarryModIcons.alwaysDisable, "tile.kuarry.gui.always_disabled")
                 }
 
         override fun onClick() {
@@ -113,12 +114,12 @@ class KuarryGUIContainer(override val container: KuarryContainer) : BaseGUIConta
     }
 
     private inner class RenderBoundsButton(x: Int, y: Int) : Button(x, y) {
-        override val iconAndTooltip
+        override val iconAndTooltipKey
                 get() =
                     if (container.tileEntity.renderBounds) {
-                        Pair(KuarryModIcons.boundsEnable, "Show mining area boundaries")
+                        Pair(KuarryModIcons.boundsEnable, "tile.kuarry.gui.render_bounds")
                     } else {
-                        Pair(KuarryModIcons.boundsDisable, "Don't show mining area boundaries")
+                        Pair(KuarryModIcons.boundsDisable, "tile.kuarry.gui.dont_render_bounds")
                     }
 
         override fun onClick() {
@@ -132,12 +133,12 @@ class KuarryGUIContainer(override val container: KuarryContainer) : BaseGUIConta
     private inner class AutopushButton(x: Int, y: Int) : Button(x, y) {
         override val enabled: Boolean = Autopusher.isEnabled
 
-        override val iconAndTooltip
+        override val iconAndTooltipKey
             get() =
                 if (container.tileEntity.autopush) {
-                    Pair(KuarryModIcons.autopushEnable, "Automatically push items to pipes")
+                    Pair(KuarryModIcons.autopushEnable, "tile.kuarry.gui.autopush")
                 } else {
-                    Pair(KuarryModIcons.autopushDisable, "Don't automatically push items to pipes")
+                    Pair(KuarryModIcons.autopushDisable, "tile.kuarry.gui.dont_autopush")
                 }
 
         override fun onClick() {

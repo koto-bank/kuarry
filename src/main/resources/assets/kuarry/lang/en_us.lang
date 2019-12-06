@@ -6,6 +6,15 @@ Who knows, what will crawl out tomorrow, woken up by the cleeky intruders from t
 tile.kuarry.tooltips.energy_stored=%sEnergy stored
 tile.kuarry.tooltips.items_stored=%sItems stored
 
+tile.kuarry.gui.always_enabled=Always enabled
+tile.kuarry.gui.always_disabled=Always disabled
+tile.kuarry.gui.enable_with_rs=Enable with redstone signal
+tile.kuarry.gui.disable_with_rs=Disable with redstone signal
+tile.kuarry.gui.render_bounds=Show mining area boundaries
+tile.kuarry.gui.dont_render_bounds=Don't show mining area boundaries
+tile.kuarry.gui.autopush=Automatically push items to pipes
+tile.kuarry.gui.dont_autopush=Don't automatically push items to pipes
+
 tile.denatured_stone.name=Denatured stone
 tile.denatured_stone.description=Denatured stone is proven to be a very useful material\: it can be a cheap papier mache, \
 it can be smashed to pieces, or it can be the subject of a ten year long "How can we use denatured stone?" research with an immense budget. \
@@ -32,6 +41,13 @@ tooltips.luck_upgrade.about_energy_multiplication=Multiplies energy usage by %s 
 
 item.custom_filter.name=Kuarry custom filter
 item.custom_filter.description=Allows filtering mined blocks
+item.custom_filter.gui.blacklist=Blacklist
+item.custom_filter.gui.whitelist=Whitelist
+item.custom_filter.gui.blacklist_description=Skip these items when mining
+item.custom_filter.gui.whitelist_description=Only mine these items
+item.custom_filter.gui.blacklist_mode_only=Only blacklist the specified blocks, overriding the default blacklist
+item.custom_filter.gui.blacklist_mode_additional=Blacklist the specified blocks, plus the blocks blacklisted by default
+item.custom_filter.gui.default_blacklist=Default blacklist
 
 item.speed_upgrade.name=Kuarry speed upgrade
 item.speed_upgrade.description=§c§lThe red one goes faster

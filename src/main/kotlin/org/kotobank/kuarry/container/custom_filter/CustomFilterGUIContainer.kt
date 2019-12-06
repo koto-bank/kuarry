@@ -1,5 +1,6 @@
 package org.kotobank.kuarry.container.custom_filter
 
+import net.minecraft.client.resources.I18n
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.text.TextFormatting
 import org.kotobank.kuarry.KuarryMod
@@ -35,18 +36,18 @@ class CustomFilterGUIContainer(override val container: CustomFilterContainer) : 
         }
 
     protected inner class ModeButton(x: Int, y: Int) : Button(x, y) {
-        override val iconAndTooltip
+        override val iconAndTooltipKey
             get() =
                 when (KuarryCustomFilter.mode(filter)) {
-                    KuarryCustomFilter.Mode.Blacklist -> Pair(KuarryModIcons.blacklist, "Blacklist")
-                    KuarryCustomFilter.Mode.Whitelist -> Pair(KuarryModIcons.whitelist, "Whitelist")
+                    KuarryCustomFilter.Mode.Blacklist -> Pair(KuarryModIcons.blacklist, "item.custom_filter.gui.blacklist")
+                    KuarryCustomFilter.Mode.Whitelist -> Pair(KuarryModIcons.whitelist, "item.custom_filter.gui.whitelist")
                 }
 
         override val additionalTooltipLines
             get() = arrayOf(
                     when (KuarryCustomFilter.mode(filter)) {
-                        KuarryCustomFilter.Mode.Blacklist -> "Skip these items when mining"
-                        KuarryCustomFilter.Mode.Whitelist -> "Only mine these items"
+                        KuarryCustomFilter.Mode.Blacklist -> I18n.format("item.custom_filter.gui.blacklist_description")
+                        KuarryCustomFilter.Mode.Whitelist -> I18n.format("item.custom_filter.gui.whitelist_description")
                     }
             )
 
@@ -60,16 +61,16 @@ class CustomFilterGUIContainer(override val container: CustomFilterContainer) : 
     }
 
     protected inner class BlacklistModeButton(x: Int, y: Int) : Button(x, y) {
-        override val iconAndTooltip
+        override val iconAndTooltipKey
             get() =
                 when (KuarryCustomFilter.blacklistMode(filter)) {
                     KuarryCustomFilter.BlacklistMode.Only -> Pair(
                             KuarryModIcons.blacklistOnly,
-                            "Only blacklist the specified blocks, overriding the default blacklist"
+                            "item.custom_filter.gui.blacklist_mode_only"
                     )
                     KuarryCustomFilter.BlacklistMode.Additional ->  Pair(
                             KuarryModIcons.blacklistAdditional,
-                            "Blacklist the specified blocks, plus the blocks blacklisted by default"
+                            "item.custom_filter.gui.blacklist_mode_additional"
                     )
                 }
 
@@ -87,7 +88,7 @@ class CustomFilterGUIContainer(override val container: CustomFilterContainer) : 
                         // Show the default blacklist after the help text, with a colored header
                         arrayOf(
                                 "",
-                                "${TextFormatting.BLUE}${TextFormatting.BOLD}Default blacklist",
+                                "${TextFormatting.BLUE}${TextFormatting.BOLD}${I18n.format("item.custom_filter.gui.default_blacklist")}",
                                 defaultBlacklistStr
                         )
                     }

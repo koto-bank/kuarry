@@ -4,6 +4,7 @@ import net.minecraft.client.audio.PositionedSoundRecord
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.client.resources.I18n
 import net.minecraft.init.SoundEvents
 import net.minecraft.inventory.Container
 import net.minecraft.util.ResourceLocation
@@ -87,8 +88,9 @@ abstract class BaseGUIContainer(protected open val container: Container) : GuiCo
         /** Whether the button should be drawn. */
         open val enabled = true
 
-        /** Returns, depending on some custom circumstances, a pair consisting of an icon and a tooltip to use for the button */
-        abstract val iconAndTooltip: Pair<TextureAtlasSprite, String>
+        /** Returns, depending on some custom circumstances, a pair consisting of an icon and a tooltip translation key to use for the button
+         */
+        abstract val iconAndTooltipKey: Pair<TextureAtlasSprite, String>
 
         /** Additional lines to add to the tooltip besides the button name. */
         open val additionalTooltipLines = arrayOf<String>()
@@ -106,7 +108,7 @@ abstract class BaseGUIContainer(protected open val container: Container) : GuiCo
             mc.soundHandler.playSound(PositionedSoundRecord.getRecord(SoundEvents.UI_BUTTON_CLICK, 1f, 0.3f))
         }
 
-        /** Draws the button and the icon from [iconAndTooltip]. */
+        /** Draws the button and the icon from [iconAndTooltipKey]. */
         open fun draw(mouseX: Int, mouseY: Int) {
             if (!enabled) return
 
@@ -119,19 +121,20 @@ abstract class BaseGUIContainer(protected open val container: Container) : GuiCo
             val buttonTex = if (hovered) KuarryModIcons.buttonHighlight else KuarryModIcons.button
             drawTexturedModalRect(x, y, buttonTex, buttonSize, buttonSize)
 
-            val (icon, _) = iconAndTooltip
+            val (icon, _) = iconAndTooltipKey
 
             drawTexturedModalRect(x, y, icon, buttonSize, buttonSize)
         }
 
-        /** Draws the tooltip from [iconAndTooltip] if the mouse is floating over the button. */
+        /** Draws the tooltip from [iconAndTooltipKey] if the mouse is floating over the button. */
         open fun drawTooltip(mouseX: Int, mouseY: Int) {
             if (!enabled) return
 
             if (isOnButton(mouseX, mouseY)) {
-                val (_, tooltip) = iconAndTooltip
+                val (_, tooltipKey) = iconAndTooltipKey
 
-                drawTooltip(mouseX, mouseY, tooltip, *additionalTooltipLines)
+
+                drawTooltip(mouseX, mouseY, I18n.format(tooltipKey), *additionalTooltipLines)
             }
         }
     }
