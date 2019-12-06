@@ -19,7 +19,7 @@ import org.kotobank.kuarry.tile_entity.special_renderer.KuarrySpecialRenderer
 object KuarryMod {
     const val MODID = "kuarry"
     const val NAME = "Kuarry"
-    const val VERSION = "0.2"
+    const val VERSION = "@VERSION@"
 
     internal lateinit var logger: Logger
 

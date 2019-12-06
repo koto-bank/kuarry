@@ -19,7 +19,7 @@ apply plugin: "net.minecraftforge.gradle.forge"
 
 def mc_version_short = "1.12", mc_version = "${mc_version_short}.2"
 
-version = "0.2"
+version = "0.2.1"
 group = "org.kotobank.kuarry" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "kuarry-${mc_version}"
 
@@ -39,6 +39,9 @@ minecraft {
     // simply re-run your setup task after changing the mappings to update your workspace.
     mappings = "snapshot_20171003"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+
+    replaceIn "KuarryMod.kt"
+    replace "@VERSION@": project.version
 }
 
 repositories {
