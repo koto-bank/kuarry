@@ -1,5 +1,7 @@
 # Kuarry mod
 
+[Curseforge][5] [MCForge forum thread][6]
+
 Kuarry is a minecraft mod that adds an upgradable quarry that teleports resources to itself instead of
 digging a huge hole in the ground, replacing these resources with a placeholder block called "denatured stone".
 This block drops nothing most of the time, but sometimes you can get gravel from it.
@@ -35,10 +37,15 @@ The kuarry gui
 The custom filter gui
 ![custom filter gui](screenshots/custom_filter_gui.png)
 
+## Help translating
+
+Help translating the mod into other languages by adding new files to the [lang directory][7] and submitting them
+as pull requests!
+
 [1]: https://www.curseforge.com/minecraft/mc-mods/thermal-foundation
 [2]: https://www.curseforge.com/minecraft/mc-mods/ender-io
 [3]: https://www.curseforge.com/minecraft/mc-mods/industrial-craft
 [4]: https://www.curseforge.com/minecraft/mc-mods/shadowfacts-forgelin
-
-
-
+[5]: https://www.curseforge.com/minecraft/mc-mods/kuarry
+[6]: https://www.minecraftforge.net/forum/topic/78544-kuarry/
+[7]: src/main/resources/assets/kuarry/lang
