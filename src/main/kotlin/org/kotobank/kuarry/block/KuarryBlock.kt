@@ -18,17 +18,20 @@ import net.minecraft.util.NonNullList
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
-import org.kotobank.kuarry.KuarryMod
-import org.kotobank.kuarry.KuarryModGUIHandler
-import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.text.TextFormatting
+import net.minecraftforge.fml.common.Optional
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import net.minecraftforge.items.ItemStackHandler
 import org.kotobank.kuarry.helper.TranslationHelper
+import org.kotobank.kuarry.KuarryMod
+import org.kotobank.kuarry.KuarryModGUIHandler
+import org.kotobank.kuarry.tile_entity.KuarryTileEntity
+import cofh.api.block.IDismantleable
 
-class KuarryBlock(material: Material, registryName: String) : Block(material) {
+@Optional.Interface(iface = "cofh.api.block.IDismantleable", modid = "cofhcore")
+class KuarryBlock(material: Material, registryName: String) : Block(material), IDismantleable {
     companion object {
         val FACING: PropertyDirection =
                 PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL)
@@ -152,4 +155,22 @@ class KuarryBlock(material: Material, registryName: String) : Block(material) {
             ))
         }
     }
+
+    // region IDismantleable implementation
+
+    @Optional.Method(modid = "cofhcore")
+    override fun canDismantle(world: World?, pos: BlockPos?, state: IBlockState?, player: EntityPlayer?) = true
+
+    @Optional.Method(modid = "cofhcore")
+    override fun dismantleBlock(world: World, pos: BlockPos, state: IBlockState, player: EntityPlayer, returnDrops: Boolean): ArrayList<ItemStack> {
+        val res = ItemStack.EMPTY
+        val te = world.getTileEntity(pos)
+        if (te != null) {
+            harvestBlock(world, player, pos, state, te, res)
+        }
+
+        return arrayListOf(res)
+    }
+
+    // endregion
 }
