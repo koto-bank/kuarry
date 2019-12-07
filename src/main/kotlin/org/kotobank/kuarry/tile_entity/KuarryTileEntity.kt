@@ -654,4 +654,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
         return originalBB
     }
+
+    // Overriden to make it not reset the TE on block rotation
+    override fun shouldRefresh(world: World, pos: BlockPos, oldState: IBlockState, newSate: IBlockState) = false
 }
