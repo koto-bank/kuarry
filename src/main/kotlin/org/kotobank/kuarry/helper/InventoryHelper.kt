@@ -10,11 +10,11 @@ internal object InventoryHelper {
      *             If this function returns "true", then iteration is stopped.
      */
     fun forEachPositionInInventory(width: Int, height: Int, func: (position: Int, widthPos: Int, heightPos: Int) -> Boolean) {
-        for (i in 0 until height) {
-            for (j in 0 until width) {
-                val position = (j * height) + i
+        for (heightPos in 0 until height) {
+            for (widthPos in 0 until width) {
+                val position = (widthPos * height) + heightPos
 
-                if (func(position, j, i)) return
+                if (func(position, widthPos, heightPos)) return
             }
         }
     }
