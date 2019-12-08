@@ -5,8 +5,8 @@ tile.kuarry.tooltips.description=Extrae recursos de las entrañas de la tierra d
 Quién sabe, ¿qué se arrastrará mañana, despertado por los intrusos arrogantes desde arriba?
 tile.kuarry.tooltips.energy_stored=%sEnergía acumulada
 tile.kuarry.tooltips.items_stored=%sArtículos acumulados
-tile.kuarry.gui.always_enabled=Siempre activada
-tile.kuarry.gui.always_disabled=Siempre desactivada
+tile.kuarry.gui.always_enabled=Siempre activado
+tile.kuarry.gui.always_disabled=Siempre desactivado
 tile.kuarry.gui.enable_with_rs=Activar por la señal de redstone
 tile.kuarry.gui.disable_with_rs=Desactivar por la señal de redstone
 tile.kuarry.gui.render_bounds=Mostrar límites de la zona minera
