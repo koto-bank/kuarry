@@ -1,0 +1,57 @@
+#PARSE_ESCAPES
+
+tile.kuarry.name=Kuarry
+tile.kuarry.tooltips.description=It draws resources from deep bowels of the earth, leaving a frothy stone-like sponge behind. \
+Who knows, what will crawl out tomorrow, awoken by haughty intruders from above?
+tile.kuarry.tooltips.energy_stored=%sEnergy stored
+tile.kuarry.tooltips.items_stored=%sItems stored
+tile.kuarry.gui.always_enabled=Always enabled
+tile.kuarry.gui.always_disabled=Always disabled
+tile.kuarry.gui.enable_with_rs=Enable via redstone signal
+tile.kuarry.gui.disable_with_rs=Disable via redstone signal
+tile.kuarry.gui.render_bounds=Show mining area boundaries
+tile.kuarry.gui.dont_render_bounds=Don't show mining area boundaries
+tile.kuarry.gui.autopush=Automatically push items into pipes
+tile.kuarry.gui.dont_autopush=Don't automatically push items into pipes
+tile.kuarry.gui.approx_left=Approx. left
+
+tile.denatured_stone.name=Denatured stone
+tile.denatured_stone.description=Denatured stone is proven to be a very useful material\: it may be a cheap papier mache, \
+it may be smashed into pieces, or it may be the subject of a ten year long "How can we use denatured stone?" research with an immense budget. \
+The most crucial of its features, however, is that it drops gravel at times when broken.
+
+item.kuarry_casing.name=Kuarry casing
+
+item.x_boundaries_upgrade.name=Kuarry X-axis boundary expansion upgrade
+item.x_boundaries_upgrade.description=Enables the kuarry to mine one more chunk along the X dimension
+
+item.z_boundaries_upgrade.name=Kuarry Z-axis boundary expansion upgrade
+item.z_boundaries_upgrade.description=Enables the kuarry to mine one more chunk along the Z dimension
+
+item.silk_touch_upgrade.name=Kuarry Silk Touch upgrade
+item.silk_touch_upgrade.description=Makes the kuarry retrieve the blocks as they are, instead of mining them
+item.silk_touch_upgrade.description.incompat=Incompatible with the luck upgrade
+
+item.luck_upgrade_0.name=Kuarry luck upgade I
+item.luck_upgrade_1.name=Kuarry luck upgrade II
+item.luck_upgrade_2.name=Kuarry luck upgrade III
+item.luck_upgrade.description = Makes the kuarry mine more resources from some ores
+item.luck_upgrade.description.incompat=Incompatible with the Silk Touch upgrade
+item.luck_upgrade.description.about_energy_multiplication=Multiplies energy usage by %s per level
+
+item.custom_filter.name=Kuarry custom filter
+item.custom_filter.description=Enables filtering mined blocks
+item.custom_filter.gui.blacklist=Blacklist
+item.custom_filter.gui.whitelist=Whitelist
+item.custom_filter.gui.blacklist_description=Skip these items when mining
+item.custom_filter.gui.whitelist_description=Only mine these items
+item.custom_filter.gui.blacklist_mode_only=Only blacklist the specified blocks, overriding the default blacklist
+item.custom_filter.gui.blacklist_mode_additional=Blacklist the specified blocks, plus the blocks blacklisted by default
+item.custom_filter.gui.default_blacklist=Default blacklist
+
+item.speed_upgrade.name=Kuarry Speed upgrade
+item.speed_upgrade.description=§c§lThe red colour makes all faster
+
+tooltips.about_energy_multiplication=Multiplies energy usage by %s
+
+tooltips.hold_shift_for_ext_desc=[Hold %1$sShift%2$s for a detailed description]
