@@ -2,41 +2,41 @@
 
 tile.kuarry.name=Karrière
 tile.kuarry.tooltips.description=Il puise ses ressources dans les entrailles profondes de la terre, laissant derrière lui une éponge semblable à de la pierre mousseuse. \
-Qui sait, qu'est-ce qui sortira demain, réveillé par des intrus hautains d'en haut?
+Qui sait, qu'est-ce qui sortira demain, réveillé par des intrus hautains d'en haut ?
 tile.kuarry.tooltips.energy_stored=%sEnergie stockée
 tile.kuarry.tooltips.items_stored=%sObjets stockés
 tile.kuarry.gui.always_enabled=Toujours activée
-tile.kuarry.gui.always_disabled=Toujours désactivé
+tile.kuarry.gui.always_disabled=Toujours désactivée
 tile.kuarry.gui.enable_with_rs=Activer via le signal de redstone
 tile.kuarry.gui.disable_with_rs=Désactiver via le signal de redstone
 tile.kuarry.gui.render_bounds=Afficher les limites de la zone minière
 tile.kuarry.gui.dont_render_bounds= Ne pas afficher les limites de la zone minière
 tile.kuarry.gui.autopush=Pousser automatiquement les objets dans les tuyaux
 tile.kuarry.gui.dont_autopush=Ne pas pousser automatiquement les éléments dans les tuyaux
-tile.kuarry.gui.approx_left=Approx. reste
+tile.kuarry.gui.approx_left=Reste environ
 
 tile.denatured_stone.name=Pierre dénaturée
-tile.denatured_stone.description=DLa pierre dénaturée s'est avérée être un matériau très utile \: il peut s'agir d'un papier mâché bon marché, \
-elle peut être brisée en morceaux, ou elle peut faire l'objet d'une dizaine d'années "Comment utiliser la pierre dénaturée?" recherche avec un budget immense. \
-Le plus crucial de ses caractéristiques, cependant, est qu'il tombe parfois du gravier lorsqu'il est cassé.
+tile.denatured_stone.description=La pierre dénaturée s'est avérée être un matériau très utile \: elle peut servir de matériau bon marché, \
+elle peut être brisée en morceaux, ou elle peut faire l'objet d'une dizaine d'années de recherche sur « Comment utiliser la pierre dénaturée ? » avec un budget immense. \
+Le plus crucial de ses caractéristiques, cependant, est que du gravier tombe parfois lorsqu'elle est cassée.
 
 item.kuarry_casing.name=Boîtier de la karrière
 
-item.x_boundaries_upgrade.name=Mise à niveau d'extension des limites de l'axe X
-item.x_boundaries_upgrade.description=Permet à la karrière d'extraire un morceau de plus le long de la dimension X
+item.x_boundaries_upgrade.name=Augmentation des limites de l'axe X
+item.x_boundaries_upgrade.description=Permet à la karrière d'extraire un bloc de plus le long de l'axe X
 
-item.z_boundaries_upgrade.name=Mise à niveau d'extension des limites de l'axe Z
-item.z_boundaries_upgrade.description=Permet à la karrière d'extraire un morceau de plus le long de la dimension Z
+item.z_boundaries_upgrade.name=Augmentation des limites de l'axe Z
+item.z_boundaries_upgrade.description=Permet à la karrière d'extraire un bloc de plus le long de l'axe Z
 
-item.silk_touch_upgrade.name=Mise à niveau "Silk Touch"
-item.silk_touch_upgrade.description=Rend la karrière récupérer les blocs tels quels, au lieu de les extraire
-item.silk_touch_upgrade.description.incompat=Incompatible avec la mise à niveau de Chance
+item.silk_touch_upgrade.name=Amélioration Toucher de soie
+item.silk_touch_upgrade.description=Permet à la karrière de récupérer les blocs tels quels, au lieu de les miner
+item.silk_touch_upgrade.description.incompat=Incompatible avec l'amélioration Chance
 
-item.luck_upgrade_0.name=Mise à niveau de Chance I
-item.luck_upgrade_1.name=Mise à niveau de Chance II
-item.luck_upgrade_2.name=Mise à niveau de Chance III
+item.luck_upgrade_0.name=Amélioration Chance I
+item.luck_upgrade_1.name=Amélioration Chance II
+item.luck_upgrade_2.name=Amélioration Chance III
 item.luck_upgrade.description=Permet à la karrière d'extraire plus de ressources de certains minerais
-item.luck_upgrade.description.incompat=Incompatible avec la mise à niveau "Silk Touch"
+item.luck_upgrade.description.incompat=Incompatible avec l'amélioration Toucher de soie
 item.luck_upgrade.description.about_energy_multiplication=Multiplie la consommation d'énergie par %s par niveau
 
 item.custom_filter.name=Filtre personnalisé de la karrière
@@ -49,8 +49,8 @@ item.custom_filter.gui.blacklist_mode_only=Mettre sur liste noire seulement les 
 item.custom_filter.gui.blacklist_mode_additional=Mettre sur liste noire les blocs spécifiés, plus les blocs sur liste noire par défaut
 item.custom_filter.gui.default_blacklist=Liste noire par défaut
 
-item.speed_upgrade.name=Mise à niveau de Rapidité
-item.speed_upgrade.description=§c§lLa couleur rouge rend tout plus rapide
+item.speed_upgrade.name=Amélioration Rapidité
+item.speed_upgrade.description=§c§lLe rouge rend tout plus rapide
 
 tooltips.about_energy_multiplication=Multiplie la consommation d'énergie par %s
 
