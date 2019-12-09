@@ -54,4 +54,4 @@ item.speed_upgrade.description=§c§lLe rouge rend tout plus rapide
 
 tooltips.about_energy_multiplication=Multiplie la consommation d'énergie par %s
 
-tooltips.hold_shift_for_ext_desc=[Maintenez la touche %1$sShift%2$s pour une description détaillée]
+tooltips.hold_shift_for_ext_desc=[Maintenez la touche %sShift%s pour une description détaillée]

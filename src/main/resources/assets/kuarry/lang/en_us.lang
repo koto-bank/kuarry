@@ -63,4 +63,4 @@ tooltips.level_uprgade_wrong_level=This upgrade can only be applied to a kuarry 
 
 tooltips.about_energy_multiplication=Multiplies energy usage by %s
 
-tooltips.hold_shift_for_ext_desc=[Hold %1$sShift%2$s for a detailed description]
+tooltips.hold_shift_for_ext_desc=[Hold %sShift%s for a detailed description]

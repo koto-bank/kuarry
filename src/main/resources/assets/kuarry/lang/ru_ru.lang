@@ -54,4 +54,4 @@ item.speed_upgrade.description=§c§lКрасный цвет делает всё
 
 tooltips.about_energy_multiplication=Увеличивает потребляемую энергия в %s раза
 
-tooltips.hold_shift_for_ext_desc=[Зажмите %1$sShift%2$s для подробного описания]
+tooltips.hold_shift_for_ext_desc=[Зажмите %sShift%s для подробного описания]
