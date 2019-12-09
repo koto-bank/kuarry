@@ -8,11 +8,25 @@
     }
   },
   "variants": {
-    "facing=north":  { "model": "kuarry:kuarry" },
-    "facing=south":  { "model": "kuarry:kuarry", "y": 180, "uvlock": true },
-    "facing=east": { "model": "kuarry:kuarry", "y": 90, "uvlock": true },
-    "facing=west": { "model": "kuarry:kuarry", "y": 270, "uvlock": true },
+    "level": {
+      "0": {
+        "textures": { "front": "kuarry:block/kuarry_front", "side": "kuarry:block/kuarry_side" }
+      },
+      "1": {
+        "textures": { "front": "kuarry:block/kuarry_front_level_2", "side": "kuarry:block/kuarry_side_level_2" }
+      },
+      "2": {
+        "textures": { "front": "kuarry:block/kuarry_front_level_3", "side": "kuarry:block/kuarry_side_level_3" }
+      }
+    },
 
-    "inventory": {"model": "kuarry:kuarry"}
+    "facing": {
+      "north":  { "model": "kuarry:kuarry" },
+      "south":  { "model": "kuarry:kuarry", "y": 180, "uvlock": true },
+      "east": { "model": "kuarry:kuarry", "y": 90, "uvlock": true },
+      "west": { "model": "kuarry:kuarry", "y": 270, "uvlock": true }
+    },
+
+    "inventory": { "model": "kuarry:kuarry" }
   }
 }

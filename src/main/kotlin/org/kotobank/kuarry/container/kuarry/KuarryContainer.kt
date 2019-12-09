@@ -50,7 +50,7 @@ class KuarryContainer(inventoryPlayer: InventoryPlayer, val tileEntity: KuarryTi
 
         // Add the upgrade inventory
         val upgradeInventory = tileEntity.upgradeInventory
-        InventoryHelper.forEachPositionInInventory(KuarryTileEntity.upgradeInventoryWidth, KuarryTileEntity.upgradeInventoryHeight) {
+        InventoryHelper.forEachPositionInInventory(tileEntity.upgradeInventoryWidth, tileEntity.upgradeInventoryHeight) {
             positionInInventory: Int, widthPos: Int, heightPos: Int ->
 
             addSlotToContainer(

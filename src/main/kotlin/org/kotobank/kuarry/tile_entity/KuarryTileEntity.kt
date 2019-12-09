@@ -13,6 +13,7 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.*
 import net.minecraft.util.math.*
+import net.minecraft.world.World
 import net.minecraft.world.chunk.Chunk
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.energy.*
@@ -20,6 +21,7 @@ import net.minecraftforge.items.*
 import net.minecraftforge.fluids.IFluidBlock
 import net.minecraftforge.fml.common.Loader
 import org.kotobank.kuarry.*
+import org.kotobank.kuarry.helper.InventoryHelper
 import org.kotobank.kuarry.integration.autopushing.Autopusher
 import org.kotobank.kuarry.item.*
 import org.kotobank.kuarry.integration.MjReceiverImpl
@@ -27,10 +29,6 @@ import kotlin.reflect.KClass
 
 class KuarryTileEntity : TileEntity(), ITickable {
     companion object {
-        internal const val upgradeInventoryWidth = 2
-        internal const val upgradeInventoryHeight = 3
-        internal const val upgradeInventorySize = upgradeInventoryWidth * upgradeInventoryHeight
-
         internal const val packetEntityID = 0
 
         /** The blocks that cannot be un-blacklisted by an external filter */
@@ -67,7 +65,14 @@ class KuarryTileEntity : TileEntity(), ITickable {
     }
 
     private var lastEnergyStored = 0
-    private val energyStorage = EnergyStorage(100000, 2000, 5000)
+    private val energyStorageCapacity
+        get() = LevelValues[upgradeLevel].energy
+    private val energyStorage = object : EnergyStorage(energyStorageCapacity, 2000, 5000) {
+        /** The capacity of the storage that can also be changed. */
+        var capacity
+            get() = super.capacity
+            set(value) { super.capacity = value }
+    }
 
     /** IMjReceiver implementation for BuildCraft compatibility */
     private val mjEnergyStorage: MjReceiverImpl? by lazy {
@@ -85,13 +90,61 @@ class KuarryTileEntity : TileEntity(), ITickable {
         }
     }
 
+    internal val upgradeInventoryWidth = 2
+    internal val upgradeInventoryHeight
+        get() =
+            LevelValues[upgradeLevel].upgradeSlotLines
+    internal val upgradeInventorySize
+        get() = upgradeInventoryWidth * upgradeInventoryHeight
+
+
     /** A small inventory for upgrades not exposed via getCapability */
-    internal val upgradeInventory = object : ItemStackHandler(upgradeInventoryWidth * upgradeInventoryHeight) {
+    internal val upgradeInventory = object : ItemStackHandler(upgradeInventorySize) {
         override fun onContentsChanged(slot: Int) {
             super.onContentsChanged(slot)
             markDirty()
         }
     }
+
+    /** The level of the kuarry. The number is used to access the data from the [LevelValues] at that index. */
+    var upgradeLevel = 0
+        set(value) {
+            // Only do this if the level actually changed
+            if (field != value) {
+                // Update the field, this will change upgradeInventorySize
+                field = value
+
+                val oldSize = upgradeInventory.slots
+                // If the new size is different, the inventory needs to be expanded
+                if (oldSize != upgradeInventorySize) {
+                    val oldHeight = oldSize / upgradeInventoryWidth
+                    // Copy all the items in the same order the player sees them by saving their width/height positions
+                    val oldItems = HashMap<Pair<Int, Int>, ItemStack>(oldSize)
+                    InventoryHelper.forEachPositionInInventory(upgradeInventoryWidth, oldHeight) {
+                        posInInventory: Int, widthPos: Int, heightPos: Int ->
+
+                        oldItems[Pair(widthPos, heightPos)] = upgradeInventory.getStackInSlot(posInInventory)
+
+                        false
+                    }
+
+                    // Set the new upgrade inventory size, after the field has been updated
+                    upgradeInventory.setSize(upgradeInventorySize)
+
+                    // Restore all the items to their orignal positions
+                    oldItems.forEach { (widthPos, heightPos), stack ->
+                        val pos = (widthPos * upgradeInventoryHeight) + heightPos
+
+                        upgradeInventory.setStackInSlot(pos, stack)
+                    }
+                }
+
+                // Update the energy storage capacity with the new level's value
+                energyStorage.capacity = energyStorageCapacity
+
+                notifyClientAndMarkDirty()
+            }
+        }
 
     private val autopusher by lazy {
         if (Autopusher.isEnabled)
@@ -116,9 +169,11 @@ class KuarryTileEntity : TileEntity(), ITickable {
      */
     internal var activationMode = ActivationMode.AlwaysOn
         set(value) {
-            field = value
+            if (field != value) {
+                field = value
 
-            notifyClientAndMarkDirty()
+                notifyClientAndMarkDirty()
+            }
         }
 
     /** Switches the [activationMode] circularly and notifies the client about the change.
@@ -153,9 +208,11 @@ class KuarryTileEntity : TileEntity(), ITickable {
         get() =
             Autopusher.isEnabled && field
         set(value) {
-            field = value
+            if (field != value) {
+                field = value
 
-            notifyClientAndMarkDirty()
+                notifyClientAndMarkDirty()
+            }
         }
 
     /** Toggles [autopush] on or off. */
@@ -212,6 +269,8 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
                 setString("activation_mode", activationMode.name)
                 setBoolean("autopush", autopush)
+
+                setInteger("upgrade_level", upgradeLevel)
             }
 
     /** Read mod's NBT data, but not game's NBT data. */
@@ -223,6 +282,8 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
             activationMode = ActivationMode.valueOf(getString("activation_mode"))
             autopush = getBoolean("autopush")
+
+            upgradeLevel = getInteger("upgrade_level")
         }
     }
 

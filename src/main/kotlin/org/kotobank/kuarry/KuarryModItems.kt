@@ -26,25 +26,38 @@ object KuarryModItems {
         )
     }
 
+    private val levelUpgrades by lazy {
+        listOf(
+                Pair("level_2_upgrade", HardenedUpgrade()),
+                Pair("level_3_upgrade", ReinforcedUpgrade())
+        )
+    }
+
     private val items by lazy {
         listOf(
-                Pair("kuarry", ItemBlock(KuarryModBlocks.kuarry)),
                 Pair("denatured_stone", ItemBlock(KuarryModBlocks.denatured_stone)),
 
                 Pair("kuarry_casing", Item())
         )
     }
 
-    internal val allItems by lazy { items + upgrades }
+    /** Items that can easily be registered with the same code */
+    internal val commonlyRegisteredItems by lazy { items + upgrades + levelUpgrades }
+
+    // region Items that need special code for registration
 
     internal val luckUpgrade by lazy { KuarryLuckUpgrade() }
+
+    internal val kuarry by lazy { KuarryItemBlock(KuarryModBlocks.kuarry) }
+
+    // endregion
 
     @SubscribeEvent
     fun registerItems(event: Register<Item>) {
         // Set each upgrade's max stack size
         upgrades.forEach { (_, item) -> item.setMaxStackSize(item.stackSize) }
 
-        allItems.forEach { (name, item) ->
+        commonlyRegisteredItems.forEach { (name, item) ->
             item.apply {
                 setRegistryName(KuarryMod.MODID, name)
                 setUnlocalizedName(name)
@@ -59,6 +72,20 @@ object KuarryModItems {
             setMaxStackSize(stackSize)
             setRegistryName(KuarryMod.MODID, "luck_upgrade")
             setUnlocalizedName("luck_upgrade")
+            event.registry.register(this)
+        }
+
+        with(kuarry) {
+            setRegistryName(KuarryMod.MODID, "kuarry")
+            setUnlocalizedName("kuarry")
+
+            ModelLoader.setCustomMeshDefinition(this) { stack ->
+                val level = stack.tagCompound?.getInteger("upgrade_level") ?: 0
+
+                // Return a custom model based on the level from the ItemStack
+                ModelResourceLocation(this.registryName!!, "facing=north,level=${level}")
+            }
+
             event.registry.register(this)
         }
     }
@@ -83,7 +110,7 @@ object ItemModelLoader {
     @SubscribeEvent(priority = EventPriority.LOW)
     @Suppress("UNUSED_PARAMETER")
     fun loadModels(event: Register<Item>) {
-        KuarryModItems.allItems.forEach { (_, item) ->
+        KuarryModItems.commonlyRegisteredItems.forEach { (_, item) ->
             item.apply {
                 ModelLoader.setCustomModelResourceLocation(this, 0, ModelResourceLocation(this.registryName!!, "inventory"))
             }

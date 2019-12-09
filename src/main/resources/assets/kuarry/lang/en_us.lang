@@ -1,6 +1,8 @@
 #PARSE_ESCAPES
 
 tile.kuarry.name=Kuarry
+tile.kuarry.level_2.name=Kuarry (Hardened)
+tile.kuarry.level_3.name=Kuarry (Reinforced)
 tile.kuarry.tooltips.description=It sucks resources out from the bowels of earth, and leaves just a frothy stone-like sponge in place of matter. \
 Who knows, what will crawl out tomorrow, woken up by the cleeky intruders from the surface?
 tile.kuarry.tooltips.energy_stored=%sEnergy stored
@@ -51,6 +53,9 @@ item.custom_filter.gui.default_blacklist=Default blacklist
 
 item.speed_upgrade.name=Kuarry speed upgrade
 item.speed_upgrade.description=§c§lThe red one goes faster
+
+item.level_2_upgrade.name=Kuarry hardened upgrade
+item.level_3_upgrade.name=Kuarry reinforced upgrade
 
 tooltips.about_energy_multiplication=Multiplies energy usage by %s
 

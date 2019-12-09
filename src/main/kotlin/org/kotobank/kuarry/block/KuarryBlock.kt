@@ -1,8 +1,10 @@
 package org.kotobank.kuarry.block
 
+import java.util.ArrayList
 import net.minecraft.block.Block
 import net.minecraft.block.material.Material
 import net.minecraft.block.properties.PropertyDirection
+import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.BlockStateContainer
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.gui.GuiScreen
@@ -25,6 +27,7 @@ import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import net.minecraftforge.items.ItemStackHandler
 import org.kotobank.kuarry.helper.TranslationHelper
+import org.kotobank.kuarry.item.LevelUpgrade
 import org.kotobank.kuarry.KuarryMod
 import org.kotobank.kuarry.KuarryModGUIHandler
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity
@@ -35,6 +38,8 @@ class KuarryBlock(material: Material, registryName: String) : Block(material), I
     companion object {
         val FACING: PropertyDirection =
                 PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL)
+
+        val LEVEL: PropertyInteger = PropertyInteger.create("level", 0, 2)
 
         val tileEntityClass = KuarryTileEntity::class.java
     }
@@ -58,13 +63,21 @@ class KuarryBlock(material: Material, registryName: String) : Block(material), I
                                   playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing,
                                   hitX: Float, hitY: Float, hitZ: Float): Boolean {
         if (!worldIn.isRemote) {
+            val item = playerIn.getHeldItem(hand).item
+            val te = worldIn.getTileEntity(pos)
+            // If the item used is an upgrade and the tile entity exists, DON'T open the GUI,
+            // because the block will be upgraded
+            if (item is LevelUpgrade && te is KuarryTileEntity && item.shouldUpgrade(te)) {
+                return false
+            }
+
             playerIn.openGui(KuarryMod, KuarryModGUIHandler.KUARRY, worldIn, pos.x, pos.y, pos.z)
         }
 
-        return true;
+        return true
     }
 
-    override fun createBlockState() = BlockStateContainer(this, FACING)
+    override fun createBlockState() = BlockStateContainer(this, FACING, LEVEL)
 
     override fun getMetaFromState(state: IBlockState) = state.getValue(FACING).index
 
@@ -153,6 +166,16 @@ class KuarryBlock(material: Material, registryName: String) : Block(material), I
                     "${I18n.format("tile.kuarry.tooltips.energy_stored", TextFormatting.BLUE)}: ${energyStored}RF",
                     "${I18n.format("tile.kuarry.tooltips.items_stored", TextFormatting.BLUE)}: $itemCount"
             ))
+        }
+    }
+
+    override fun getActualState(state: IBlockState, worldIn: IBlockAccess, pos: BlockPos): IBlockState {
+        val te = worldIn.getTileEntity(pos)
+        return if (te is KuarryTileEntity) {
+            // If there tile entity already exists, return the upgrade level from it
+            state.withProperty(LEVEL, te.upgradeLevel)
+        } else {
+            state
         }
     }
 

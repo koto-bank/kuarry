@@ -11,16 +11,29 @@ import org.kotobank.kuarry.packet.SwitchKuarrySetting
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity.ActivationMode
 import org.kotobank.kuarry.container.BaseGUIContainer
 import org.kotobank.kuarry.integration.autopushing.Autopusher
+import org.kotobank.kuarry.item.LevelValues
 
 
 class KuarryGUIContainer(override val container: KuarryContainer) : BaseGUIContainer(container) {
     companion object {
-        private const val energyBarTopY = 76
+        private const val energyBarTopY = 184
         private const val energyBarPlaceX = 194
         private const val energyBarTextureX = 240
 
         private const val energyBarHeight = 38
         private const val energyBarWidth = 14
+
+        private const val upgradeInvX = 182
+        private const val upgradeInvTopY = 0
+        private const val upgradeInvWidth = 50
+        private const val upgradeInvSurroundersHeight = 7
+        private const val upgradeInvSlotLineHeight = 18
+
+        private const val upgradeInvSlotLineTextureX = 182
+        private const val upgradeInvSlotLineTextureY = 230
+        private const val upgradeInvSurroundersTextureX = 131
+        private const val upgradeInvHeaderTextureY = 230
+        private const val upgradeInvBottomTextureY = 241
     }
 
     override val actualXSize = 231
@@ -57,6 +70,32 @@ class KuarryGUIContainer(override val container: KuarryContainer) : BaseGUIConta
                     guiLeft + energyBarPlaceX, guiTop + energyBarTopY + energyBarHeight - scaledHeight,
                     energyBarTextureX, energyBarTopY + energyBarHeight - scaledHeight,
                     energyBarWidth, scaledHeight
+            )
+
+            // Upgrade inventory header
+            drawTexturedModalRect(
+                    guiLeft + upgradeInvX, guiTop + upgradeInvTopY,
+                    upgradeInvSurroundersTextureX, upgradeInvHeaderTextureY,
+                    upgradeInvWidth, upgradeInvSurroundersHeight
+            )
+            val upgradeSlotLines = LevelValues[container.tileEntity.upgradeLevel].upgradeSlotLines
+            // Draw all the lines
+            for (i in 0 until upgradeSlotLines) {
+                drawTexturedModalRect(
+                        guiLeft + upgradeInvX,
+                        // Add the header + all the lines' heights that were before this line
+                        guiTop + upgradeInvTopY + upgradeInvSurroundersHeight + (i * upgradeInvSlotLineHeight),
+                        upgradeInvSlotLineTextureX, upgradeInvSlotLineTextureY,
+                        upgradeInvWidth, upgradeInvSlotLineHeight
+                )
+            }
+            // Draw the inventory bottom after all the lines
+            drawTexturedModalRect(
+                    guiLeft + upgradeInvX,
+                    guiTop + upgradeInvTopY + upgradeInvSurroundersHeight +
+                            (upgradeSlotLines * upgradeInvSlotLineHeight),
+                    upgradeInvSurroundersTextureX, upgradeInvBottomTextureY,
+                    upgradeInvWidth, upgradeInvSurroundersHeight
             )
         }
     }
