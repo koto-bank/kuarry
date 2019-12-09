@@ -1,11 +1,17 @@
 package org.kotobank.kuarry.item
 
+import net.minecraft.client.resources.I18n
+import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.SoundEvents
 import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraft.util.*
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.text.TextComponentTranslation
 import net.minecraft.world.World
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 
 /** Data storage for various level-dependant things of the [KuarryTileEntity]. */
@@ -23,6 +29,9 @@ val LevelValues = arrayOf(
 
 sealed class LevelUpgrade : Item() {
     abstract val level: Int
+
+    /** The tooltip about what upgrade does. */
+    protected val levelUpgradeInfoKey: String = "tooltips.about_level_upgrade"
 
     /** Whether the upgrade should apply.
      *
@@ -45,11 +54,32 @@ sealed class LevelUpgrade : Item() {
                     worldIn.playSound(null, pos, SoundEvents.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 1f, 1f)
 
                     return EnumActionResult.SUCCESS
+                } else {
+                    player.sendMessage(
+                            TextComponentTranslation(
+                                    "tooltips.level_uprgade_wrong_level",
+                                    level, // This number is basically the number the user wants to see, since those are + 1 of actual numbers
+                                    te.upgradeLevel + 1 // Add 1 to this to stay consistent with the previous one
+                            )
+                    )
                 }
             }
         }
 
         return EnumActionResult.PASS
+    }
+
+    @get:SideOnly(Side.CLIENT)
+    protected val tooltipStrings: List<String>
+        get() {
+            val levelValues = LevelValues[level]
+
+            return listOf(I18n.format(levelUpgradeInfoKey, levelValues.energy, levelValues.upgradeSlotLines * 2))
+        }
+
+    @SideOnly(Side.CLIENT)
+    override fun addInformation(stack: ItemStack, worldIn: World?, tooltip: MutableList<String>, flagIn: ITooltipFlag) {
+        tooltip.addAll(tooltipStrings)
     }
 }
 

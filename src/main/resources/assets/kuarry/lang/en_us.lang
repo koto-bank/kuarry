@@ -57,6 +57,10 @@ item.speed_upgrade.description=§c§lThe red one goes faster
 item.level_2_upgrade.name=Kuarry hardened upgrade
 item.level_3_upgrade.name=Kuarry reinforced upgrade
 
+tooltips.about_level_upgrade=Allows the kuarry to hold up to %sRF of energy and up to %s upgrades. Can only be \
+applied to the previous level of the kuarry.
+tooltips.level_uprgade_wrong_level=This upgrade can only be applied to a kuarry of level %s, but this kuarry is of level %s
+
 tooltips.about_energy_multiplication=Multiplies energy usage by %s
 
 tooltips.hold_shift_for_ext_desc=[Hold %1$sShift%2$s for a detailed description]
