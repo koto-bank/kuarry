@@ -1,0 +1,29 @@
+{
+  "_comment": "A recipe for the level 2 upgrade from IC2 ingredients",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " a ",
+    "cpc",
+    "rar"
+  ],
+  "key": {
+    "a": {
+      "type": "forge:ore_dict",
+      "ore": "plateAdvancedAlloy"
+    },
+    "c": {
+      "type": "forge:ore_dict",
+      "ore": "circuitBasic"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "p": {
+      "item": "kuarry:kuarry_casing"
+    }
+  },
+  "result": {
+    "item": "kuarry:level_2_upgrade",
+    "count": 1
+  }
+}

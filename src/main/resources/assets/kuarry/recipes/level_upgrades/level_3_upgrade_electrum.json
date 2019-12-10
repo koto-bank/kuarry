@@ -1,0 +1,25 @@
+{
+  "_comment": "A recipe for the level 3 upgrade from TE's electrum ingots",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " e ",
+    "epe",
+    "rer"
+  ],
+  "key": {
+    "e": {
+      "type": "forge:ore_dict",
+      "ore": "ingotElectrum"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "p": {
+      "item": "kuarry:kuarry_casing"
+    }
+  },
+  "result": {
+    "item": "kuarry:level_3_upgrade",
+    "count": 1
+  }
+}

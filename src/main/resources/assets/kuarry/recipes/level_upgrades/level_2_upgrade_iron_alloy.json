@@ -1,0 +1,25 @@
+{
+  "_comment": "A recipe for the level 3 upgrade from EnderIO's iron alloy",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " c ",
+    "cpc",
+    "rcr"
+  ],
+  "key": {
+    "c": {
+      "type": "forge:ore_dict",
+      "ore": "ingotConstructionAlloy"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "p": {
+      "item": "kuarry:kuarry_casing"
+    }
+  },
+  "result": {
+    "item": "kuarry:level_3_upgrade",
+    "count": 1
+  }
+}

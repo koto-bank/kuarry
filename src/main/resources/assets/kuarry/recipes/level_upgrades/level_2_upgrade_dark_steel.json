@@ -1,0 +1,25 @@
+{
+  "_comment": "A recipe for the level 2 upgrade from EnderIO's dark steel",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " d ",
+    "dpd",
+    "rdr"
+  ],
+  "key": {
+    "d": {
+      "type": "forge:ore_dict",
+      "ore": "ingotDarkSteel"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "p": {
+      "item": "kuarry:kuarry_casing"
+    }
+  },
+  "result": {
+    "item": "kuarry:level_2_upgrade",
+    "count": 1
+  }
+}
