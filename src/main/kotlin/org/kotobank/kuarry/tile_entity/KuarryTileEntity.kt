@@ -16,7 +16,6 @@ import net.minecraft.util.math.*
 import net.minecraft.world.World
 import net.minecraft.world.chunk.Chunk
 import net.minecraftforge.common.capabilities.Capability
-import net.minecraftforge.energy.*
 import net.minecraftforge.items.*
 import net.minecraftforge.fluids.IFluidBlock
 import net.minecraftforge.fml.common.Loader
@@ -25,6 +24,7 @@ import org.kotobank.kuarry.helper.InventoryHelper
 import org.kotobank.kuarry.integration.autopushing.Autopusher
 import org.kotobank.kuarry.item.*
 import org.kotobank.kuarry.integration.MjReceiverImpl
+import org.kotobank.kuarry.tile_entity.kuarry_component.EnergyComponent
 import kotlin.reflect.KClass
 
 class KuarryTileEntity : TileEntity(), ITickable {
@@ -57,30 +57,12 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 Blocks.SNOW_LAYER
         )
 
-        internal const val baseRequiredEnergy = 1000
-
         internal const val inventoryWidth = 9
         internal const val inventoryHeight = 3
         internal const val inventorySize = inventoryWidth * inventoryHeight
     }
 
-    private var lastEnergyStored = 0
-    private val energyStorageCapacity
-        get() = LevelValues[upgradeLevel].energy
-    private val energyStorage = object : EnergyStorage(energyStorageCapacity, 2000, 5000) {
-        /** The capacity of the storage that can also be changed. */
-        var capacity
-            get() = super.capacity
-            set(value) { super.capacity = value }
-    }
-
-    /** IMjReceiver implementation for BuildCraft compatibility */
-    private val mjEnergyStorage: MjReceiverImpl? by lazy {
-        if (Loader.isModLoaded("buildcraftcore"))
-            MjReceiverImpl(energyStorage)
-        else
-            null
-    }
+    private val energyComponent = EnergyComponent(this)
 
     /** A chest-sized inventory for inner item storage */
     internal val inventory = object : ItemStackHandler(inventorySize) {
@@ -139,8 +121,9 @@ class KuarryTileEntity : TileEntity(), ITickable {
                     }
                 }
 
-                // Update the energy storage capacity with the new level's value
-                energyStorage.capacity = energyStorageCapacity
+
+                // Run the stuff that needs to change when the level changes
+                energyComponent.onUpgradeLevelChanged()
 
                 notifyClientAndMarkDirty()
             }
@@ -232,38 +215,30 @@ class KuarryTileEntity : TileEntity(), ITickable {
         notifyClientAndMarkDirty()
     }
 
-    override fun hasCapability(capability: Capability<*>, facing: EnumFacing?): Boolean {
-        return when (capability) {
-            CapabilityEnergy.ENERGY, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY -> true
-            else -> when {
-                Loader.isModLoaded("buildcraftcore") &&
-                        (capability == MjReceiverImpl.capConnector || capability == MjReceiverImpl.capReceiver) -> true
-                else -> super.hasCapability(capability, facing)
-            }
-
-        }
-    }
+    override fun hasCapability(capability: Capability<*>, facing: EnumFacing?) =
+            energyComponent.hasCapability(capability) ||
+                    (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) ||
+                    (Loader.isModLoaded("buildcraftcore") &&
+                            (capability == MjReceiverImpl.capConnector || capability == MjReceiverImpl.capReceiver)) ||
+                    super.hasCapability(capability, facing)
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T : Any?> getCapability(capability: Capability<T>, facing: EnumFacing?): T? {
-        return when (capability) {
-            CapabilityEnergy.ENERGY ->
-                energyStorage as T
-            CapabilityItemHandler.ITEM_HANDLER_CAPABILITY ->
-                inventory as T
-            else -> when {
-                Loader.isModLoaded("buildcraftcore") &&
-                        (capability == MjReceiverImpl.capConnector || capability == MjReceiverImpl.capReceiver) ->
-                    mjEnergyStorage as T
-                else -> super.getCapability(capability, facing)
-            }
-        }
+    override fun <T : Any> getCapability(capability: Capability<T>, facing: EnumFacing?): T? {
+        return (
+                energyComponent.getCapability(capability) ?:
+                // If the energy component returns null, try the other stuff
+                when (capability) {
+                    CapabilityItemHandler.ITEM_HANDLER_CAPABILITY ->
+                        inventory as T
+                    else -> super.getCapability(capability, facing)
+                })
     }
 
     /** Write NBT data that is mod's and not game's. */
     internal fun writeModNBT(compound: NBTTagCompound): NBTTagCompound =
             compound.apply {
-                setTag("energy", CapabilityEnergy.ENERGY.writeNBT(energyStorage, EnumFacing.NORTH)!!)
+                energyComponent.writeToNBT(compound)
+
                 setTag("inventory", inventory.serializeNBT())
                 setTag("upgrade_inventory", upgradeInventory.serializeNBT())
 
@@ -274,9 +249,10 @@ class KuarryTileEntity : TileEntity(), ITickable {
             }
 
     /** Read mod's NBT data, but not game's NBT data. */
-    internal fun readModNBT(compound: NBTTagCompound): Unit {
+    internal fun readModNBT(compound: NBTTagCompound) {
         compound.apply {
-            CapabilityEnergy.ENERGY.readNBT(energyStorage, EnumFacing.NORTH, getTag("energy"))
+            energyComponent.readFromNBT(compound)
+
             inventory.deserializeNBT(getCompoundTag("inventory"))
             upgradeInventory.deserializeNBT(getCompoundTag("upgrade_inventory"))
 
@@ -328,7 +304,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
     }
 
     /** Both notify the client about the change in block data and mark the block dirty for the game to save it. */
-    private fun notifyClientAndMarkDirty() {
+    internal fun notifyClientAndMarkDirty() {
         notifyClient()
         markDirty()
     }
@@ -414,12 +390,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
             if (updateCount < 5) return
             updateCount = 0
 
-            // If the energy amount changed, send that new amount to the client
-            if (lastEnergyStored != energyStorage.energyStored) {
-                lastEnergyStored = energyStorage.energyStored
-
-                notifyClientAndMarkDirty()
-            }
+            energyComponent.update()
 
             // 6000 ~= 5 minutes
             // 50 is to wait a little until the world loads on start
@@ -576,44 +547,13 @@ class KuarryTileEntity : TileEntity(), ITickable {
         // Skip the block if it's blacklisted or is a fluid
         if (!isBlockAllowed(block)) return false
 
-        // Harvesting something with pick/shovel should not cost more,
-        // otherwise double the energy count
-        val toolHarvestModifier = when (block.getHarvestTool(blockState)) {
-            "pickaxe", "shovel", null -> 1
-            else -> 2
-        }
-        // Don't want to have 0 or -1 as a modifier, as it would break the math later on, so make it 1
-        val levelHarvestModifier = block.getHarvestLevel(blockState).let { if (it <= 0) 1 else it }
+        val requiredEnergy = energyComponent.calculateRequiredEnergyForBlock(block, blockState)
 
+        // Try extracting the energy. If the function returns false,
+        // then there's not enough energy to mine the block, skip it
+        if (!energyComponent.tryExtractingEnergy(requiredEnergy)) return false
 
-        var requiredEnergy = run {
-            // Get the starting energy from all the other modifiers
-            var energy = baseRequiredEnergy * toolHarvestModifier * levelHarvestModifier
-
-            // Go through the upgrade inventory and add all the energy required by the upgrades
-            for (i in 0 until upgradeInventorySize) {
-                val stack = upgradeInventory.getStackInSlot(i)
-                if (!stack.isEmpty) {
-                    val item = stack.item
-                    require(item is KuarryUpgrade)
-
-                    energy = item.energyUsageWithUpgrade(energy, stack)
-                }
-            }
-
-            energy
-        }
-
-        // Not enough energy to mine the block, skip it
-        if (energyStorage.energyStored < requiredEnergy) return false
-
-        // Take out all the energy required, in multiple iterations if needed (by subtracting the
-        // already extracted energy from the rest)
-        while (requiredEnergy > 0) {
-            requiredEnergy -= energyStorage.extractEnergy(requiredEnergy, false)
-        }
-
-        var drops = NonNullList.create<ItemStack>()
+        val drops = NonNullList.create<ItemStack>()
         if (upgradeCountInInventory<KuarrySilkTouchUpgrade>() < 1) {
             // Get the fortune level, depending on the upgrades.
             // The levels are mapped to metadata + 1 and invalid number
