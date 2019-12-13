@@ -64,7 +64,6 @@ class KuarryBlock(material: Material, registryName: String) : Block(material), I
                                   hitX: Float, hitY: Float, hitZ: Float): Boolean {
         if (!worldIn.isRemote) {
             val item = playerIn.getHeldItem(hand).item
-            val te = worldIn.getTileEntity(pos)
             // If the item used is an upgrade, DON'T open the GUI, because the block will either be upgraded
             // or the player will be sent a message that the upgrade it not appropriate for the level
             if (item is LevelUpgrade) {
