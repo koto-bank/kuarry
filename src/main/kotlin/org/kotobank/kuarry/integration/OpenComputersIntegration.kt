@@ -59,7 +59,7 @@ object OpenComputersDriver : DriverSidedTileEntity() {
         fun getInstalledUpgrades(context: Context, args: Arguments): Array<Any> {
             val result = mutableListOf<ItemStack>()
 
-            val inventory = tileEntity.upgradeInventory
+            val inventory = tileEntity.upgradeInventoryComponent.upgradeInventory
             for (i in 0 until inventory.slots) {
                 val stack = inventory.getStackInSlot(i)
                 if (!stack.isEmpty) result.add(stack)

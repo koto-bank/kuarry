@@ -49,8 +49,9 @@ class KuarryContainer(inventoryPlayer: InventoryPlayer, val tileEntity: KuarryTi
         addPlayerInventory(xStart, playerInventoryYStart, playerHotbarYStart)
 
         // Add the upgrade inventory
-        val upgradeInventory = tileEntity.upgradeInventory
-        InventoryHelper.forEachPositionInInventory(tileEntity.upgradeInventoryWidth, tileEntity.upgradeInventoryHeight) {
+        val upgradeInventoryComponent = tileEntity.upgradeInventoryComponent
+        val upgradeInventory = upgradeInventoryComponent.upgradeInventory
+        InventoryHelper.forEachPositionInInventory(upgradeInventoryComponent.upgradeInventoryWidth, upgradeInventoryComponent.upgradeInventoryHeight) {
             positionInInventory: Int, widthPos: Int, heightPos: Int ->
 
             addSlotToContainer(
@@ -70,11 +71,11 @@ class KuarryContainer(inventoryPlayer: InventoryPlayer, val tileEntity: KuarryTi
                             return item is KuarryUpgrade &&
                                     // Check that there are no other ItemStacks of this type in the
                                     // upgrade inventory
-                                    tileEntity.upgradeCountInInventory(item::class) == 0 &&
+                                    upgradeInventoryComponent.upgradeCountInInventory(item::class) == 0 &&
                                     // If there is an incompatible upgrade defined, check that it also is
                                     // not in the inventory
                                     (if (item.incompatibleWith != null)
-                                        tileEntity.upgradeCountInInventory(item.incompatibleWith!!) == 0
+                                        upgradeInventoryComponent.upgradeCountInInventory(item.incompatibleWith!!) == 0
                                     else
                                         true)
                         }

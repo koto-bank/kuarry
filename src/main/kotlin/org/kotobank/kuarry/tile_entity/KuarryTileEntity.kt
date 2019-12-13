@@ -5,7 +5,6 @@ import net.minecraft.block.SilkTouchHarvest
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.init.Blocks
-import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.NetworkManager
@@ -20,12 +19,10 @@ import net.minecraftforge.items.*
 import net.minecraftforge.fluids.IFluidBlock
 import net.minecraftforge.fml.common.Loader
 import org.kotobank.kuarry.*
-import org.kotobank.kuarry.helper.InventoryHelper
 import org.kotobank.kuarry.integration.autopushing.Autopusher
 import org.kotobank.kuarry.item.*
 import org.kotobank.kuarry.integration.MjReceiverImpl
-import org.kotobank.kuarry.tile_entity.kuarry_component.EnergyComponent
-import kotlin.reflect.KClass
+import org.kotobank.kuarry.tile_entity.kuarry_component.*
 
 class KuarryTileEntity : TileEntity(), ITickable {
     companion object {
@@ -62,26 +59,12 @@ class KuarryTileEntity : TileEntity(), ITickable {
         internal const val inventorySize = inventoryWidth * inventoryHeight
     }
 
-    private val energyComponent = EnergyComponent(this)
+    val energyComponent = EnergyComponent(this)
+
+    val upgradeInventoryComponent = UpgradeInventoryComponent(this)
 
     /** A chest-sized inventory for inner item storage */
     internal val inventory = object : ItemStackHandler(inventorySize) {
-        override fun onContentsChanged(slot: Int) {
-            super.onContentsChanged(slot)
-            markDirty()
-        }
-    }
-
-    internal val upgradeInventoryWidth = 2
-    internal val upgradeInventoryHeight
-        get() =
-            LevelValues[upgradeLevel].upgradeSlotLines
-    internal val upgradeInventorySize
-        get() = upgradeInventoryWidth * upgradeInventoryHeight
-
-
-    /** A small inventory for upgrades not exposed via getCapability */
-    internal val upgradeInventory = object : ItemStackHandler(upgradeInventorySize) {
         override fun onContentsChanged(slot: Int) {
             super.onContentsChanged(slot)
             markDirty()
@@ -96,33 +79,10 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 // Update the field, this will change upgradeInventorySize
                 field = value
 
-                val oldSize = upgradeInventory.slots
-                // If the new size is different, the inventory needs to be expanded
-                if (oldSize != upgradeInventorySize) {
-                    val oldHeight = oldSize / upgradeInventoryWidth
-                    // Copy all the items in the same order the player sees them by saving their width/height positions
-                    val oldItems = HashMap<Pair<Int, Int>, ItemStack>(oldSize)
-                    InventoryHelper.forEachPositionInInventory(upgradeInventoryWidth, oldHeight) {
-                        posInInventory: Int, widthPos: Int, heightPos: Int ->
-
-                        oldItems[Pair(widthPos, heightPos)] = upgradeInventory.getStackInSlot(posInInventory)
-
-                        false
-                    }
-
-                    // Set the new upgrade inventory size, after the field has been updated
-                    upgradeInventory.setSize(upgradeInventorySize)
-
-                    // Restore all the items to their orignal positions
-                    oldItems.forEach { (widthPos, heightPos), stack ->
-                        val pos = (widthPos * upgradeInventoryHeight) + heightPos
-
-                        upgradeInventory.setStackInSlot(pos, stack)
-                    }
-                }
 
 
                 // Run the stuff that needs to change when the level changes
+                upgradeInventoryComponent.onUpgradeLevelChanged()
                 energyComponent.onUpgradeLevelChanged()
 
                 notifyClientAndMarkDirty()
@@ -240,7 +200,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 energyComponent.writeToNBT(compound)
 
                 setTag("inventory", inventory.serializeNBT())
-                setTag("upgrade_inventory", upgradeInventory.serializeNBT())
+                upgradeInventoryComponent.writeToNBT(compound)
 
                 setString("activation_mode", activationMode.name)
                 setBoolean("autopush", autopush)
@@ -254,7 +214,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
             energyComponent.readFromNBT(compound)
 
             inventory.deserializeNBT(getCompoundTag("inventory"))
-            upgradeInventory.deserializeNBT(getCompoundTag("upgrade_inventory"))
+            upgradeInventoryComponent.readToNBT(compound)
 
             activationMode = ActivationMode.valueOf(getString("activation_mode"))
             autopush = getBoolean("autopush")
@@ -324,37 +284,14 @@ class KuarryTileEntity : TileEntity(), ITickable {
     /** Tick count for the resource-count-in-the-chunk updates */
     private var resourcesLeftUpdateCount = 0
 
-    /** Finds an upgrade in the inventory, or null if there was none.
-     *
-     * The inventory _should_ not contain more than one [ItemStack] of any upgrade,
-     * therefore this function returns the first upgrade found.
-     */
-    internal fun upgradeInInventory(upgradeC: KClass<out Item>): ItemStack? {
-        for (i in 0 until upgradeInventorySize) {
-            val slotItemStack = upgradeInventory.getStackInSlot(i)
-            if (!slotItemStack.isEmpty && slotItemStack.item::class == upgradeC) {
-                return slotItemStack
-            }
-        }
-
-        return null
-    }
-
-    /** Counts the amount of upgrades of specified type in the upgrade inventory. */
-    internal fun upgradeCountInInventory(upgradeC: KClass<out Item>): Int =
-            upgradeInInventory(upgradeC)?.count ?: 0
-
-    /** A convenience function with a generic parameter that calls the [KClass]-receiving version. */
-    internal inline fun <reified T : KuarryUpgrade> upgradeCountInInventory() = upgradeCountInInventory(T::class)
-
     /** Count the amount of chunks added to X and Z by upgrades.
      *
      * The amount is equal to the amount of these upgrades, this function is
      * a convenient way to get both values.
      */
     fun xzChunkExpansion(): Pair<Int, Int> = Pair(
-            upgradeCountInInventory<KuarryXBoundariesUpgrade>(),
-            upgradeCountInInventory<KuarryZBoundariesUpgrade>()
+            upgradeInventoryComponent.upgradeCountInInventory<KuarryXBoundariesUpgrade>(),
+            upgradeInventoryComponent.upgradeCountInInventory<KuarryZBoundariesUpgrade>()
     )
 
     /** Find and put in a list the chunks to be mined.
@@ -368,7 +305,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
         val (additionalXChunks, additionalZChunks) = xzChunkExpansion()
 
         val kuarryChunk = world.getChunkFromBlockCoords(pos)
-        var chunks = mutableListOf<Chunk>()
+        val chunks = mutableListOf<Chunk>()
         for (x in 0..additionalXChunks) {
             for (z in 0..additionalZChunks) {
                 chunks.add(world.getChunkFromChunkCoords(kuarryChunk.x + x, kuarryChunk.z + z))
@@ -407,7 +344,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
             // Calculate the amount of ticks subtracted with speed upgrades
             val ticksSubtracted = run {
-                val speedUpgradeCount = upgradeCountInInventory<KuarrySpeedUpgrade>()
+                val speedUpgradeCount = upgradeInventoryComponent.upgradeCountInInventory<KuarrySpeedUpgrade>()
 
                 // Should max out at 50, therefore speeding it up to a block per second
                 10 * speedUpgradeCount
@@ -495,7 +432,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
         // TODO: allow fluids somehow?
         if (block is IFluidBlock) return false
 
-        val customFilter = upgradeInInventory(KuarryCustomFilter::class)
+        val customFilter = upgradeInventoryComponent.upgradeInInventory(KuarryCustomFilter::class)
 
         // If there's a custom filter, get its mode, otherwise default to blacklist
         val mode = customFilter?.let(KuarryCustomFilter.Companion::mode) ?: KuarryCustomFilter.Mode.Blacklist
@@ -554,12 +491,12 @@ class KuarryTileEntity : TileEntity(), ITickable {
         if (!energyComponent.tryExtractingEnergy(requiredEnergy)) return false
 
         val drops = NonNullList.create<ItemStack>()
-        if (upgradeCountInInventory<KuarrySilkTouchUpgrade>() < 1) {
+        if (upgradeInventoryComponent.upgradeCountInInventory<KuarrySilkTouchUpgrade>() < 1) {
             // Get the fortune level, depending on the upgrades.
             // The levels are mapped to metadata + 1 and invalid number
             // is treated as level 1
             val fortune =
-                    upgradeInInventory(KuarryLuckUpgrade::class)?.let {
+                    upgradeInventoryComponent.upgradeInInventory(KuarryLuckUpgrade::class)?.let {
                         when (it.metadata) {
                             0 -> 1
                             1 -> 2

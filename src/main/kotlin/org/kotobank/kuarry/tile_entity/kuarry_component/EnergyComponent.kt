@@ -113,8 +113,8 @@ class EnergyComponent(val parent: KuarryTileEntity) {
         var energy = baseRequiredEnergy * toolHarvestModifier * levelHarvestModifier
 
         // Go through the upgrade inventory and add all the energy required by the upgrades
-        for (i in 0 until parent.upgradeInventorySize) {
-            val stack = parent.upgradeInventory.getStackInSlot(i)
+        for (i in 0 until parent.upgradeInventoryComponent.upgradeInventorySize) {
+            val stack = parent.upgradeInventoryComponent.upgradeInventory.getStackInSlot(i)
             if (!stack.isEmpty) {
                 val item = stack.item
                 require(item is KuarryUpgrade)
