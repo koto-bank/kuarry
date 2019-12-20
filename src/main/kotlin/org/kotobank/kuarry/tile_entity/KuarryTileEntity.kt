@@ -476,7 +476,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
     /** Processes a single block.
      *
-     * @return Whether the block was mined or not
+     * @return whether the block was mined or not
      */
     private fun processBlock(blockPos: BlockPos, blockState: IBlockState): Boolean {
         val block = blockState.block

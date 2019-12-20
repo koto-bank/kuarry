@@ -39,7 +39,7 @@ class EnergyComponent(private val parent: KuarryTileEntity) {
 
     /** Tries to extract energy from the energy storage.
      *
-     * @return If there is enough energy, it is extracted wholly and true is returned;
+     * @return if there is enough energy, it is extracted wholly and true is returned;
      *         if there is not enough, then none is extracted and false is returned.
      */
     fun tryExtractingEnergy(requiredEnergy: Int): Boolean {

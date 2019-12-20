@@ -13,13 +13,13 @@ abstract class BaseAutopusher(private val world: World, private val pos: BlockPo
 
     /** Try to push [itemStack] to the [toTileEntity] from the [fromSide] side.
      *
-     * @return Items that remained after pushing and should be returned to the inventory.
+     * @return items that remained after pushing and should be returned to the inventory.
      */
     protected abstract fun tryPushingToSide(toTileEntity: TileEntity?, fromSide: EnumFacing, itemStack: ItemStack): ItemStack
 
     /** Try to push to the autopushing receiver.
      *
-     * @return Whether the push was successful and other receiver should not be tried next.
+     * @return whether the push was successful and other receiver should not be tried next.
      */
     open fun tryPushing(): Boolean {
         var pushed = false

@@ -3,9 +3,9 @@ package org.kotobank.kuarry.helper
 internal object InventoryHelper {
     /** Runs a function, passing it a position in the inventory matrix, traversing it from left to right, top to bottom.
      *
-     * @param width Width of the inventory
-     * @param height Height of the inventory
-     * @param func The function which is run on each position, where "position" is the slot number in the inventory, and
+     * @param width width of the inventory
+     * @param height height of the inventory
+     * @param func the function which is run on each position, where "position" is the slot number in the inventory, and
      *             "widthPos" & "heightPos" are the corresponding column and line in the inventory.
      *             If this function returns "true", then iteration is stopped.
      */
