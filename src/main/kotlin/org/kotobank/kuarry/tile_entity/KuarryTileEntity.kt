@@ -63,6 +63,8 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
     val upgradeInventoryComponent = UpgradeInventoryComponent(this)
 
+    val fluidInventoryComponent = FluidInventoryComponent(this)
+
     /** A chest-sized inventory for inner item storage */
     internal val inventory = object : ItemStackHandler(inventorySize) {
         override fun onContentsChanged(slot: Int) {
@@ -175,6 +177,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
     override fun hasCapability(capability: Capability<*>, facing: EnumFacing?) =
             energyComponent.hasCapability(capability) ||
+                    fluidInventoryComponent.hasCapability(capability) ||
                     (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) ||
                     (Loader.isModLoaded("buildcraftcore") &&
                             (capability == MjReceiverImpl.capConnector || capability == MjReceiverImpl.capReceiver)) ||
@@ -184,6 +187,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
     override fun <T : Any> getCapability(capability: Capability<T>, facing: EnumFacing?): T? {
         return (
                 energyComponent.getCapability(capability) ?:
+                fluidInventoryComponent.getCapability(capability) ?:
                 // If the energy component returns null, try the other stuff
                 when (capability) {
                     CapabilityItemHandler.ITEM_HANDLER_CAPABILITY ->
@@ -199,6 +203,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
                 setTag("inventory", inventory.serializeNBT())
                 upgradeInventoryComponent.writeToNBT(compound)
+                fluidInventoryComponent.writeToNBT(compound)
 
                 setString("activation_mode", activationMode.name)
                 setBoolean("autopush", autopush)
@@ -213,6 +218,7 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
             inventory.deserializeNBT(getCompoundTag("inventory"))
             upgradeInventoryComponent.readToNBT(compound)
+            fluidInventoryComponent.readFromNBT(compound)
 
             activationMode = ActivationMode.valueOf(getString("activation_mode"))
             autopush = getBoolean("autopush")

@@ -1,10 +1,12 @@
 package org.kotobank.kuarry.container.kuarry
 
 import net.minecraft.client.resources.I18n
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.energy.CapabilityEnergy
 import org.kotobank.kuarry.KuarryMod
+import org.kotobank.kuarry.KuarryModGUIHandler
 import org.kotobank.kuarry.KuarryModIcons
 import org.kotobank.kuarry.KuarryModPackets
 import org.kotobank.kuarry.packet.SwitchKuarrySetting
@@ -14,7 +16,7 @@ import org.kotobank.kuarry.integration.autopushing.Autopusher
 import org.kotobank.kuarry.item.LevelValues
 
 
-class KuarryGUIContainer(override val container: KuarryContainer) : BaseGUIContainer(container) {
+class KuarryGUIContainer(override val container: KuarryContainer, val player: EntityPlayer) : BaseGUIContainer(container) {
     companion object {
         private const val energyBarTopY = 184
         private const val energyBarPlaceX = 194
@@ -42,13 +44,13 @@ class KuarryGUIContainer(override val container: KuarryContainer) : BaseGUIConta
     override val backgroundTexture = ResourceLocation(KuarryMod.MODID, "textures/gui/kuarry.png")
 
     override val buttons: List<Button> =
-            container.tileEntity.run {
-                listOf(
-                        ActivationModeButton(10, 10),
-                        RenderBoundsButton(10, 30),
-                        AutopushButton(10, 50)
-                )
-            }
+            listOf(
+                    ActivationModeButton(10, 10),
+                    RenderBoundsButton(10, 30),
+                    AutopushButton(10, 50),
+                    FluidInventoryButton(153, 65)
+            )
+
 
     init {
         xSize = actualXSize
@@ -184,6 +186,22 @@ class KuarryGUIContainer(override val container: KuarryContainer) : BaseGUIConta
             KuarryModPackets.networkChannel.sendToServer(
                     SwitchKuarrySetting(container.tileEntity.pos, SwitchKuarrySetting.Setting.Autopush)
             )
+            super.onClick()
+        }
+    }
+
+    private inner class FluidInventoryButton(x: Int, y: Int) : Button(x, y) {
+        // override val enabled: Boolean = Autopusher.isEnabled
+
+        override val iconAndTooltipKey=
+                Pair(KuarryModIcons.fluidInventory, "tile.kuarry.gui.fluid_inventory")
+
+
+        override fun onClick() {
+            val pos = container.tileEntity.pos
+
+            player.openGui(KuarryMod, KuarryModGUIHandler.KUARRY_FLUID, player.world, pos.x, pos.y, pos.z)
+
             super.onClick()
         }
     }

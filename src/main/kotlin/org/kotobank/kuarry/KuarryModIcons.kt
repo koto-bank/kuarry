@@ -44,6 +44,9 @@ object KuarryModIcons {
     lateinit var autopushDisable: TextureAtlasSprite
     lateinit var autopushEnable: TextureAtlasSprite
 
+    lateinit var back: TextureAtlasSprite
+    lateinit var fluidInventory: TextureAtlasSprite
+
     private fun registerIcons(map: TextureMap) {
         with (map) {
             button = registerIcon("button")
@@ -65,6 +68,9 @@ object KuarryModIcons {
 
             autopushDisable = registerIcon("autopush_disable")
             autopushEnable = registerIcon("autopush_enable")
+
+            back = registerIcon("back")
+            fluidInventory = registerIcon("fluid_inventory")
         }
     }
 }

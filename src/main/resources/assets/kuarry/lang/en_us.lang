@@ -16,6 +16,8 @@ tile.kuarry.gui.dont_render_bounds=Don't show mining area boundaries
 tile.kuarry.gui.autopush=Automatically push items to pipes
 tile.kuarry.gui.dont_autopush=Don't automatically push items to pipes
 tile.kuarry.gui.approx_left=Approx. left
+tile.kuarry.gui.fluid_inventory=Open the fluid inventory
+tile.kuarry.gui.back=Back
 
 tile.denatured_stone.name=Denatured stone
 tile.denatured_stone.description=Denatured stone is proven to be a very useful material\: it can be a cheap papier mache, \

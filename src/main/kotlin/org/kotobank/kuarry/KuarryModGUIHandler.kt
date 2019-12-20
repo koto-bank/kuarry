@@ -15,6 +15,7 @@ class KuarryModGUIHandler : IGuiHandler {
     companion object {
         const val KUARRY = 0
         const val CUSTOM_FILTER = 1
+        const val KUARRY_FLUID = 2
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -31,6 +32,10 @@ class KuarryModGUIHandler : IGuiHandler {
                 } else {
                     null
                 }
+            KUARRY_FLUID -> KuarryFluidContainer(
+                    player.inventory,
+                    world.getTileEntity(BlockPos(x, y, z)) as KuarryTileEntity
+            )
             else -> null
         }
     }
@@ -41,7 +46,7 @@ class KuarryModGUIHandler : IGuiHandler {
                 getServerGuiElement(ID, player, world, x, y, z)?.let {
                     require(it is KuarryContainer)
 
-                    KuarryGUIContainer(it)
+                    KuarryGUIContainer(it, player)
                 }
                 CUSTOM_FILTER ->
                     getServerGuiElement(ID, player, world, x, y, z)?.let {
@@ -49,6 +54,12 @@ class KuarryModGUIHandler : IGuiHandler {
 
                         CustomFilterGUIContainer(it)
                     }
+            KUARRY_FLUID ->
+                getServerGuiElement(ID, player, world, x, y, z)?.let {
+                    require(it is KuarryFluidContainer)
+
+                    KuarryFluidGUIContainer(it, player)
+                }
 
             else -> null
         }
