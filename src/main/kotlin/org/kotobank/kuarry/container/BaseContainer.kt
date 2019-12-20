@@ -12,12 +12,16 @@ import org.kotobank.kuarry.helper.InventoryHelper
  * Contains a base implementation of some functions that should be useful in most GUIs.
  */
 abstract class BaseContainer(val inventoryPlayer: InventoryPlayer) : Container() {
-    // Player inventory size is constant, 3 x 9 + toolbar of width 9
-    val playerInventoryWidth = 9
-    val playerInventoryHeight = 3
-    val playerHotbarSize = 9
+    companion object {
+        // Player inventory size is constant, 3 x 9 + toolbar of width 9
+        protected const val playerInventoryWidth = 9
+        protected const val playerInventoryHeight = 3
+        protected const val playerHotbarSize = 9
 
-    val slotSize = 18
+        protected const val slotSize = 18
+    }
+
+
 
     /** Adds the player's inventory to the container.
      *
