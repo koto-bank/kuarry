@@ -79,8 +79,6 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 // Update the field, this will change upgradeInventorySize
                 field = value
 
-
-
                 // Run the stuff that needs to change when the level changes
                 upgradeInventoryComponent.onUpgradeLevelChanged()
                 energyComponent.onUpgradeLevelChanged()
@@ -330,7 +328,6 @@ class KuarryTileEntity : TileEntity(), ITickable {
             energyComponent.update()
 
             // 6000 ~= 5 minutes
-            // 50 is to wait a little until the world loads on start
             if (resourcesLeftUpdateCount >= 6000) {
                 shouldUpdateResourcesLeft = true
                 resourcesLeftUpdateCount = 0
