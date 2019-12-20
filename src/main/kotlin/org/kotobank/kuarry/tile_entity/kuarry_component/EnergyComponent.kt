@@ -13,7 +13,7 @@ import org.kotobank.kuarry.item.KuarryUpgrade
 import org.kotobank.kuarry.item.LevelValues
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 
-class EnergyComponent(val parent: KuarryTileEntity) {
+class EnergyComponent(private val parent: KuarryTileEntity) {
     companion object {
         /** The base amount of energy per block mined. */
         internal const val baseRequiredEnergy = 1000

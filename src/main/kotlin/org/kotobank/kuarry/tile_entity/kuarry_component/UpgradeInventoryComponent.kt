@@ -10,7 +10,7 @@ import org.kotobank.kuarry.item.LevelValues
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity
 import kotlin.reflect.KClass
 
-class UpgradeInventoryComponent(val parent: KuarryTileEntity) {
+class UpgradeInventoryComponent(private val parent: KuarryTileEntity) {
     internal val upgradeInventoryWidth = 2
 
     internal val upgradeInventoryHeight
