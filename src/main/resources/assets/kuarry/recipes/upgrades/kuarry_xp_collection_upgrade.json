@@ -1,0 +1,27 @@
+{
+  "_comment": "A recipe for crafting the XP collection upgrade",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "bBb",
+    "crc",
+    "bBb"
+  ],
+  "key": {
+    "c": {
+      "item": "kuarry:kuarry_casing"
+    },
+    "b": {
+      "item": "minecraft:book"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "B": {
+      "item": "minecraft:glass_bottle"
+    }
+  },
+  "result": {
+    "item": "kuarry:xp_collection_upgrade",
+    "count": 1
+  }
+}

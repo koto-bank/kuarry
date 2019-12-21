@@ -22,7 +22,7 @@ abstract class KuarryUpgrade : Item() {
      */
     open val stackSize = 1
 
-    open val incompatibleWith: KClass<out KuarryUpgrade>? = null
+    open val incompatibleWith: Array<KClass<out KuarryUpgrade>> = emptyArray()
 
     /** Energy usage multiplier used with [energyUsageWithUpgrade]. */
     open val energyUsageMultiplier = 1f
@@ -49,7 +49,7 @@ abstract class KuarryUpgrade : Item() {
     get() {
         val tooltipList = mutableListOf(I18n.format(tooltipKey))
 
-        if (incompatibleWith != null)
+        if (incompatibleWith.isNotEmpty())
             tooltipList.add(I18n.format(incompatWithKey))
 
         if (energyUsageMultiplier > 1)
@@ -91,7 +91,10 @@ class KuarryZBoundariesUpgrade : KuarryUpgrade() {
 class KuarrySilkTouchUpgrade : KuarryUpgrade() {
     override val energyUsageMultiplier = 1.1f
 
-    override val incompatibleWith = KuarryLuckUpgrade::class
+    override val incompatibleWith: Array<KClass<out KuarryUpgrade>> = arrayOf(
+            KuarryLuckUpgrade::class,
+            KuarryXPCollectionUpgrade::class
+    )
 }
 
 class KuarryLuckUpgrade : KuarryUpgrade() {
@@ -127,7 +130,7 @@ class KuarryLuckUpgrade : KuarryUpgrade() {
 
     override fun getUnlocalizedName(stack: ItemStack): String = "${super.getUnlocalizedName()}_${getMetadata(stack)}"
 
-    override val incompatibleWith = KuarrySilkTouchUpgrade::class
+    override val incompatibleWith: Array<KClass<out KuarryUpgrade>> = arrayOf(KuarrySilkTouchUpgrade::class)
 
     fun registerSubitemModels() {
         for (level in 0..2) {
@@ -143,4 +146,11 @@ class KuarryLuckUpgrade : KuarryUpgrade() {
 class KuarrySpeedUpgrade : KuarryUpgrade() {
     override val stackSize = 5
     override val energyUsageMultiplier = 1.2f
+}
+
+class KuarryXPCollectionUpgrade : KuarryUpgrade() {
+    // Multiply by a low value because many blocks don't even give XP
+    override val energyUsageMultiplier: Float = 1.05f
+
+    override val incompatibleWith: Array<KClass<out KuarryUpgrade>> = arrayOf(KuarrySilkTouchUpgrade::class)
 }

@@ -22,7 +22,8 @@ object KuarryModItems {
                 Pair("z_boundaries_upgrade", KuarryZBoundariesUpgrade()),
                 Pair("silk_touch_upgrade", KuarrySilkTouchUpgrade()),
                 Pair("custom_filter", KuarryCustomFilter()),
-                Pair("speed_upgrade", KuarrySpeedUpgrade())
+                Pair("speed_upgrade", KuarrySpeedUpgrade()),
+                Pair("xp_collection_upgrade", KuarryXPCollectionUpgrade())
         )
     }
 

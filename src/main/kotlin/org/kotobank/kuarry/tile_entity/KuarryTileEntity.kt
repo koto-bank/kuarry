@@ -65,6 +65,8 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
     val fluidInventoryComponent = FluidInventoryComponent(this)
 
+    val xpCollectorComponent = XPCollectorComponent()
+
     /** A chest-sized inventory for inner item storage */
     internal val inventory = object : ItemStackHandler(inventorySize) {
         override fun onContentsChanged(slot: Int) {
@@ -510,6 +512,15 @@ class KuarryTileEntity : TileEntity(), ITickable {
 
             // If there's no silk touch upgrade, process the block as if it was mined
             block.getDrops(drops, world, pos, blockState, fortune)
+
+            // Only collect XP without silk touch and with an XP collection upgrade
+            if (xpCollectorComponent.enabled && upgradeInventoryComponent.upgradeCountInInventory<KuarryXPCollectionUpgrade>() > 0) {
+                xpCollectorComponent.xpFromBlock(
+                        block, blockState,
+                        world, blockPos,
+                        fortune
+                )?.let(fluidInventoryComponent::putFluid)
+            }
         } else {
             // If there is silk touch, collect it as if with silk touch
             drops.add(SilkTouchHarvest.getSilkTouchDrop(block, blockState))

@@ -34,7 +34,7 @@ item.z_boundaries_upgrade.description=Upgrades the kuarry to mine one more chunk
 
 item.silk_touch_upgrade.name=Kuarry silk touch upgrade
 item.silk_touch_upgrade.description=Makes the kuarry retrieve the blocks as they are, instead of mining them
-item.silk_touch_upgrade.description.incompat=Not compatible with the luck upgrade
+item.silk_touch_upgrade.description.incompat=Not compatible with the luck upgrade and the XP collection upgrade
 
 item.luck_upgrade_0.name=Kuarry luck upgade I
 item.luck_upgrade_1.name=Kuarry luck upgrade II
@@ -59,6 +59,10 @@ item.speed_upgrade.description=§c§lThe red one goes faster
 item.level_2_upgrade.name=Kuarry hardened upgrade
 item.level_3_upgrade.name=Kuarry reinforced upgrade
 
+item.xp_collection_upgrade.name=Kuarry XP collection upgrade
+item.xp_collection_upgrade.description=Allows the kuarry to collect XP from some of the mined blocks
+item.xp_collection_upgrade.description.incompat=Incompatible with the silk touch upgrade
+
 tooltips.about_level_upgrade=Allows the kuarry to hold up to %sRF of energy and up to %s upgrades. Can only be \
 applied to the previous level of the kuarry.
 tooltips.level_uprgade_wrong_level=This upgrade can only be applied to a kuarry of level %s, but this kuarry is of level %s
@@ -66,3 +70,5 @@ tooltips.level_uprgade_wrong_level=This upgrade can only be applied to a kuarry 
 tooltips.about_energy_multiplication=Multiplies energy usage by %s
 
 tooltips.hold_shift_for_ext_desc=[Hold %sShift%s for a detailed description]
+
+tooltips.upgrade_incompat_with=Incompatible with

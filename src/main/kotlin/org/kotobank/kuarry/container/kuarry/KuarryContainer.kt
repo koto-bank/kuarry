@@ -72,10 +72,10 @@ class KuarryContainer(inventoryPlayer: InventoryPlayer, val tileEntity: KuarryTi
                                     // Check that there are no other ItemStacks of this type in the
                                     // upgrade inventory
                                     upgradeInventoryComponent.upgradeCountInInventory(item::class) == 0 &&
-                                    // If there is an incompatible upgrade defined, check that it also is
+                                    // If there are incompatible upgrades defined, check that they are also
                                     // not in the inventory
-                                    (if (item.incompatibleWith != null)
-                                        upgradeInventoryComponent.upgradeCountInInventory(item.incompatibleWith!!) == 0
+                                    (if (item.incompatibleWith.isNotEmpty())
+                                        item.incompatibleWith.all { upgradeInventoryComponent.upgradeCountInInventory(it) == 0 }
                                     else
                                         true)
                         }
