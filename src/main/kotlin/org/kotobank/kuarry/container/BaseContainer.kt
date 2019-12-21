@@ -18,7 +18,8 @@ abstract class BaseContainer(val inventoryPlayer: InventoryPlayer) : Container()
         protected const val playerInventoryHeight = 3
         protected const val playerHotbarSize = 9
 
-        protected const val slotSize = 18
+        @JvmStatic
+        protected val slotSize = 18
     }
 
 
