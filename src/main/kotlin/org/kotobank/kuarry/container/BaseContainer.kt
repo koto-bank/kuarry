@@ -14,15 +14,12 @@ import org.kotobank.kuarry.helper.InventoryHelper
 abstract class BaseContainer(val inventoryPlayer: InventoryPlayer) : Container() {
     companion object {
         // Player inventory size is constant, 3 x 9 + toolbar of width 9
-        protected const val playerInventoryWidth = 9
-        protected const val playerInventoryHeight = 3
-        protected const val playerHotbarSize = 9
-
-        @JvmStatic
-        protected val slotSize = 18
+        private const val playerInventoryWidth = 9
+        private const val playerInventoryHeight = 3
+        private const val playerHotbarSize = 9
     }
 
-
+    protected val slotSize = 18
 
     /** Adds the player's inventory to the container.
      *
