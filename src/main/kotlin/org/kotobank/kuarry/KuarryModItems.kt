@@ -79,14 +79,6 @@ object KuarryModItems {
         with(kuarry) {
             setRegistryName(KuarryMod.MODID, "kuarry")
             setUnlocalizedName("kuarry")
-
-            ModelLoader.setCustomMeshDefinition(this) { stack ->
-                val level = stack.tagCompound?.getInteger("upgrade_level") ?: 0
-
-                // Return a custom model based on the level from the ItemStack
-                ModelResourceLocation(this.registryName!!, "facing=north,level=${level}")
-            }
-
             event.registry.register(this)
         }
     }
@@ -115,6 +107,13 @@ object ItemModelLoader {
             item.apply {
                 ModelLoader.setCustomModelResourceLocation(this, 0, ModelResourceLocation(this.registryName!!, "inventory"))
             }
+        }
+
+        ModelLoader.setCustomMeshDefinition(KuarryModItems.kuarry) { stack ->
+            val level = stack.tagCompound?.getInteger("upgrade_level") ?: 0
+
+            // Return a custom model based on the level from the ItemStack
+            ModelResourceLocation(KuarryModItems.kuarry.registryName!!, "facing=north,level=${level}")
         }
 
         KuarryModItems.luckUpgrade.registerSubitemModels()
