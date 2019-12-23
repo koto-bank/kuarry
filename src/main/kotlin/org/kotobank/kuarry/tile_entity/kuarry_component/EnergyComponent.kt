@@ -97,20 +97,9 @@ class EnergyComponent(private val parent: KuarryTileEntity) {
         }
     }
 
-    /** Calculates the energy required to mine the block. */
-    fun calculateRequiredEnergyForBlock(block: Block, blockState: IBlockState): Int {
-        // Harvesting something with pick/shovel should not cost more,
-        // otherwise double the energy count
-        val toolHarvestModifier = when (block.getHarvestTool(blockState)) {
-            "pickaxe", "shovel", null -> 1
-            else -> 2
-        }
-        // Don't want to have 0 or -1 as a modifier, as it would break the math later on, so make it 1
-        val levelHarvestModifier = block.getHarvestLevel(blockState).let { if (it <= 0) 1 else it }
-
-
-        // Get the starting energy from all the other modifiers
-        var energy = baseRequiredEnergy * toolHarvestModifier * levelHarvestModifier
+    /** Calculates the energy needed with upgrades, starting from [currentEnergy] as a base. */
+    private fun calculateRequiredEnergyForUpgrades(currentEnergy: Int): Int {
+        var energy = currentEnergy
 
         // Go through the upgrade inventory and add all the energy required by the upgrades
         for (i in 0 until parent.upgradeInventoryComponent.upgradeInventorySize) {
@@ -125,6 +114,30 @@ class EnergyComponent(private val parent: KuarryTileEntity) {
 
         return energy
     }
+
+    /** Calculates the energy required to mine the block. */
+    fun calculateRequiredEnergyForBlock(block: Block, blockState: IBlockState): Int {
+        // Harvesting something with pick/shovel should not cost more,
+        // otherwise double the energy count
+        val toolHarvestModifier = when (block.getHarvestTool(blockState)) {
+            "pickaxe", "shovel", null -> 1
+            else -> 2
+        }
+        // Don't want to have 0 or -1 as a modifier, as it would break the math later on, so make it 1
+        val levelHarvestModifier = block.getHarvestLevel(blockState).let { if (it <= 0) 1 else it }
+
+
+        // Get the starting energy from all the other modifiers
+
+        return calculateRequiredEnergyForUpgrades(
+                baseRequiredEnergy * toolHarvestModifier * levelHarvestModifier
+        )
+    }
+
+    /** The required energy to collect fluids only depends on installed upgrades, since fluids
+     * don't need a tool to be collected and don't have hardness.
+     */
+    fun calculateRequiredEnergyForFluid()= calculateRequiredEnergyForUpgrades(baseRequiredEnergy)
 
     /** Checks if the energy amount has changed since the last tick.
      *

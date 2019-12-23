@@ -3,9 +3,11 @@ package org.kotobank.kuarry.container.custom_filter
 import net.minecraft.block.Block
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
+import net.minecraft.init.Items
 import net.minecraft.inventory.ClickType
-import net.minecraft.item.Item
+import net.minecraft.item.ItemBucket
 import net.minecraft.item.ItemStack
+import net.minecraftforge.fluids.UniversalBucket
 import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.IItemHandler
 import net.minecraftforge.items.ItemStackHandler
@@ -67,8 +69,19 @@ class CustomFilterContainer(val player: EntityPlayer) : BaseContainer(player.inv
         fun itemStackAllowed(itemStack: ItemStack): Boolean {
             require(slot != null)
 
-            // If the item stack is empty of the item is not a block, don't allow it
-            if (itemStack.isEmpty || Block.getBlockFromItem(itemStack.item) == Blocks.AIR) return false;
+            val item = itemStack.item
+
+            if (itemStack.isEmpty) return false
+
+            when {
+                // If it's a universal bucket, allow it if there's a block assigned to it
+                item is UniversalBucket ->
+                    if (item.getFluid(itemStack)?.fluid?.block == null) return false
+                item is ItemBucket ->
+                    if (item != Items.LAVA_BUCKET && item != Items.WATER_BUCKET) return false
+                // If the item stack is empty of the item is not a block, don't allow it
+                Block.getBlockFromItem(item) == Blocks.AIR -> return false
+            }
 
             var hasAnyAlready = false
             for (position in 0 until KuarryCustomFilter.inventorySize) {

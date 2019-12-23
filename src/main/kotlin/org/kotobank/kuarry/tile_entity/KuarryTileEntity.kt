@@ -1,28 +1,42 @@
 package org.kotobank.kuarry.tile_entity
 
 import net.minecraft.block.Block
+import net.minecraft.block.BlockLiquid
 import net.minecraft.block.SilkTouchHarvest
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.init.Blocks
+import net.minecraft.init.Items
+import net.minecraft.item.ItemBlock
+import net.minecraft.item.ItemBucket
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.*
-import net.minecraft.util.math.*
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.ITickable
+import net.minecraft.util.NonNullList
+import net.minecraft.util.math.AxisAlignedBB
+import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.minecraft.world.chunk.Chunk
 import net.minecraftforge.common.capabilities.Capability
-import net.minecraftforge.items.*
+import net.minecraftforge.fluids.FluidUtil
 import net.minecraftforge.fluids.IFluidBlock
+import net.minecraftforge.fluids.UniversalBucket
 import net.minecraftforge.fml.common.Loader
-import org.kotobank.kuarry.*
+import net.minecraftforge.items.CapabilityItemHandler
+import net.minecraftforge.items.ItemStackHandler
+import org.kotobank.kuarry.KuarryModBlocks
+import org.kotobank.kuarry.integration.MjReceiverImpl
 import org.kotobank.kuarry.integration.autopushing.Autopusher
 import org.kotobank.kuarry.item.*
-import org.kotobank.kuarry.integration.MjReceiverImpl
-import org.kotobank.kuarry.tile_entity.kuarry_component.*
+import org.kotobank.kuarry.tile_entity.kuarry_component.EnergyComponent
+import org.kotobank.kuarry.tile_entity.kuarry_component.FluidInventoryComponent
+import org.kotobank.kuarry.tile_entity.kuarry_component.UpgradeInventoryComponent
+import org.kotobank.kuarry.tile_entity.kuarry_component.XPCollectorComponent
+
 
 class KuarryTileEntity : TileEntity(), ITickable {
     companion object {
@@ -51,7 +65,9 @@ class KuarryTileEntity : TileEntity(), ITickable {
                 Blocks.NETHERRACK,
 
                 Blocks.TALLGRASS,
-                Blocks.SNOW_LAYER
+                Blocks.SNOW_LAYER,
+
+                Blocks.WATER
         )
 
         internal const val inventoryWidth = 9
@@ -247,8 +263,6 @@ class KuarryTileEntity : TileEntity(), ITickable {
             SPacketUpdateTileEntity(pos, packetEntityID, updateTag)
 
     override fun onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity) {
-        super.onDataPacket(net, pkt)
-
         // Handle the usual non-ephemeral properties
         handleUpdateTag(pkt.nbtCompound)
 
@@ -377,8 +391,8 @@ class KuarryTileEntity : TileEntity(), ITickable {
     private fun countAllMinable(minedChunks: List<Chunk>): Int {
         var amountOfBlocks = 0
 
-        doWithAllBlocksInChunks(minedChunks) { _, blockState ->
-            if (isBlockAllowed(blockState.block)) {
+        doWithAllBlocksInChunks(minedChunks) { blockPos, blockState ->
+            if (isBlockAllowed(blockState, blockPos)) {
                 amountOfBlocks++
             }
 
@@ -431,11 +445,20 @@ class KuarryTileEntity : TileEntity(), ITickable {
         // The exit condition is to not go through bedrock
     }
 
+    private fun isFluidBlock(block: Block) = block is IFluidBlock || block is BlockLiquid
+    private fun isFluidSourceBlock(blockState: IBlockState, pos: BlockPos) =
+            when (val block = blockState.block) {
+                is IFluidBlock -> block.canDrain(world, pos)
+                is BlockLiquid -> blockState.getValue(BlockLiquid.LEVEL) == 0
+                else -> false
+            }
+
     /** Checks if the block is allowed by black/whitelisting and should be mined. */
-    private fun isBlockAllowed(block: Block): Boolean {
-        // Blacklist all fluids
-        // TODO: allow fluids somehow?
-        if (block is IFluidBlock) return false
+    private fun isBlockAllowed(blockState: IBlockState, blockPos: BlockPos): Boolean {
+        val block = blockState.block
+        val hasFluidUpgrade by lazy { upgradeInventoryComponent.upgradeCountInInventory<KuarryFluidCollectionUpgrade>() > 0 }
+
+        if (isFluidBlock(block) && (!hasFluidUpgrade || !isFluidSourceBlock(blockState, blockPos))) return false
 
         val customFilter = upgradeInventoryComponent.upgradeInInventory(KuarryCustomFilter::class)
 
@@ -451,7 +474,20 @@ class KuarryTileEntity : TileEntity(), ITickable {
                         // Take the itemstack in a slot and if it has a block, return that block. Otherwise return null.
                         cap.getStackInSlot(i)
                                 .takeUnless { it.isEmpty }
-                                ?.let { Block.getBlockFromItem(it.item) }
+                                ?.let {
+                                    when (val item = it.item) {
+                                        is ItemBlock -> Block.getBlockFromItem(item)
+                                        // Only buckets that have a fluid block should be here anyway,
+                                        // since the slot checks for that
+                                        is UniversalBucket -> item.getFluid(it)!!.fluid!!.block
+                                        is ItemBucket -> when (item) {
+                                            Items.WATER_BUCKET -> Blocks.WATER
+                                            Items.LAVA_BUCKET -> Blocks.LAVA
+                                            else -> null
+                                        }
+                                        else -> null
+                                    }
+                                }
                                 ?.takeUnless { it == Blocks.AIR }
                     }.filterNotNull()
 
@@ -487,85 +523,105 @@ class KuarryTileEntity : TileEntity(), ITickable {
         val block = blockState.block
 
         // Skip the block if it's blacklisted or is a fluid
-        if (!isBlockAllowed(block)) return false
+        if (!isBlockAllowed(blockState, blockPos)) return false
 
-        val requiredEnergy = energyComponent.calculateRequiredEnergyForBlock(block, blockState)
+        val isFluid = isFluidBlock(block)
+
+        val requiredEnergy =
+                if (isFluid) {
+                    energyComponent.calculateRequiredEnergyForBlock(block, blockState)
+                } else {
+                    energyComponent.calculateRequiredEnergyForFluid()
+                }
 
         // Try extracting the energy. If the function returns false,
         // then there's not enough energy to mine the block, skip it
         if (!energyComponent.tryExtractingEnergy(requiredEnergy)) return false
 
-        val drops = NonNullList.create<ItemStack>()
-        if (upgradeInventoryComponent.upgradeCountInInventory<KuarrySilkTouchUpgrade>() < 1) {
-            // Get the fortune level, depending on the upgrades.
-            // The levels are mapped to metadata + 1 and invalid number
-            // is treated as level 1
-            val fortune =
-                    upgradeInventoryComponent.upgradeInInventory(KuarryLuckUpgrade::class)?.let {
-                        when (it.metadata) {
-                            0 -> 1
-                            1 -> 2
-                            2 -> 3
-                            else -> 1
-                        }
-                    } ?: 0
+        if (!isFluid) {
+            // Handle normal blocks
 
-            // If there's no silk touch upgrade, process the block as if it was mined
-            block.getDrops(drops, world, pos, blockState, fortune)
+            val drops = NonNullList.create<ItemStack>()
+            if (upgradeInventoryComponent.upgradeCountInInventory<KuarrySilkTouchUpgrade>() < 1) {
+                // Get the fortune level, depending on the upgrades.
+                // The levels are mapped to metadata + 1 and invalid number
+                // is treated as level 1
+                val fortune =
+                        upgradeInventoryComponent.upgradeInInventory(KuarryLuckUpgrade::class)?.let {
+                            when (it.metadata) {
+                                0 -> 1
+                                1 -> 2
+                                2 -> 3
+                                else -> 1
+                            }
+                        } ?: 0
 
-            // Only collect XP without silk touch and with an XP collection upgrade
-            if (xpCollectorComponent.enabled && upgradeInventoryComponent.upgradeCountInInventory<KuarryXPCollectionUpgrade>() > 0) {
-                xpCollectorComponent.xpFromBlock(
-                        block, blockState,
-                        world, blockPos,
-                        fortune
-                )?.let(fluidInventoryComponent::putFluid)
+                // If there's no silk touch upgrade, process the block as if it was mined
+                block.getDrops(drops, world, pos, blockState, fortune)
+
+                // Only collect XP without silk touch and with an XP collection upgrade
+                if (xpCollectorComponent.enabled && upgradeInventoryComponent.upgradeCountInInventory<KuarryXPCollectionUpgrade>() > 0) {
+                    xpCollectorComponent.xpFromBlock(
+                            block, blockState,
+                            world, blockPos,
+                            fortune
+                    )?.let(fluidInventoryComponent::putFluid)
+                }
+            } else {
+                // If there is silk touch, collect it as if with silk touch
+                drops.add(SilkTouchHarvest.getSilkTouchDrop(block, blockState))
             }
-        } else {
-            // If there is silk touch, collect it as if with silk touch
-            drops.add(SilkTouchHarvest.getSilkTouchDrop(block, blockState))
-        }
 
-        // Some blocks don't drop anything, so check if there are any drops at all
-        if (drops.isNotEmpty()) {
-            var allPut = false
-            slotLoop@ for (i in 0 until inventoryHeight) {
-                // The width counter, reset every step.
-                // Not advanced UNLESS the item cannot be put into the slot.
-                // This ensures that if there are multiple ItemStacks that can be put into the
-                // same slot, they will be.
-                var j = 0
-                while (j < inventoryWidth) {
-                    val positionInInventory = (j * inventoryHeight) + i
+            // Some blocks don't drop anything, so check if there are any drops at all
+            if (drops.isNotEmpty()) {
+                var allPut = false
+                slotLoop@ for (i in 0 until inventoryHeight) {
+                    // The width counter, reset every step.
+                    // Not advanced UNLESS the item cannot be put into the slot.
+                    // This ensures that if there are multiple ItemStacks that can be put into the
+                    // same slot, they will be.
+                    var j = 0
+                    while (j < inventoryWidth) {
+                        val positionInInventory = (j * inventoryHeight) + i
 
-                    if (inventory.insertItem(positionInInventory, drops.first(), false) == ItemStack.EMPTY) {
-                        // If the item has successfully been put into the inventory, remove it from the drops list
-                        drops.removeAt(0)
+                        if (inventory.insertItem(positionInInventory, drops.first(), false) == ItemStack.EMPTY) {
+                            // If the item has successfully been put into the inventory, remove it from the drops list
+                            drops.removeAt(0)
 
-                        // Exit when there are no more items
-                        if (drops.isEmpty()) {
-                            allPut = true
-                            break@slotLoop
+                            // Exit when there are no more items
+                            if (drops.isEmpty()) {
+                                allPut = true
+                                break@slotLoop
+                            }
+                        } else {
+                            // The item could not have been put, advance the width slot
+                            j++
                         }
-                    } else {
-                        // The item could not have been put, advance the width slot
-                        j++
+                    }
+                }
+                if (!allPut) {
+                    for (remainingDrop in drops) {
+                        // If there is no space inside the kuarry, spawn all dropped items
+                        // as entities in the world on top of the kuarry block
+                        world.spawnEntity(
+                                EntityItem(world, pos.x.toDouble(), (pos.y + 1).toDouble(), pos.z.toDouble(), remainingDrop)
+                        )
                     }
                 }
             }
-            if (!allPut) {
-                for (remainingDrop in drops) {
-                    // If there is no space inside the kuarry, spawn all dropped items
-                    // as entities in the world on top of the kuarry block
-                    world.spawnEntity(
-                            EntityItem(world, pos.x.toDouble(), (pos.y + 1).toDouble(), pos.z.toDouble(), remainingDrop)
-                    )
-                }
-            }
-        }
 
-        // TODO: something smart here
-        world.setBlockState(blockPos, KuarryModBlocks.denatured_stone.defaultState)
+            // TODO: something smart here
+            world.setBlockState(blockPos, KuarryModBlocks.denatured_stone.defaultState)
+        } else {
+            // Handle fluids
+
+            val fluidHandler = FluidUtil.getFluidHandler(world, blockPos, null)
+            fluidHandler?.drain(FluidInventoryComponent.maxAmount, true)
+                    ?.let(fluidInventoryComponent::putFluid)
+                    ?.let { rest ->
+                        fluidHandler.fill(rest, true)
+                    }
+        }
 
         approxResourcesLeft.dec().let {
             when {

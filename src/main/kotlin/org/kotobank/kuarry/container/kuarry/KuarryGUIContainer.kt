@@ -13,6 +13,8 @@ import org.kotobank.kuarry.packet.SwitchKuarrySetting
 import org.kotobank.kuarry.tile_entity.KuarryTileEntity.ActivationMode
 import org.kotobank.kuarry.container.BaseGUIContainer
 import org.kotobank.kuarry.integration.autopushing.Autopusher
+import org.kotobank.kuarry.item.KuarryFluidCollectionUpgrade
+import org.kotobank.kuarry.item.KuarryXPCollectionUpgrade
 import org.kotobank.kuarry.item.LevelValues
 
 
@@ -191,7 +193,13 @@ class KuarryGUIContainer(override val container: KuarryContainer, val player: En
     }
 
     private inner class FluidInventoryButton(x: Int, y: Int) : Button(x, y) {
-        // override val enabled: Boolean = Autopusher.isEnabled
+        override val enabled: Boolean
+            get() {
+                val upgradeInv = container.tileEntity.upgradeInventoryComponent
+                // Only show the fluid inventory button when the upgrades that need it are installed
+                return upgradeInv.upgradeCountInInventory<KuarryFluidCollectionUpgrade>() > 0 ||
+                        upgradeInv.upgradeCountInInventory<KuarryXPCollectionUpgrade>() > 0
+            }
 
         override val iconAndTooltipKey=
                 Pair(KuarryModIcons.fluidInventory, "tile.kuarry.gui.fluid_inventory")

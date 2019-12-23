@@ -154,3 +154,8 @@ class KuarryXPCollectionUpgrade : KuarryUpgrade() {
 
     override val incompatibleWith: Array<KClass<out KuarryUpgrade>> = arrayOf(KuarrySilkTouchUpgrade::class)
 }
+
+class KuarryFluidCollectionUpgrade : KuarryUpgrade() {
+    // Multiply by a low value because many blocks don't even give XP
+    override val energyUsageMultiplier: Float = 1.05f
+}

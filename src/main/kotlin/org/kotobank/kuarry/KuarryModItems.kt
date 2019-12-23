@@ -23,7 +23,8 @@ object KuarryModItems {
                 Pair("silk_touch_upgrade", KuarrySilkTouchUpgrade()),
                 Pair("custom_filter", KuarryCustomFilter()),
                 Pair("speed_upgrade", KuarrySpeedUpgrade()),
-                Pair("xp_collection_upgrade", KuarryXPCollectionUpgrade())
+                Pair("xp_collection_upgrade", KuarryXPCollectionUpgrade()),
+                Pair("fluid_collection_upgrade", KuarryFluidCollectionUpgrade())
         )
     }
 

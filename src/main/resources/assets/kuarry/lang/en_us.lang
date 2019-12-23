@@ -63,6 +63,9 @@ item.xp_collection_upgrade.name=Kuarry XP collection upgrade
 item.xp_collection_upgrade.description=Allows the kuarry to collect XP from some of the mined blocks
 item.xp_collection_upgrade.description.incompat=Incompatible with the silk touch upgrade
 
+item.fluid_collection_upgrade.name=Kuarry fluid collection upgrade
+item.fluid_collection_upgrade.description=Allows the kuarry to collect fluids in addition to blocks
+
 tooltips.about_level_upgrade=Allows the kuarry to hold up to %sRF of energy and up to %s upgrades. Can only be \
 applied to the previous level of the kuarry.
 tooltips.level_uprgade_wrong_level=This upgrade can only be applied to a kuarry of level %s, but this kuarry is of level %s
