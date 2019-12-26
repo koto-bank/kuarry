@@ -1,6 +1,8 @@
 #PARSE_ESCAPES
 
 tile.kuarry.name=Kuarry
+tile.kuarry.level_2.name=Kuarry (Hardened)
+tile.kuarry.level_3.name=Kuarry (Reinforced)
 tile.kuarry.tooltips.description=It draws resources from deep bowels of the earth, leaving a frothy stone-like sponge behind. \
 Who knows, what will crawl out tomorrow, awoken by haughty intruders from above?
 tile.kuarry.tooltips.energy_stored=%sEnergy stored
@@ -14,6 +16,8 @@ tile.kuarry.gui.dont_render_bounds=Don't show mining area boundaries
 tile.kuarry.gui.autopush=Automatically push items into pipes
 tile.kuarry.gui.dont_autopush=Don't automatically push items into pipes
 tile.kuarry.gui.approx_left=Approx. left
+tile.kuarry.gui.fluid_inventory=Open the liquid store
+tile.kuarry.gui.back=Back
 
 tile.denatured_stone.name=Denatured stone
 tile.denatured_stone.description=Denatured stone is proven to be a very useful material\: it may be a cheap papier mache, \
@@ -30,7 +34,7 @@ item.z_boundaries_upgrade.description=Enables the kuarry to mine one more chunk 
 
 item.silk_touch_upgrade.name=Kuarry Silk Touch upgrade
 item.silk_touch_upgrade.description=Makes the kuarry retrieve the blocks as they are, instead of mining them
-item.silk_touch_upgrade.description.incompat=Incompatible with the luck upgrade
+item.silk_touch_upgrade.description.incompat=Incompatible with the luck upgrade and the XP collection upgrade
 
 item.luck_upgrade_0.name=Kuarry Luck upgade I
 item.luck_upgrade_1.name=Kuarry Luck upgrade II
@@ -51,6 +55,24 @@ item.custom_filter.gui.default_blacklist=Default blacklist
 
 item.speed_upgrade.name=Kuarry Speed upgrade
 item.speed_upgrade.description=§c§lThe red colour makes all faster
+
+
+item.level_2_upgrade.name=Kuarry hardened upgrade
+item.level_3_upgrade.name=Kuarry reinforced upgrade
+
+item.xp_collection_upgrade.name=Kuarry XP collection upgrade
+item.xp_collection_upgrade.description=Enables the kuarry to collect XP from certain blocks
+item.xp_collection_upgrade.description.incompat=Incompatible with the Silk Touch upgrade
+
+item.fluid_collection_upgrade.name=Kuarry liquid collection upgrade
+item.fluid_collection_upgrade.description=Allows the kuarry to collect liquids withal blocks
+
+tooltips.about_level_upgrade=Allows the kuarry to hold up to %sRF of energy and up to %s upgrades. Can only be \
+applied to the previous level of the kuarry
+tooltips.level_uprgade_wrong_level=This upgrade can be applied merely to a kuarry of level %s, although the present kuarry is of level %s
+
+
+
 
 tooltips.about_energy_multiplication=Multiplies energy usage by %s
 
