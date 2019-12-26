@@ -1,12 +1,14 @@
 #PARSE_ESCAPES
 
 tile.kuarry.name=Kantera
+tile.kuarry.level_2.name=Kantera (Endurecida)
+tile.kuarry.level_3.name=Kantera (Reforzada)
 tile.kuarry.tooltips.description=Extrae recursos de las entrañas de la tierra dejando solamente una cáscara vacía de piedra en lugar de materia. \
 Quién sabe, ¿qué se arrastrará mañana, despertado por los intrusos arrogantes desde arriba?
 tile.kuarry.tooltips.energy_stored=%sEnergía acumulada
 tile.kuarry.tooltips.items_stored=%sArtículos acumulados
-tile.kuarry.gui.always_enabled=Siempre activado
-tile.kuarry.gui.always_disabled=Siempre desactivado
+tile.kuarry.gui.always_enabled=Siempre activada
+tile.kuarry.gui.always_disabled=Siempre desactivada
 tile.kuarry.gui.enable_with_rs=Activar por la señal de redstone
 tile.kuarry.gui.disable_with_rs=Desactivar por la señal de redstone
 tile.kuarry.gui.render_bounds=Mostrar límites de la zona minera
@@ -14,6 +16,8 @@ tile.kuarry.gui.dont_render_bounds=No mostrar límites de la zona minera
 tile.kuarry.gui.autopush=Empujar los artículos a tubos automáticamente
 tile.kuarry.gui.dont_autopush=No empujar los artículos a tubos automáticamente
 tile.kuarry.gui.approx_left=Aprox. queda
+tile.kuarry.gui.fluid_inventory=Abrir el almacén de líquidos
+tile.kuarry.gui.back=Atrás
 
 tile.denatured_stone.name=Piedra desnaturalizada
 tile.denatured_stone.description=Piedra desnaturalizada se demuestra que es un material muy útil\: puede ser un cartón piedra barato, \
@@ -28,15 +32,15 @@ item.x_boundaries_upgrade.description=Mejora la kantera para que extraiga un chu
 item.z_boundaries_upgrade.name=Mejora de ampliación de límites en el eje Z
 item.z_boundaries_upgrade.description=Mejora la kantera para que extraiga un chunk más a lo largo del eje Z
 
-item.silk_touch_upgrade.name=Mejora "Silk Touch"
+item.silk_touch_upgrade.name=Mejora "Toque de seda"
 item.silk_touch_upgrade.description=Permite a la kantera obtener bloques como están en vez de extraerlos.
-item.silk_touch_upgrade.description.incompat=Incompatible con la mejora de Suerte
+item.silk_touch_upgrade.description.incompat=Incompatible con la mejora de Suerte i la de XP
 
 item.luck_upgrade_0.name=Mejora de Suerte I
 item.luck_upgrade_1.name=Mejora de Suerte II
 item.luck_upgrade_2.name=Mejora de Suerte III
 item.luck_upgrade.description = Permite a la kantera extraer más recursos de from de ciertas menas
-item.luck_upgrade.description.incompat=Incompatible con la mejora "Silk Touch"
+item.luck_upgrade.description.incompat=Incompatible con la mejora "Toque de seda"
 item.luck_upgrade.description.about_energy_multiplication=Multiplica el uso de energía por %s por nivel
 
 item.custom_filter.name=Filtro de kantera a medida
@@ -51,6 +55,23 @@ item.custom_filter.gui.default_blacklist=Lista negra por defecto
 
 item.speed_upgrade.name=Mejora de Velocidad
 item.speed_upgrade.description=§c§lEl rojo lo hace todo más rápido
+
+item.level_2_upgrade.name=Mejora a la kantera endurecida
+item.level_3_upgrade.name=Mejora a la kantera reforzada 
+
+item.xp_collection_upgrade.name=Mejora de extracción de XP
+item.xp_collection_upgrade.description=Permite a la kantera extraer XP de ciertos bloques
+item.xp_collection_upgrade.description.incompat=Incompatible con la mejora de Suerte 
+
+item.fluid_collection_upgrade.name=Mejora de recogida de líquidos
+item.fluid_collection_upgrade.description=Permite a la kantera recoger líquidos además de bloques
+
+tooltips.about_level_upgrade=Permite a la kantera contener un máximo de %sRF de energía y lo de %s mejoras. Solo se puede \
+aplicar al nivel anterior de la kantera
+tooltips.level_uprgade_wrong_level=Esta mejora solamente se puede aplicar a una kantera del nivel %s, pero esta es del nivel %s
+
+
+
 
 tooltips.about_energy_multiplication=Multiplica el uso de energía por %s
 

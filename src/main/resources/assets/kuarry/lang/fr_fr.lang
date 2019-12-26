@@ -1,6 +1,8 @@
 #PARSE_ESCAPES
 
 tile.kuarry.name=Karrière
+tile.kuarry.level_2.name=Karrièrre (Endurcie)
+tile.kuarry.level_3.name=Karrièrre (Renforcée)
 tile.kuarry.tooltips.description=Il puise ses ressources dans les entrailles profondes de la terre, laissant derrière lui une éponge semblable à de la pierre mousseuse. \
 Qui sait, qu'est-ce qui sortira demain, réveillé par des intrus hautains d'en haut ?
 tile.kuarry.tooltips.energy_stored=%sEnergie stockée
@@ -14,6 +16,8 @@ tile.kuarry.gui.dont_render_bounds= Ne pas afficher les limites de la zone mini�
 tile.kuarry.gui.autopush=Pousser automatiquement les objets dans les tuyaux
 tile.kuarry.gui.dont_autopush=Ne pas pousser automatiquement les éléments dans les tuyaux
 tile.kuarry.gui.approx_left=Reste environ
+tile.kuarry.gui.fluid_inventory=Ouvrir le stockage de liquides
+tile.kuarry.gui.back=Arrière
 
 tile.denatured_stone.name=Pierre dénaturée
 tile.denatured_stone.description=La pierre dénaturée s'est avérée être un matériau très utile \: elle peut servir de matériau bon marché, \
@@ -28,15 +32,15 @@ item.x_boundaries_upgrade.description=Permet à la karrière d'extraire un bloc 
 item.z_boundaries_upgrade.name=Augmentation des limites de l'axe Z
 item.z_boundaries_upgrade.description=Permet à la karrière d'extraire un bloc de plus le long de l'axe Z
 
-item.silk_touch_upgrade.name=Amélioration Toucher de soie
+item.silk_touch_upgrade.name=Amélioration "Toucher de soie"
 item.silk_touch_upgrade.description=Permet à la karrière de récupérer les blocs tels quels, au lieu de les miner
-item.silk_touch_upgrade.description.incompat=Incompatible avec l'amélioration Chance
+item.silk_touch_upgrade.description.incompat=Incompatible avec l'amélioration Chance et l'amélioration de XP
 
 item.luck_upgrade_0.name=Amélioration Chance I
 item.luck_upgrade_1.name=Amélioration Chance II
 item.luck_upgrade_2.name=Amélioration Chance III
 item.luck_upgrade.description=Permet à la karrière d'extraire plus de ressources de certains minerais
-item.luck_upgrade.description.incompat=Incompatible avec l'amélioration Toucher de soie
+item.luck_upgrade.description.incompat=Incompatible avec l'amélioration "Toucher de soie"
 item.luck_upgrade.description.about_energy_multiplication=Multiplie la consommation d'énergie par %s par niveau
 
 item.custom_filter.name=Filtre personnalisé de la karrière
@@ -51,6 +55,20 @@ item.custom_filter.gui.default_blacklist=Liste noire par défaut
 
 item.speed_upgrade.name=Amélioration Rapidité
 item.speed_upgrade.description=§c§lLe rouge rend tout plus rapide
+
+item.level_2_upgrade.name=Amélioration a la karrière endurcie
+item.level_3_upgrade.name=Amélioration a la karrière renforcée
+
+item.xp_collection_upgrade.name=Amélioration d'extraction de XP
+item.xp_collection_upgrade.description=Permet a la karrière de extraire de XP sur certains blocs
+item.xp_collection_upgrade.description.incompat=Incompatible avec l'amélioration Toucher de soie
+
+item.fluid_collection_upgrade.name=Amélioration de collection de fluides
+item.fluid_collection_upgrade.description=Permet a la karrière de collecter des fluides en plus des blocs
+
+tooltips.about_level_upgrade=Permet a la karrière de contenir jusqu'à %s d'énergie et jusqu'a %s améliorationes. Ne peut être \
+appliquée que si au niveau précédent de la karriére
+tooltips.level_uprgade_wrong_level= Cette amèlioration ne peut être appliquée qu'à ua karrière de niveau %s, mais ce kuarry est de niveau %s
 
 tooltips.about_energy_multiplication=Multiplie la consommation d'énergie par %s
 
