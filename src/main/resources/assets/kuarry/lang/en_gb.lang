@@ -39,7 +39,7 @@ item.silk_touch_upgrade.description.incompat=Incompatible with the luck upgrade 
 item.luck_upgrade_0.name=Kuarry Luck upgade I
 item.luck_upgrade_1.name=Kuarry Luck upgrade II
 item.luck_upgrade_2.name=Kuarry Luck upgrade III
-item.luck_upgrade.description = Makes the kuarry mine more resources from some ores
+item.luck_upgrade.description=Makes the kuarry mine more resources from some ores
 item.luck_upgrade.description.incompat=Incompatible with the Silk Touch upgrade
 item.luck_upgrade.description.about_energy_multiplication=Multiplies energy usage by %s per level
 

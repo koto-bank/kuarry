@@ -40,7 +40,7 @@ item.silk_touch_upgrade.description.incompat=Несовместимо с улу�
 item.luck_upgrade_0.name=Улучшение "Удача" I
 item.luck_upgrade_1.name=Улучшение "Удача" II
 item.luck_upgrade_2.name=Улучшение "Удача" III
-item.luck_upgrade.description = Позволяет получать больше ресурсов из некоторых руд
+item.luck_upgrade.description=Позволяет получать больше ресурсов из некоторых руд
 item.luck_upgrade.description.incompat=Несовместимо с улучшенем "Шёлковое касание"
 item.luck_upgrade.description.about_energy_multiplication=Увеличивает потрябляемую энергию в %s раза за каждый уровень
 

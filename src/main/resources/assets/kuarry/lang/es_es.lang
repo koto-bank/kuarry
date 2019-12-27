@@ -39,7 +39,7 @@ item.silk_touch_upgrade.description.incompat=Incompatible con la mejora de Suert
 item.luck_upgrade_0.name=Mejora de Suerte I
 item.luck_upgrade_1.name=Mejora de Suerte II
 item.luck_upgrade_2.name=Mejora de Suerte III
-item.luck_upgrade.description = Permite a la kantera extraer más recursos de from de ciertas menas
+item.luck_upgrade.description=Permite a la kantera extraer más recursos de from de ciertas menas
 item.luck_upgrade.description.incompat=Incompatible con la mejora "Toque de seda"
 item.luck_upgrade.description.about_energy_multiplication=Multiplica el uso de energía por %s por nivel
 
