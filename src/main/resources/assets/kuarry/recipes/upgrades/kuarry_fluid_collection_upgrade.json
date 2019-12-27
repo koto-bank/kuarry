@@ -1,0 +1,28 @@
+{
+  "_comment": "A recipe for crafting the fluid collection upgrade",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "gbg",
+    "crc",
+    "gbg"
+  ],
+  "key": {
+    "c": {
+      "item": "kuarry:kuarry_casing"
+    },
+    "b": {
+      "item": "minecraft:bucket",
+      "data":  0
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "g": {
+      "item": "minecraft:glass"
+    }
+  },
+  "result": {
+    "item": "kuarry:fluid_collection_upgrade",
+    "count": 1
+  }
+}
